@@ -3618,11 +3618,11 @@ function dfAllyHit(p){for(const a of (DG.al||[])){if(!a.dead&&!a.nh&&Math.hypot(
 
 /* ===== Nâng cấp toàn đội (màn mới) ===== */
 const FU_MAX=5;
-function fuS(){S.fu=S.fu||{};['sl','hp','dm','hq','sp'].forEach(k=>{if(!S.fu[k])S.fu[k]=1});return S.fu}
-function fuN(){return 2+Math.floor((fuS().sl-1)/20)}
+function fuS(){S.fu=S.fu||{};['sl','hp','dm','hq','sp'].forEach(k=>{if(!S.fu[k])S.fu[k]=1});if(!S.fu.slv2){S.fu.slv2=1;S.fu.sl=Math.min(5,1+Math.floor((S.fu.sl-1)/20))}else if(S.fu.sl>5)S.fu.sl=5;return S.fu}
+function fuN(){return 1+Math.min(5,fuS().sl)}
 function fuIdx(){return Array.from({length:fuN()},(_,i)=>i)}
 const FUI=[
- {k:'sl',n:'Số lượng tàu phụ',max:100,short:l=>`+1 slot tàu phụ / 20 cấp`,desc:'Cứ 20 cấp mở thêm 1 slot tàu phụ (tối đa 6 tàu phụ). Mỗi cấp còn tăng 2% máu và sát thương của tàu phụ.',cur:l=>`${2+Math.floor((l-1)/20)} tàu phụ · +${2*(l-1)}% sức mạnh`,cost:l=>({d:1000*l,s:30+2*(l-1)})},
+ {k:'sl',n:'Số lượng tàu phụ',max:5,short:l=>`+1 slot tàu phụ / cấp`,desc:'Mỗi cấp mở thêm 1 slot tàu phụ (tối đa 6 tàu phụ).',cur:l=>`${1+l} tàu phụ`,cost:l=>({d:1000*l,s:30+2*(l-1)})},
  {k:'hp',n:'Máu tàu chiến',max:100,short:l=>'+10 Máu / cấp',sub:'Chỉ áp dụng cho tàu chiến',desc:'Tăng máu tối đa của tàu chiến do bạn điều khiển. Không áp dụng cho tàu phụ.',cur:l=>`+${10*(l-1)} Máu`,cost:l=>({d:100+40*l,s:0})},
  {k:'dm',n:'Sát thương toàn đội',max:100,short:l=>'+3 Sát thương / cấp',desc:'Cộng thêm sát thương mỗi phát bắn của tàu chiến và toàn bộ tàu phụ.',cur:l=>`+${3*(l-1)} sát thương`,cost:l=>({d:150+50*l,s:0})},
  {k:'hq',n:'Máu trụ sở',max:100,short:l=>'+25 Máu / lần nâng cấp',desc:'Tăng máu tối đa của trụ sở trong mọi trận Level.',cur:l=>`+${25*(l-1)} Máu trụ sở`,cost:l=>({d:120+45*l,s:0})},
@@ -3665,7 +3665,7 @@ $('fudet').onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;const F
   S.da-=c.d;S.sao-=c.s;F[it.k]++;save();refresh();fuRender();toast('Đã nâng cấp '+it.n+' lên cấp '+F[it.k])};
 /* áp dụng vào trận */
 {const _M=dfMakeShip;dfMakeShip=function(sh,team,wm,fit,x,y,o){const r=_M.apply(this,arguments);
-  if(team==='p'&&o&&o.lvl){const F=fuS();r.ws.forEach(w=>{w.dmg+=3*(F.dm-1)/(o.dmgDiv||20)});if(o.inf){const q=1+.02*(F.sl-1);r.hp*=q;r.max=r.hp;r.dm*=q}const m=1+.001*(F.sp-1);r.sp*=m;if(r.sp0)r.sp0*=m;if(r.spT)Object.keys(r.spT).forEach(k=>r.spT[k]*=m);
+  if(team==='p'&&o&&o.lvl){const F=fuS();r.ws.forEach(w=>{w.dmg+=3*(F.dm-1)/(o.dmgDiv||20)});const m=1+.001*(F.sp-1);r.sp*=m;if(r.sp0)r.sp0*=m;if(r.spT)Object.keys(r.spT).forEach(k=>r.spT[k]*=m);
     if(!o.inf){r.hp+=10*(F.hp-1);r.max=r.hp}}
   return r}}
 {const _S=dfStart;dfStart=function(){_S.apply(this,arguments);if(DG&&DG.hq&&!DG.fud){DG.fud=1;const b=fuHqBonus()/DFB;DG.hq.hp+=b;DG.hq.max+=b}};$('dfgo').onclick=dfStart}
@@ -8697,7 +8697,7 @@ const T={
  ['Gói chiến binh',199000,499000,['gem','wp','arm'],{g:{da:500000},up:[['wp',1,10],['arm',1,10]]}],
  ['Gói chỉ huy',249000,599000,['gem','cap','st'],{g:{da:300000,sao:800},capName:['Lê Nguyệt Hà']}],
  ['Gói mở khóa tàu',77000,215000,['ship'],{ship:1}],
- ['Gói hạm đội',299000,699000,['ship','dr','st'],{g:{sao:600},up:[['ship',2,10],['dr',1,10]],fu:[['sl',10]]}],
+ ['Gói hạm đội',299000,699000,['ship','dr','st'],{g:{sao:600},up:[['ship',2,10],['dr',1,10]]}],
  ['Gói công nghệ',229000,549000,['mod','mod','gem'],{g:{da:400000,m1:60,m2:30},up:[['mod',3,5]]}],
  ['Gói hỏa lực',329000,799000,['wph','wpe','gem'],{g:{da:600000},up:[['wph',1,15],['wpe',1,15]]}],
  ['Gói phòng thủ',279000,659000,['arm','arm','gem'],{g:{da:500000,m2:40},up:[['arm',2,10]],fu:[['hq',10]]}],
@@ -8708,8 +8708,8 @@ const T={
  ['Máu tàu chiến +10',59000,129000,['ship'],{fu:[['hp',10]]}],
  ['Máu trụ sở +10',59000,129000,['arm'],{fu:[['hq',10]]}],
  ['Tốc chạy toàn đội +10',69000,149000,['mod'],{fu:[['sp',10]]}],
- ['Số lượng tàu phụ +20',129000,299000,['dr','ship'],{fu:[['sl',20]]}],
- ['Nâng cấp toàn đội +10',249000,599000,['wp','arm','ship'],{fu:[['dm',10],['hp',10],['hq',10],['sp',10],['sl',10]]}],
+ ['Số lượng tàu phụ +1',129000,299000,['dr','ship'],{fu:[['sl',1]]}],
+ ['Nâng cấp toàn đội +10',249000,599000,['wp','arm','ship'],{fu:[['dm',10],['hp',10],['hq',10],['sp',10]]}],
  ['Nâng cấp tàu',119000,269000,['ship','ship'],{up:[['ship',2,10]]}],
  ['Nâng cấp tàu lớn',219000,499000,['ship','ship','ship'],{up:[['ship',1,30]]}],
  ['Nâng cấp thuyền trưởng',129000,299000,['cap'],{capLv:[1,25]}],
@@ -8736,7 +8736,7 @@ const lines=s=>{const L=[];
   if(s.lvup){const q=wpGet(s.lvup[0]),l=lvOf(q.id);L.push('Đã sở hữu: cấp '+l+'/'+GMAX);L.push(l>=GMAX?'Đã đạt cấp tối đa':'Nâng lên cấp '+Math.min(GMAX,l+s.lvup[1]))}
   if(s.ship)L.push('Mở khóa 1 tàu kế tiếp');
   (s.up||[]).forEach(u=>L.push(PN[u[0]]+' x '+u[1]+': +'+u[2]+' cấp'));
-  (s.fu||[]).forEach(f=>L.push(FN[f[0]]+' +'+f[1]+' cấp'));
+  (s.fu||[]).forEach(f=>L.push(FN[f[0]]+' +'+f[1]+(f[0]==='sl'?' slot':' cấp')));
   return L};
 const pick=(a,n)=>{a=a.slice();const r=[];while(a.length&&r.length<n){r.push(a.splice((Math.random()*a.length)|0,1)[0])}return r};
 function give(s){const t=[];
@@ -8759,12 +8759,13 @@ function give(s){const t=[];
     if(n){S.unl=S.unl||{};S.unl[n.id]=true;t.push('mở khóa tàu '+n.n)}else{S.sao+=300;t.push('+300 Sao (đã mở mọi tàu)')}}
   (s.up||[]).forEach(u=>{S.alv=S.alv||{};const L=POOL[u[0]]().filter(x=>lvOf(x.id)<GMAX);
     pick(L,u[1]).forEach(x=>{setLv(x.id,Math.min(GMAX,lvOf(x.id)+u[2]));t.push(x.n+' +'+u[2]+' cấp')})});
-  (s.fu||[]).forEach(f=>{const F=fuS();F[f[0]]=Math.min(100,F[f[0]]+f[1]);t.push(FN[f[0]]+' +'+f[1]+' cấp')});
+  (s.fu||[]).forEach(f=>{const F=fuS(),mx=(FUI.find(x=>x.k===f[0])||{max:100}).max;F[f[0]]=Math.min(mx,F[f[0]]+f[1]);t.push(FN[f[0]]+' +'+f[1]+(f[0]==='sl'?' slot':' cấp'))});
   return t}
 function canBuy(s){
   if(s.capLv&&!S.caps.some(n=>clv(n)<100))return 'Bạn chưa có thuyền trưởng nào để nâng cấp';
   if(s.own&&shopOwn(s.own))return 'Bạn đã sở hữu vật phẩm này';
   if(s.lvup&&lvOf(s.lvup[0])>=GMAX)return 'Vật phẩm đã đạt cấp tối đa';
+  if(s.fu&&s.fu.length===1&&s.fu[0][0]==='sl'&&fuS().sl>=5)return 'Đã đủ 6 tàu phụ (tối đa)';
   for(const u of s.up||[])if(!POOL[u[0]]().some(x=>lvOf(x.id)<GMAX))return 'Bạn chưa sở hữu món nào để nâng cấp trong gói này (hãy mua vật phẩm ở tab Vũ khí / Drone / Khiên / Modul)';
   return ''}
 function pay(name,price,done){
@@ -8778,11 +8779,14 @@ function show(tab){
   if(tab==='Khuyến mãi'){grid.innerHTML=orig;grid.classList.remove('pk2');grid.querySelectorAll('.pb').forEach(b=>b.onclick=()=>toast('Thanh toán chưa mở trong bản thử'));return}
   const L0=typeof T[tab]==='function'?T[tab]():T[tab];const L=Array.isArray(L0)?L0.filter(x=>!(x&&x[4]&&(x[4].cap||x[4].capName||x[4].capN!=null))):L0;grid.classList.add('pk2');
   grid.innerHTML=L.map((p,i)=>`<div class="pc"><h4>${p[0]}</h4><div class="pa">${p[3].map((k,j)=>{const u=imgOf(k,i+j);return u?`<img src="${u}" alt="" style="max-width:${Math.floor(94/p[3].length)}%${k==='gem'||k==='st'||k==='m1'||k==='m2'?';mix-blend-mode:screen':''}">`:''}).join('')}</div><ul>${lines(p[4]).map(x=>`<li>${x}</li>`).join('')}</ul><s>${NF(p[2])} VNĐ</s><button class="pb" data-i="${i}">${NF(p[1])} VNĐ</button></div>`).join('');
+  grid.querySelectorAll('.pc').forEach((c,i)=>{const pp=L[i],k0=pp&&pp[3]&&pp[3][0];if(typeof k0!=='string'||k0.slice(0,2)!=='i:')return;const wid=k0.slice(2);if(!WP.some(x=>x.id===wid))return;
+    c.classList.add('wpvc');c.title='Bấm để xem mô phỏng khai hỏa';const vb=document.createElement('button');vb.className='wpvb';vb.type='button';vb.title='Xem mô phỏng khai hỏa';vb.textContent='▶';c.appendChild(vb);
+    c.onclick=e=>{if(e.target.closest('.pb'))return;if(window.WPV)WPV.open(wid)}});
   grid.querySelectorAll('.pb').forEach(b=>b.onclick=()=>{const p=L[+b.dataset.i],why=canBuy(p[4]);if(why){toast(why);return}
     pay(p[0],p[1],()=>{const t=give(p[4]);save();refresh();toast('Đã mua '+p[0]+(t.length?' · '+t.join(', '):''));show(tab)})})}
 root.querySelectorAll('.pt[data-t]').forEach(b=>{if(b.dataset.t==='Khuyến mãi'||T[b.dataset.t])b.onclick=()=>show(b.dataset.t)});
 const st=document.createElement('style');
-st.textContent='#psh .pgrid.pk2{grid-template-rows:none;grid-auto-rows:minmax(0,1fr);overflow:auto}#psh .pk2 .pc h4{padding:0 4px;max-width:none;width:100%;box-sizing:border-box}#psh .pk2 .pa{gap:2px;align-items:center;min-height:30px}#psh .pk2 .pa img{max-height:100%;min-width:0;object-fit:contain}#psh .pk2 ul{line-height:1.25}#psh .pk2 li{white-space:normal;font-size:.9em;line-height:1.2}';
+st.textContent='#psh .pgrid.pk2{grid-template-rows:none;grid-auto-rows:minmax(0,1fr);overflow:auto}#psh .pk2 .pc h4{padding:0 4px;max-width:none;width:100%;box-sizing:border-box}#psh .pk2 .pa{gap:2px;align-items:center;min-height:30px}#psh .pk2 .pa img{max-height:100%;min-width:0;object-fit:contain}#psh .pk2 ul{line-height:1.25}#psh .pk2 li{white-space:normal;font-size:.9em;line-height:1.2}#psh .pc.wpvc{position:relative;cursor:pointer}#psh .pk2 .pc.wpvc h4{padding:0 28px}#psh .pc .wpvb{top:4px;right:4px;width:24px;height:24px;line-height:22px;font-size:12px}';
 document.head.appendChild(st);
 })();
 
@@ -8877,7 +8881,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL='';
-  const VER='v150';
+  const VER='v151';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`
