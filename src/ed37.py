@@ -25,6 +25,6 @@ rep1("function c5Near(G,x,y,R,n){const L=c5E(G)","function c5Near(G,x,y,R,n){R+=
 # giao diện đặt làn khói trong Trụ sở
 rep1("Mở theo chương: ${nc.map(b=>b.n).join(', ')}.`:'');\n}\nfunction bCnt(){","Mở theo chương: ${nc.map(b=>b.n).join(', ')}.`:'');\n  try{window.c17BaseUI&&window.c17BaseUI(s)}catch(e){console.error(e)}\n}\nfunction bCnt(){")
 rep1("$('brst').onclick=()=>{S.base.pos={};S.base.rot={};save();","$('brst').onclick=()=>{S.base.pos={};S.base.rot={};S.base.smk={};save();")
-rep1("VER='v153'","VER='v154'")
+rep1("VER='v153'","VER='v155'")
 open(p,'w',encoding='utf8').write(s)
 print('ok37')
