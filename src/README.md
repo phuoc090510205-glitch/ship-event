@@ -1,0 +1,9 @@
+# Mã nguồn các mô-đun công trình (v154)
+
+- `c15.js`: nhà drone tấn công, súng phun lửa, tia laser/nỏ thần...
+- `c16.js`: công trình bảo trì (drone sửa chữa, kho vật tư, ga-ra cứu hộ, trạm y tế) và khung mô phỏng xem trước.
+- `c17.js`: 20 công trình mới của v154 (bể na nô giáp trắng, trạm tái chế phế liệu, mô-đun hồi sinh, xưởng cơ khí trung tâm, triệu hồi tàu chiến, phát hiện tàng hình, tháp tín hiệu xanh, bản đồ chiến thuật, phòng thí nghiệm lõi năng lượng, đài thiên văn, trung tâm dữ liệu, tháp chỉ huy trung tâm, viện nghiên cứu cầu quang, vòm kính, bộ chỉ huy tối cao, dàn pin mặt trời, dãy ắc quy trụ, lò phản ứng plasma, tổ máy phát hơi nước, tụ điện cao thế) kèm giao diện đặt làn khói và mô phỏng xem trước.
+- `ed35.py`, `ed36.py`, `ed37.py`: script chèn các mô-đun trên vào file game một-file (`index.html`).
+- `warship.b64`: ảnh tàu chiến 2D dùng cho công trình Triệu hồi tàu chiến.
+
+File chạy game là `index.html` (kèm `imgs1.js`…`imgs10.js`).
