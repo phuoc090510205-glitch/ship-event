@@ -7,7 +7,7 @@ const N1=n=>String(Math.round(n*10)/10).replace('.',',');
 const PCT=(a,b)=>b?Math.round((a/b-1)*100):0;
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const css=document.createElement('style');
-css.textContent=`#toast{z-index:140}
+css.textContent=`#toast{z-index:140;pointer-events:none}
 .c23o{position:fixed;inset:0;z-index:96;background:#000c;display:flex;align-items:center;justify-content:center;padding:8px}
 .c23o>div{width:min(620px,96vw);max-height:96vh;overflow:auto;background:linear-gradient(#0b1840,#060f2e);border:1.5px solid #2b5ac9;border-radius:14px;padding:12px;color:#fff;box-shadow:0 0 30px #1b4fe066;font:14px system-ui,sans-serif}
 .c23o .wh{display:flex;gap:10px;align-items:center}.c23o .wh img{width:64px;height:64px;object-fit:contain;filter:drop-shadow(0 3px 6px #000)}
