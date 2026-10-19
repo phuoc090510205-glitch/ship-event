@@ -10179,8 +10179,8 @@ upd('ne5',(l,k)=>[['Phạm vi','8 ô'],['Thôi miên','3 giây · biến mục t
 upd('ne6',(l,k)=>[['Phạm vi','5 ô quanh tháp'],['Hiệu ứng','Sao chép kỹ năng thuyền trưởng vừa dùng'],['Hồi chiêu','60 giây']],'Trong 5 ô, khi thuyền trưởng dùng kỹ năng, pháo sao chép và dùng lại ngay sau đó (hồi chiêu 60 giây).');
 upd('ne7',(l,k)=>[['Giáp gương','Chắn '+nf(500*k)+' sát thương'],['Khi vào trận','Tự dựng tấm khiên cong đứng chéo ở mũi gương'],['Hồi chiêu','30 giây (sau khi vỡ)'],['Hướng','4 hướng chéo, chỉnh ở Trụ sở']],'Vào trận tự dựng tấm khiên cong đứng chéo theo mũi gương, chắn 500 sát thương; vỡ rồi hồi chiêu 30 giây. Xoay được 4 hướng chéo ở Trụ sở.');
 upd('ne8',(l,k)=>[['Phạm vi thu năng lượng','6 ô'],['Chu kỳ','12 giây'],['Đạn xanh','Nổ bán kính 4 ô vào mục tiêu gần nhất'],['Sát thương','90% sát thương tích lũy, chia đều']],'Tích lũy sát thương do mục tiêu trong 6 ô gây ra; sau 12 giây bắn viên đạn xanh nổ 4 ô vào mục tiêu gần nhất, gây 90% sát thương đã tích lũy (chia đều nếu có nhiều mục tiêu).');
-upd('ne9',(l,k)=>[['Ma trận giáp tím','Bao quanh toàn bộ Trụ sở'],['Chắn',nf(4000*k)+' sát thương'],['Hồi chiêu','50 giây (sau khi vỡ)']],'Dựng ma trận giáp tím bao quanh toàn bộ Trụ sở, chắn 4000 sát thương; vỡ rồi hồi chiêu 50 giây.');
-upd('ne10',(l,k)=>[['Điều kiện','Tích lũy 10.000 sát thương nhận vào và gây ra'],['Đạn','4 đạn tím (đường kính 3 ô) rơi từ trên trời'],['Sát thương mỗi đạn',nf(1500*k)],['Hồi chiêu','40 giây']],'Tích lũy sát thương nhận vào và gây ra từ mọi nguồn; đạt 10.000 thì phóng 4 đạn tím đường kính 3 ô rơi từ trên trời xuống bất kỳ mục tiêu nào không phải công trình, mỗi đạn 1500 sát thương lần lượt. Hồi chiêu 40 giây.');
+upd('ne9',(l,k)=>[['Ma trận giáp tím','Bao quanh toàn bộ căn cứ phe ta · 4 điểm ở 4 góc'],['Chắn',nf(4000*k)+' sát thương cho mọi công trình trong căn cứ (dùng chung)'],['Hồi chiêu','50 giây (sau khi vỡ)']],'Dựng ma trận giáp tím bao quanh toàn bộ căn cứ phe ta bằng 4 điểm laser ở 4 góc, chắn 4000 sát thương cho mọi công trình bên trong (dùng chung); vỡ rồi hồi chiêu 50 giây.');
+upd('ne10',(l,k)=>[['Điều kiện','Tích lũy 10.000 sát thương nhận vào và gây ra (không tính sát thương do chính Siêu pháo gây ra)'],['Đạn','4 đạn tím (đường kính 3 ô) rơi từ trên trời'],['Sát thương mỗi đạn',nf(1500*k)],['Hồi chiêu','40 giây']],'Tích lũy sát thương nhận vào và gây ra từ mọi nguồn (trừ sát thương do chính đạn tím của nó gây ra); đạt 10.000 thì phóng 4 đạn tím đường kính 3 ô rơi từ trên trời xuống bất kỳ mục tiêu nào không phải công trình, mỗi đạn 1500 sát thương lần lượt. Hồi chiêu 40 giây.');
 upd('tj1',(l,k)=>[['Phạm vi','7 ô'],['Mục tiêu trong vùng','Không thể dùng kỹ năng'],['Drone','Không thể chiến đấu, chỉ lơ lửng trong vùng']],'Trong 7 ô: cấm mục tiêu dùng kỹ năng và khiến drone không thể chiến đấu, chỉ có thể lơ lửng trong phạm vi.');
 upd('tj2',(l,k)=>[['Phạm vi','9 ô · tối đa 3 mục tiêu'],['Giam giữ','5 giây · choáng liên tục'],['Sát thương',nf(40*k)+' mỗi 0,2 giây'],['Hồi chiêu','40 giây']],'Ma trận lăng kính hình chữ nhật 3D nhốt tối đa 3 mục tiêu trong 9 ô trong 5 giây: choáng liên tục và 40 sát thương mỗi 0,2 giây. Hồi chiêu 40 giây.');
 upd('tj3',(l,k)=>[['Phạm vi xung','7 ô'],['Sát thương mỗi xung',nf(200*k)+' (chia đều cho mục tiêu trong vùng)'],['Tần suất','4 xung mỗi 4 giây'],['Choáng','10% · 0,75 giây']],'Phát xung EMP trong 7 ô: mỗi xung 200 sát thương chia đều cho mọi mục tiêu trong vùng, 4 xung mỗi 4 giây, 10% choáng 0,75 giây.');
@@ -10369,16 +10369,25 @@ function ne8(b,dt,G){const C=CFG.ne8,R=C.rng*(PB(G).rm||1);b.c19w=(b.c19w==null?
       L.forEach(e=>dfDmgS(e,p.tot/Math.max(1,L.length),false));G.fx.push({x:p.x,y:p.y,r,t:.45,max:.45,col:'#7fc4ff'});boomFx(G,p.x,p.y,r*.8);pop(G,p.x,p.y-1,'-'+nf(p.tot*20/Math.max(1,L.length))+' mỗi mục tiêu','#9fd0ff')},
     end:(G,p)=>{p.onHit(G,p,null)}});
   ping(G,b.x,b.y,2.4,'#7fc4ff',.5)}
-/* ---------- Lưới Laser Bốn Điểm: ma trận giáp tím quanh Trụ sở chắn 4000 sát thương ---------- */
+/* ---------- Lưới Laser Bốn Điểm: ma trận giáp tím bao quanh TOÀN BỘ căn cứ phe ta (4 điểm ở 4 góc), chắn 4000 sát thương dùng chung ---------- */
+const MPAD=1;
+function matBox(G,m){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9,n=0;
+  G.bl.forEach(o=>{if(o.hp<=0||o.t==='mine'||o.aux||o.u)return;n++;const w=(o.w||1)/2,h=(o.h||1)/2;x0=Math.min(x0,o.x-w);x1=Math.max(x1,o.x+w);y0=Math.min(y0,o.y-h);y1=Math.max(y1,o.y+h)});
+  const b=m.bb;if(n){if(b){x0=Math.min(x0,b.x0);y0=Math.min(y0,b.y0);x1=Math.max(x1,b.x1);y1=Math.max(y1,b.y1)}m.bb={x0,y0,x1,y1}}return m.bb||null}
+function matCorners(bb){return [[bb.x0-MPAD,bb.y0-MPAD],[bb.x1+MPAD,bb.y0-MPAD],[bb.x1+MPAD,bb.y1+MPAD],[bb.x0-MPAD,bb.y1+MPAD]]}
+function matPing(G,m,col,t){const bb=m.bb;if(!bb)return;matCorners(bb).forEach(p=>ping(G,p[0],p[1],1.1,col,t))}
 function ne9(b,dt,G){const C=CFG.ne9;let m=b.c19x;if(!m){const mx=C.hp*LV(b);m=b.c19x={hp:mx,max:mx,cd:null,up:G.t}}
-  if(m.hp<=0){if(m.cd==null){m.cd=C.cd}m.cd-=tk(G,dt);if(m.cd<=0){m.hp=m.max;m.cd=null;m.up=G.t;const h=G.hq;if(h)ping(G,h.x,h.y,Math.max(h.w,h.h)*.9,'#b99cff',.7);pop(G,b.x,b.y-b.h*.5,'Ma trận giáp sẵn sàng','#d9b0ff')}}}
-function hqAbsorb(G,hq,d){G.bl.forEach(b=>{if(!(d>0)||b.hp<=0||!b.nb||b.nb.c19!=='ne9')return;const m=b.c19x;if(!m||m.hp<=0)return;const a=Math.min(d,m.hp);m.hp-=a;d-=a;m.hitT=G.t;m.abs=(m.abs||0)+a;
-    if(m.hp<=0){m.hp=0;m.cd=null;ping(G,hq.x,hq.y,Math.max(hq.w,hq.h)*.9,'#ffb0a0',.6);pop(G,b.x,b.y-b.h*.5,'Ma trận giáp vỡ','#ffb0a0')}});return d}
+  matBox(G,m);
+  if(m.hp<=0){if(m.cd==null){m.cd=C.cd}m.cd-=tk(G,dt);if(m.cd<=0){m.hp=m.max;m.cd=null;m.up=G.t;matPing(G,m,'#b99cff',.7);pop(G,b.x,b.y-b.h*.5,'Ma trận giáp sẵn sàng','#d9b0ff')}}}
+function hqAbsorb(G,bd,d){G.bl.forEach(b=>{if(!(d>0)||b.hp<=0||!b.nb||b.nb.c19!=='ne9')return;const m=b.c19x;if(!m||m.hp<=0)return;
+    const bb=matBox(G,m);if(!bb||bd.x<bb.x0-MPAD||bd.x>bb.x1+MPAD||bd.y<bb.y0-MPAD||bd.y>bb.y1+MPAD)return;
+    const a=Math.min(d,m.hp);m.hp-=a;d-=a;m.hitT=G.t;m.abs=(m.abs||0)+a;m.hx=bd.x;m.hy=bd.y;
+    if(m.hp<=0){m.hp=0;m.cd=null;matPing(G,m,'#ffb0a0',.6);pop(G,b.x,b.y-b.h*.5,'Ma trận giáp vỡ','#ffb0a0')}});return d}
 /* ---------- Siêu Pháo Quang Phổ: đủ 10.000 sát thương → 4 đạn tím rơi từ trời ---------- */
 function skyShell(G,b,tg,delay){const C=CFG.ne10,o={k:'sky',x:tg.x,y:tg.y,tg,t:0,max:delay+1.4,dl:delay,hit:false,b};
   o.u=function(G,dt,o){if(o.t<o.dl)return false;const u=o.t-o.dl;
     if(u<.5&&o.tg&&!o.tg.dead){o.x=o.tg.x;o.y=o.tg.y}
-    if(u>=.85&&!o.hit){o.hit=true;const r=C.d/2;enemies(G).forEach(e=>{if(Math.hypot(e.x-o.x,e.y-o.y)<r+(e.size||2)*.35)dfDmgS(e,dm(b,G,C.dmg),false)});
+    if(u>=.85&&!o.hit){o.hit=true;const r=C.d/2;G.c19own=b;try{enemies(G).forEach(e=>{if(Math.hypot(e.x-o.x,e.y-o.y)<r+(e.size||2)*.35)dfDmgS(e,dm(b,G,C.dmg),false)})}finally{G.c19own=null}
       G.fx.push({x:o.x,y:o.y,r:r*1.3,t:.5,max:.5,col:'#c58bff'});boomFx(G,o.x,o.y,r*1.2);ping(G,o.x,o.y,r*1.7,'#e0c0ff',.45)}
     return false};
   return effPush(G,o)}
@@ -10434,11 +10443,11 @@ function pre(G,dt){
 {const _S=dfStep;dfStep=function(dt){const r=_S.apply(this,arguments);try{const G=DG;if(G&&G.bl&&!G.done&&G.en)pre(G,dt)}catch(e){console.error(e)}return r}}
 /* ghi nhận sát thương: ne8 (do mục tiêu trong 6 ô gây ra) · ne10 (mọi nguồn) */
 function evt(G,kind,disp){if(!G||!G.bl||!(disp>0))return;
-  G.bl.forEach(b=>{if(b.hp<=0||!b.nb)return;const c=b.nb.c19;if(c==='ne10')b.c19acc=(b.c19acc||0)+disp;
+  G.bl.forEach(b=>{if(b.hp<=0||!b.nb)return;const c=b.nb.c19;if(c==='ne10'){if(G.c19own!==b)b.c19acc=(b.c19acc||0)+disp}
     else if(c==='ne8'&&kind!=='e'){const o=G.c19cur;if(o&&!o.dead&&o.team==='e'&&Math.hypot(o.x-b.x,o.y-b.y)<=CFG.ne8.R+(o.size||2)*.3)b.c19acc=(b.c19acc||0)+disp}})}
 {const _S=dfDmgS;dfDmgS=function(s,d,f){const G=DG;try{if(G&&s&&!s.dead)evt(G,s.team==='e'?'e':'m',d*20)}catch(e){console.error(e)}return _S.apply(this,arguments)}}
 {const _A=dfDmgA;dfDmgA=function(a,d){const G=DG;try{if(G&&a&&!a.dead)evt(G,'m',d*20)}catch(e){console.error(e)}return _A.apply(this,arguments)}}
-{const _B=dfDmgB;dfDmgB=function(b,d){const G=DG;try{if(G&&G.bl&&b&&b.hp>0&&b.t!=='mine'&&d>0){evt(G,'b',d*DFB);if(b.hq)d=hqAbsorb(G,b,d)}}catch(e){console.error(e)}
+{const _B=dfDmgB;dfDmgB=function(b,d){const G=DG;try{if(G&&G.bl&&b&&b.hp>0&&b.t!=='mine'&&d>0){evt(G,'b',d*DFB);d=hqAbsorb(G,b,d)}}catch(e){console.error(e)}
   if(!(d>0))return;return _B.call(this,b,d)}}
 {const _F=dfFire;dfFire=function(src,wp,tg,team){const G=DG;if(team==='e'&&G){const o=G.c19cur;G.c19cur=(src&&src.o)||null;try{return _F.apply(this,arguments)}finally{G.c19cur=o}}return _F.apply(this,arguments)}}
 /* giáp gương chắn đạn / tia của địch */
@@ -10561,15 +10570,14 @@ function drawMir(q,b,G,X,Y,s,T){const m=b.c19m;if(!m)return;const g=mirGeo(b),P=
   q.shadowColor='#9fd0ff';q.shadowBlur=10+14*hit;q.strokeStyle='rgba(225,242,255,'+(.7+.3*f)+')';q.lineWidth=s*.14;q.beginPath();P.forEach((p,i)=>i?q.lineTo(p[0],p[1]):q.moveTo(p[0],p[1]));q.stroke();
   q.shadowBlur=0;q.strokeStyle='rgba(255,255,255,.85)';q.lineWidth=s*.04;q.beginPath();P.forEach((p,i)=>{const x=p[0]+g.fx*s*.05,y=p[1]+g.fy*s*.05;i?q.lineTo(x,y):q.moveTo(x,y)});q.stroke();
   const sh=((T*.6)%1),k=Math.floor(sh*(P.length-1));q.globalCompositeOperation='lighter';q.fillStyle='rgba(255,255,255,.7)';q.beginPath();q.arc(P[k][0],P[k][1],s*.1,0,7);q.fill();q.restore()}
-function drawMat(q,b,G,X,Y,s,T){const m=b.c19x,h=G.hq;if(!m||!h)return;const w=h.w+1.4,hh=h.h+1.4,x0=X(h.x-w/2),y0=Y(h.y-hh/2),W=w*s,H=hh*s,up=Math.min(1,(G.t-(m.up||0))/.7),hit=m.hitT!=null?Math.max(0,1-(G.t-m.hitT)/.35):0;
-  if(m.hp<=0){q.save();q.setLineDash([6,8]);q.strokeStyle='rgba(190,170,255,.22)';q.lineWidth=2;q.strokeRect(x0,y0,W,H);q.restore();return}
+function drawMat(q,b,G,X,Y,s,T){const m=b.c19x;if(!m)return;const bb=m.bb;if(!bb)return;
+  const C4=matCorners(bb).map(p=>[X(p[0]),Y(p[1])]),up=Math.min(1,(G.t-(m.up||0))/.7),hit=m.hitT!=null?Math.max(0,1-(G.t-m.hitT)/.35):0;
+  const edge=()=>{q.beginPath();q.moveTo(C4[0][0],C4[0][1]);for(let i=1;i<4;i++)q.lineTo(C4[i][0],C4[i][1]);q.closePath()};
+  if(m.hp<=0){q.save();q.setLineDash([5,9]);q.strokeStyle='rgba(190,170,255,.16)';q.lineWidth=1;edge();q.stroke();q.restore();return}
   const f=m.hp/m.max;q.save();q.globalAlpha=Math.max(.2,up);
-  const g=q.createLinearGradient(x0,y0,x0+W,y0+H);g.addColorStop(0,'rgba(150,90,255,'+(.12+.1*f+.2*hit)+')');g.addColorStop(1,'rgba(90,60,220,'+(.16+.12*f+.2*hit)+')');
-  q.fillStyle=g;q.shadowColor='#a070ff';q.shadowBlur=14+14*hit;q.strokeStyle='rgba(205,175,255,'+(.7+.3*f)+')';q.lineWidth=3;q.beginPath();RR(q,x0,y0,W,H,s*.5);q.fill();q.stroke();q.shadowBlur=0;
-  q.strokeStyle='rgba(190,150,255,.4)';q.lineWidth=1;q.beginPath();const st=s*.7;for(let x=x0+st;x<x0+W;x+=st){q.moveTo(x,y0);q.lineTo(x,y0+H)}for(let y=y0+st;y<y0+H;y+=st){q.moveTo(x0,y);q.lineTo(x0+W,y)}q.stroke();
-  const sc=(T*.5)%1;q.strokeStyle='rgba(235,215,255,.5)';q.lineWidth=2;q.beginPath();q.moveTo(x0,y0+sc*H);q.lineTo(x0+W,y0+sc*H);q.stroke();
-  q.globalCompositeOperation='lighter';[[x0,y0],[x0+W,y0],[x0,y0+H],[x0+W,y0+H]].forEach((p,i)=>{const r=s*(.2+.06*Math.sin(T*6+i)),gg=q.createRadialGradient(p[0],p[1],0,p[0],p[1],r*2);gg.addColorStop(0,'rgba(255,255,255,.95)');gg.addColorStop(.4,'rgba(190,130,255,.8)');gg.addColorStop(1,'rgba(110,50,255,0)');q.fillStyle=gg;q.beginPath();q.arc(p[0],p[1],r*2,0,7);q.fill();
-    q.strokeStyle='rgba(215,170,255,.55)';q.lineWidth=2;q.beginPath();q.moveTo(X(b.x),Y(b.y));q.lineTo(p[0],p[1]);q.stroke()});
+  q.strokeStyle='rgba(205,175,255,'+(.3+.25*f+.35*hit)+')';q.lineWidth=1.2+1.6*hit;edge();q.stroke();
+  q.globalCompositeOperation='lighter';
+  C4.forEach((p,i)=>{const r=s*(.13+.03*Math.sin(T*5+i)),gg=q.createRadialGradient(p[0],p[1],0,p[0],p[1],r*2);gg.addColorStop(0,'rgba(255,255,255,.9)');gg.addColorStop(.45,'rgba(190,130,255,.7)');gg.addColorStop(1,'rgba(110,50,255,0)');q.fillStyle=gg;q.beginPath();q.arc(p[0],p[1],r*2,0,7);q.fill()});
   q.restore()}
 window.c19Draw=function(q,G,X,Y,s,T){if(!G||!G.bl)return;
   G.bl.forEach(b=>{if(b.hp<=0)return;const c=b.nb&&b.nb.c19;if(!c)return;const px=X(b.x),py=Y(b.y),top=py-b.h*s*.62;
@@ -10699,13 +10707,13 @@ SC.ne8=safe({title:'THÁP CỘNG HƯỞNG CUỘN',note:'Tích lũy sát thương
     c.w.hp=c.w.max;T0(G,dt);solid(c.b);TICK.ne8(c.b,dt,G)},
   over(q,G,c,X,Y,s){const e=c.es[2];txt(q,'ngoài 6 ô · không tích lũy',X(e.x),Y(e.y)-e.size*s*.7,'#8fa6d8',10);txt(q,'Đạn xanh nổ 4 ô: 90% sát thương tích lũy, chia đều',X(7.5),Y(9.9),'#9fd0ff',11)}});
 
-SC.ne9=safe({title:'LƯỚI LASER BỐN ĐIỂM',note:'Ma trận giáp tím bao quanh toàn bộ Trụ sở, chắn 4000 sát thương, hồi chiêu 50 giây (xem nhanh)',
-  init(G,c){initC(G,c,.2);const h=mkBld(G,'hq4',9.2,5.4,{w:4,h:4,max:60});h.hq=true;h.hp=h.max;G.hq=h;c.h=h;c.b=mkBld(G,'ne9',3,7.6,{lv:c.lv});c.es=[mkE(G,c,5.4,.8),mkE(G,c,10,-.2),mkE(G,c,13.6,.9)];c.fc=[0,.15,.3]},
-  step(G,dt,c){c.es.forEach((e,i)=>{e.x=e.hx+Math.sin(G.t*.5+i*2)*.6;e.hp=e.max=1e9;c.fc[i]-=dt;if(c.fc[i]<=0){c.fc[i]=.5;mkSh(G,e.x,e.y+.5,c.h.x+(Math.random()-.5)*2,c.h.y-1,.7,9)}});
+SC.ne9=safe({title:'LƯỚI LASER BỐN ĐIỂM',note:'Ma trận giáp tím bao quanh toàn bộ căn cứ (4 điểm laser ở 4 góc), chắn 4000 sát thương cho mọi công trình bên trong, hồi chiêu 50 giây (xem nhanh)',
+  init(G,c){initC(G,c,.2);const h=mkBld(G,'hq4',9.2,5.4,{w:4,h:4,max:60});h.hq=true;h.hp=h.max;G.hq=h;c.h=h;c.b=mkBld(G,'ne9',3,7.6,{lv:c.lv});c.w=[mkBld(G,'wall',4.6,4.6,{w:2,h:1,max:4}),mkBld(G,'cannon',12.6,7,{max:4})];c.w.forEach(w=>{w.hp=w.max});c.tg=[c.h,c.w[0],c.w[1]];c.es=[mkE(G,c,5.4,.8),mkE(G,c,10,-.2),mkE(G,c,13.6,.9)];c.fc=[0,.15,.3]},
+  step(G,dt,c){c.w.forEach(w=>{if(w.hp<w.max*.3)w.hp=w.max});c.es.forEach((e,i)=>{e.x=e.hx+Math.sin(G.t*.5+i*2)*.6;e.hp=e.max=1e9;c.fc[i]-=dt;if(c.fc[i]<=0){c.fc[i]=.5;const t=c.tg[(Math.random()*c.tg.length)|0];mkSh(G,e.x,e.y+.5,t.x+(Math.random()-.5)*1.4,t.y-.5,.7,9)}});
     if(c.h.hp<c.h.max*.3)c.h.hp=c.h.max;T0(G,dt);solid(c.b)},
   over(q,G,c,X,Y,s){TICK.ne9(c.b,G.dtc||.02,G);const m=c.b.c19x;txt(q,m&&m.hp>0?'Ma trận chắn '+nf(m.hp*DFB)+' sát thương còn lại':'Ma trận vỡ · hồi chiêu '+Math.ceil(m&&m.cd!=null?m.cd:CFG.ne9.cd)+'s',X(7.5),Y(9.9),m&&m.hp>0?'#d9b0ff':'#ffc86a',11)}});
 
-SC.ne10=safe({title:'SIÊU PHÁO QUANG PHỔ',note:'Tích lũy 10.000 sát thương nhận vào và gây ra: 4 đạn tím (đường kính 3 ô) rơi từ trên trời, mỗi đạn 1500 sát thương, hồi chiêu 40 giây (xem nhanh)',
+SC.ne10=safe({title:'SIÊU PHÁO QUANG PHỔ',note:'Tích lũy 10.000 sát thương nhận vào và gây ra (không tính sát thương do chính nó gây ra): 4 đạn tím (đường kính 3 ô) rơi từ trên trời, mỗi đạn 1500 sát thương, hồi chiêu 40 giây (xem nhanh)',
   init(G,c){initC(G,c,.2);c.b=mkBld(G,'ne10',7.5,7.4,{lv:c.lv});c.es=[mkE(G,c,3.6,1.8),mkE(G,c,7.6,.9),mkE(G,c,11.4,2),mkE(G,c,5.6,3.8)]},
   step(G,dt,c){c.es.forEach((e,i)=>{e.x=e.hx+Math.sin(G.t*.55+i*1.9)*1.3;e.y=e.hy+Math.cos(G.t*.4+i)*.5;e.hp=e.max=1e9});if(!(c.b.c19cd>0))c.b.c19acc=(c.b.c19acc||0)+1700*dt;T0(G,dt);solid(c.b);TICK.ne10(c.b,dt,G)},
   over(q,G,c,X,Y,s){txt(q,'Đạn rơi lần lượt xuống mục tiêu bất kỳ (không phải công trình)',X(7.5),Y(9.9),'#e0c0ff',11)}});
@@ -11374,7 +11382,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL='';
-  const VER='v158';
+  const VER='v159';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`
