@@ -251,6 +251,8 @@ SC.fc2=safe({title:'HẦM TRÚ ẨN NHỎ',note:'Tàu đồng minh đứng sát 
   over(q,G,c,X,Y,s){drawAl(q,c.a[0],X,Y,s);txt(q,'Hầm A',X(c.A.x),Y(c.A.y)+s*1.55,'#bfeaff',10);txt(q,'Hầm B',X(c.B.x),Y(c.B.y)+s*1.55,'#bfeaff',10);
     txt(q,c.tn?'Đã qua hầm '+c.tn+' lần · mỗi tàu nghỉ 4 giây sau khi ra':'Tàu đi tới hầm A…',X(7.5),Y(9.9),'#bfeaff',11)}});
 
+SC.fc9=safe(Object.assign({},SC.fc2,{title:'HẦM NGẦM KIÊN CỐ',note:'Hầm ngầm 2.000 máu: tàu đồng minh đứng sát hầm 0,5 giây sẽ chui vào và ra ở hầm kế tiếp (chung mạng với Hầm Trú Ẩn Nhỏ)',
+  init(G,c){initC(G,c);c.A=mkBld(G,'fc9',3.4,7.6,{lv:c.lv});c.B=mkBld(G,'fc9',11.6,7.6,{lv:c.lv});c.w=mkBld(G,'wall',7.5,8.6,{w:2,h:1,max:30});c.a=[mkAl(G,c,3.4,3.4,0,100)];c.ph=0;c.tg=[3.4,7.6];c.wait=0;c.lastTp=-1;c.tn=0}}));
 SC.fc3=safe({title:'PHÁO ĐÀI BÊ TÔNG',note:'Đồng minh (kể cả drone) đi vào 5 ô nhận khiên chặn 400 sát thương trong 10 giây; mỗi đơn vị nhận lại sau tối thiểu 20 giây',
   init(G,c){initC(G,c);c.b=mkBld(G,'fc3',7.5,5.2,{lv:c.lv});c.hub=mkBld(G,'wall',13.0,9.0,{w:2,h:1,max:30});c.dr={x:12.6,y:8.2,ang:-Math.PI/2,hp:200,hmax:200,dead:false,hf:0,fl:0,age:5,rs:0};c.hub.drs=[c.dr];
     c.a=[mkAl(G,c,2,2.6,0,1e5)];c.es=[mkE(G,c,7.5,-.6)];c.t1=0;c.k=0;c.ph=0},
