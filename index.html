@@ -12280,13 +12280,15 @@ window.C23={openSim,closeSim,state:()=>cur,sceneEng,sceneArm,sceneSkl,sceneDuel,
 })();
 
 
-/* ===== c24: Thanh toán chuyển khoản ngân hàng (VietQR) + chủ game xác nhận đơn ===== */
+/* ===== c24: Thanh toán chuyển khoản ngân hàng (VietQR) + mã nhận quà do chủ game ký (không cần máy chủ) ===== */
 /* ---------- cấu hình thanh toán (chỉ sửa ở đây) ---------- */
 window.SE_CFG=window.SE_CFG||{};
 (function(C){
-  if(C.fb==null)C.fb='https://ship-event-default-rtdb.asia-southeast1.firebasedatabase.app';                 /* địa chỉ Firebase Realtime Database, ví dụ 'https://ten-du-an-default-rtdb.asia-southeast1.firebasedatabase.app' */
+  if(C.fb==null)C.fb='';                 /* để trống: không dùng máy chủ */
   C.bank=C.bank||{name:'Agribank',full:'Ngân hàng Nông nghiệp và Phát triển Nông thôn Việt Nam',bin:'970405',acc:'2000236003939',holder:''};
+  C.zalo=C.zalo||'0905110205';            /* Zalo chủ game nhận mã đơn */
   C.prefix=C.prefix||'SE';               /* tiền tố nội dung chuyển khoản */
+  C.pub=C.pub||{x:'kMyXxNpT5lDXqJGPZs5s5C4f7tLPQ22k3INYDJ7lwP8',y:'lKt9cZK-bvEY_A5-7excb2f7qizNqqOR5tDNTDIMvlA'}; /* khoá công khai kiểm tra mã nhận quà */
 })(window.SE_CFG);
 (function(){
 /* qrcode-generator 1.4.4 — (c) 2009 Kazuhiko Arase, MIT license */
@@ -12299,6 +12301,7 @@ const rid=n=>{const a=new Uint32Array(n);try{crypto.getRandomValues(a)}catch(e){
 const P=()=>{S.pay=S.pay||{};S.pay.orders=S.pay.orders||[];return S.pay};
 const me=()=>{S.fb=S.fb||{};if(!S.fb.uid)S.fb.uid='P'+rid(6);return S.fb.uid};
 const say=m=>{try{toast(m)}catch(e){}};
+const zaloUrl=()=>'https://zalo.me/'+String(CFG.zalo).replace(/\D/g,'');
 
 /* ---------- VietQR (chuẩn EMVCo / NAPAS 247) ---------- */
 const tlv=(id,v)=>{v=String(v);return id+String(v.length).padStart(2,'0')+v};
@@ -12311,13 +12314,25 @@ function qrCanvas(text,px){const q=qrcode(0,'M');q.addData(text);q.make();const 
   const c=document.createElement('canvas');c.width=c.height=W;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,W,W);g.fillStyle='#000';
   for(let r=0;r<n;r++)for(let k=0;k<n;k++)if(q.isDark(r,k))g.fillRect((k+m)*s,(r+m)*s,s,s);c.dataset.payload=text;return c}
 
-/* ---------- máy chủ đơn hàng: Firebase Realtime Database (REST) ---------- */
-const FB=()=>String(CFG.fb||'').trim().replace(/\/+$/,'');
-async function rq(path,o){o=o||{};const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),12000);
-  try{const r=await fetch(FB()+'/'+path+'.json'+(o.q||''),{method:o.m||'GET',headers:o.b!==undefined?{'Content-Type':'application/json'}:undefined,body:o.b!==undefined?JSON.stringify(o.b):undefined,signal:ac.signal});
-    if(r.status===401||r.status===403){const e=new Error('denied');e.denied=1;throw e}if(!r.ok)throw new Error('http '+r.status);return r.json()}finally{clearTimeout(tm)}}
+/* ---------- mã đơn & mã nhận quà (chữ ký ECDSA P-256, không cần máy chủ) ---------- */
+const enc=new TextEncoder(),dec=new TextDecoder();
+const b64u=bytes=>{let s='';new Uint8Array(bytes).forEach(b=>s+=String.fromCharCode(b));return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')};
+const ub64u=t=>{t=t.replace(/-/g,'+').replace(/_/g,'/');while(t.length%4)t+='=';const s=atob(t),a=new Uint8Array(s.length);for(let i=0;i<s.length;i++)a[i]=s.charCodeAt(i);return a};
+const canon=v=>Array.isArray(v)?'['+v.map(canon).join(',')+']':(v&&typeof v==='object')?'{'+Object.keys(v).sort().filter(k=>v[k]!==undefined).map(k=>JSON.stringify(k)+':'+canon(v[k])).join(',')+'}':JSON.stringify(v);
+const msgOf=o=>'SE1|'+o.id+'|'+Math.round(o.vnd)+'|'+canon({src:o.src,spec:o.spec});
+const SUB=()=>window.crypto&&crypto.subtle;
+let PUBK=null;
+async function pubKey(){if(PUBK)return PUBK;PUBK=await SUB().importKey('jwk',{kty:'EC',crv:'P-256',x:CFG.pub.x,y:CFG.pub.y,ext:true},{name:'ECDSA',namedCurve:'P-256'},false,['verify']);return PUBK}
+async function verify(o,sig){try{return await SUB().verify({name:'ECDSA',hash:'SHA-256'},await pubKey(),sig,enc.encode(msgOf(o)))}catch(e){return false}}
+/* mã đơn gửi qua Zalo: SEO1.<base64url(JSON)> */
+const orderToken=o=>'SEO1.'+b64u(enc.encode(JSON.stringify({id:o.id,src:o.src,spec:o.spec,vnd:Math.round(o.vnd),name:o.name,get:o.get||'',key:o.key||null,u:me(),t:o.t})));
+function parseOrder(text){const m=String(text).replace(/\s+/g,'').match(/SEO1\.([A-Za-z0-9_-]+)/);if(!m)return null;try{const o=JSON.parse(dec.decode(ub64u(m[1])));return o&&o.id&&o.src?o:null}catch(e){return null}}
+const zaloMsg=o=>'ĐƠN NẠP '+o.code+'\nGói: '+o.name+'\nSố tiền: '+NF(o.vnd)+' VNĐ\n'+(o.get?'Nhận: '+o.get+'\n':'')+'Mã đơn (dán vào Quản lý đơn): '+orderToken(o);
+/* mã nhận quà: SEQ1-<mã đơn>-<chữ ký> */
+function parseGift(text){const m=String(text).replace(/\s+/g,'').match(/SEQ1-([A-Z0-9]{4,12})-([A-Za-z0-9_-]{60,120})/);return m?{id:m[1],sig:m[2]}:null}
 
-/* ---------- trao vật phẩm khi chủ game đã xác nhận ---------- */
+/* ---------- trao vật phẩm ---------- */
+const AFTER={};
 function credit(o){let msg='';
   try{
     if(o.src==='psh'){const t=window.PSHG?PSHG(o.spec):[];msg=t.join(', ')}
@@ -12327,12 +12342,16 @@ function credit(o){let msg='';
         else{msg=evGive(ev)||'';try{evFinish(ev,msg)}catch(e){const E=evS();E.buy[ev.id]=1}}}}
   }catch(e){console.error(e)}
   o.st='done';o.got=Date.now();o.msg=msg;try{save()}catch(e){}try{refresh()}catch(e){}
-  say('✅ Chủ game đã xác nhận đơn '+o.code+' · '+(msg||o.name));
   const af=AFTER[o.id];if(af)try{af()}catch(e){}
-  if(FB())rq('got/'+o.id,{m:'PUT',b:{t:Date.now()}}).catch(()=>{});
-  myRender()}
-async function check(){if(!FB())return;const L=P().orders.filter(o=>o.st==='sent');
-  for(const o of L){try{const v=await rq('ok/'+o.id+'/v');if(v===1&&o.st==='sent')credit(o);else if(v===-1&&o.st==='sent'){o.st='no';save();say('❌ Đơn '+o.code+' bị từ chối. Liên hệ chủ game nếu bạn đã chuyển tiền.');myRender()}}catch(e){}}}
+  return msg}
+async function redeem(text){const g=parseGift(text);if(!g)return [0,'Mã nhận quà không đúng dạng. Hãy dán nguyên mã chủ game gửi (bắt đầu bằng SEQ1-).'];
+  const o=P().orders.find(x=>x.id===g.id);
+  if(!o)return [0,'Máy này không có đơn '+CFG.prefix+' '+g.id+'. Mã nhận quà chỉ dùng được trên đúng máy đã đặt đơn.'];
+  if(o.st==='done')return [0,'Đơn '+o.code+' đã nhận quà rồi.'];
+  if(!SUB())return [0,'Trình duyệt này không hỗ trợ kiểm tra mã. Hãy mở game bằng trình duyệt khác (Chrome, Safari).'];
+  let sig;try{sig=ub64u(g.sig)}catch(e){return [0,'Mã nhận quà bị lỗi, hãy chép lại.']}
+  if(!(await verify(o,sig)))return [0,'Mã nhận quà không hợp lệ cho đơn '+o.code+'.'];
+  const msg=credit(o);return [1,'✅ Đã nhận quà đơn '+o.code+(msg?' · '+msg:'')]}
 
 /* ---------- giao diện ---------- */
 const css=document.createElement('style');
@@ -12343,27 +12362,27 @@ css.textContent=`.pxo{position:fixed;inset:0;z-index:97;background:#000c;display
 .pxo .pxqr{display:flex;justify-content:center;margin:8px 0}.pxo .pxqr canvas{width:min(220px,62vw);height:auto;border-radius:8px;border:4px solid #fff;background:#fff}
 .pxo .pxrow{display:flex;align-items:center;gap:8px;justify-content:space-between;padding:7px 0;border-top:1px solid #1c3a80}.pxo .pxrow span{color:#9fb6e6;font-size:12.5px}.pxo .pxrow b{font-size:15px;text-align:right;word-break:break-all}
 .pxo .pxrow b.cd{font:800 18px ui-monospace,Consolas,monospace;color:#ffd45a;letter-spacing:.06em}
-.pxo .pxcp{padding:4px 9px;border-radius:7px;border:1px solid #3aa0ff;background:#0f3a8f;color:#fff;font-size:12px;cursor:pointer;flex:none}
+.pxo .pxcp{padding:5px 10px;border-radius:7px;border:1px solid #3aa0ff;background:#0f3a8f;color:#fff;font-size:12px;cursor:pointer;flex:none}
 .pxo .pxst{margin:10px 0 4px;padding:9px 10px;border-radius:9px;background:#0a1a4a;border:1px solid #1c3a80;font-size:12.5px;line-height:1.5}
-.pxo .pxst ol{margin:4px 0 0 18px;padding:0}.pxo .pxwarn{background:#2a2410;border-color:#6b5a1c;color:#ffe08a}.pxo .pxok{background:#0d2a1c;border-color:#2f7a52;color:#9fffc8}
-.pxo .pxbt{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.pxo .pxbt button{flex:1;min-width:120px;padding:11px 10px;border-radius:10px;border:1px solid #4a5a86;background:#14275a;color:#fff;font-weight:800;font-size:14px;cursor:pointer}
-.pxo .pxbt button.go{background:linear-gradient(#ffd45a,#e79a12);color:#3a2600;border-color:#ffd45a}.pxo .pxbt button:disabled{opacity:.5}
+.pxo .pxst ol{margin:4px 0 0 18px;padding:0}.pxo .pxwarn{background:#2a2410;border-color:#6b5a1c;color:#ffe08a}.pxo .pxok{background:#0d2a1c;border-color:#2f7a52;color:#9fffc8}.pxo .pxbad{background:#2a1016;border-color:#7a2f3c;color:#ffb3bf}
+.pxo .pxbt{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.pxo .pxbt button,.pxo .pxbt a{flex:1;min-width:120px;padding:11px 10px;border-radius:10px;border:1px solid #4a5a86;background:#14275a;color:#fff;font-weight:800;font-size:14px;cursor:pointer;text-align:center;text-decoration:none;box-sizing:border-box}
+.pxo .pxbt .go{background:linear-gradient(#ffd45a,#e79a12);color:#3a2600;border-color:#ffd45a}.pxo .pxbt .zl{background:#0068ff;border-color:#4d9bff}.pxo .pxbt button:disabled{opacity:.5}
 .pxo .pxl{border-top:1px solid #1c3a80;padding:8px 0;font-size:13px;display:flex;gap:8px;justify-content:space-between;align-items:center}.pxo .pxl small{display:block;color:#8fa6d8;font-size:11.5px}
 .pxo .tg{display:inline-block;font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px;border:1px solid #4a5a86;color:#cfd8ee;white-space:nowrap}
-.pxo .tg.w{border-color:#c9a23a;color:#ffd45a}.pxo .tg.k{border-color:#3fd08a;color:#7dffb4}.pxo .tg.n{border-color:#c04a5a;color:#ff9aa8}
-.pxo input{width:100%;box-sizing:border-box;background:#06122e;border:1px solid #2a4a95;border-radius:9px;color:#fff;padding:9px 10px;font-size:14px}
-.pxo .pxtab{display:flex;gap:6px;margin:8px 0}.pxo .pxtab button{flex:1;padding:7px;border-radius:8px;border:1px solid #1c4fc9;background:#0c2358;color:#fff;font-weight:700;cursor:pointer}.pxo .pxtab button.on{background:#1c4fc9}
-.pxo .pxa{display:flex;gap:6px;flex:none}.pxo .pxa button{padding:7px 10px;border-radius:8px;font-weight:800;cursor:pointer;border:1px solid #3fd08a;background:#0d4a2c;color:#fff}.pxo .pxa button.no{border-color:#c04a5a;background:#4a1420}
-#pxbell{position:fixed;left:8px;top:calc(8px + env(safe-area-inset-top,0px));z-index:98;display:none;padding:7px 12px;border-radius:99px;border:1.5px solid #ffd45a;background:#3a2600;color:#ffd45a;font:800 13px system-ui;cursor:pointer;box-shadow:0 0 14px #ffb34a88}
+.pxo .tg.w{border-color:#c9a23a;color:#ffd45a}.pxo .tg.k{border-color:#3fd08a;color:#7dffb4}
+.pxo textarea{width:100%;box-sizing:border-box;background:#06122e;border:1px solid #2a4a95;border-radius:9px;color:#fff;padding:9px 10px;font:13px ui-monospace,Consolas,monospace;min-height:64px;resize:vertical}
+.pxo .pxbox{word-break:break-all;font:12px ui-monospace,Consolas,monospace;background:#06122e;border:1px solid #2a4a95;border-radius:9px;padding:8px;color:#cfe4ff;max-height:110px;overflow:auto;user-select:all;-webkit-user-select:all}
 .pxmy{position:absolute;right:10px;bottom:10px;z-index:5;padding:7px 12px;border-radius:99px;border:1px solid #35d4ff;background:#071a40;color:#9fe3ff;font:700 12.5px system-ui;cursor:pointer}`;
 document.head.appendChild(css);
 let ov=null;
 function close(){if(ov){ov.remove();ov=null}}
-function open(html){close();ov=document.createElement('div');ov.className='pxo';ov.innerHTML='<div>'+html+'</div>';document.body.appendChild(ov);
-  ov.addEventListener('click',e=>{if(e.target===ov)close()});return ov}
-const copy=(t,b)=>{const ok=()=>{if(b){const o=b.textContent;b.textContent='✓ Đã chép';setTimeout(()=>b.textContent=o,1400)}};
-  try{navigator.clipboard.writeText(t).then(ok,()=>{fallback()})}catch(e){fallback()}
-  function fallback(){const i=document.createElement('textarea');i.value=t;document.body.appendChild(i);i.select();try{document.execCommand('copy');ok()}catch(e){}i.remove()}};
+function open(html,kind){close();ov=document.createElement('div');ov.className='pxo';if(kind)ov.dataset[kind]=1;ov.innerHTML='<div>'+html+'</div>';document.body.appendChild(ov);
+  ov.addEventListener('click',e=>{if(e.target===ov)close()});
+  ov.querySelectorAll('[data-a="x"]').forEach(b=>b.onclick=close);return ov}
+function copy(t,b){const ok=()=>{if(b){const o=b.textContent;b.textContent='✓ Đã chép';setTimeout(()=>b.textContent=o,1400)}};
+  const fb=()=>{const i=document.createElement('textarea');i.value=t;i.style.cssText='position:fixed;opacity:0';document.body.appendChild(i);i.select();let r=false;try{r=document.execCommand('copy')}catch(e){}i.remove();if(r)ok();else if(b)b.textContent='Hãy giữ ngón tay để chép'};
+  try{navigator.clipboard.writeText(t).then(ok,fb)}catch(e){fb()}}
+async function pasteInto(ta){try{const t=await navigator.clipboard.readText();if(t)ta.value=t}catch(e){say('Hãy giữ ngón tay vào ô rồi chọn Dán')}}
 
 /* ---------- 1) hộp thanh toán ---------- */
 function start(o){
@@ -12376,115 +12395,122 @@ function start(o){
    ${b.holder?`<div class="pxrow"><span>Chủ tài khoản</span><b>${esc(b.holder)}</b></div>`:''}
    <div class="pxrow"><span>Số tiền</span><b>${NF(vnd)} VNĐ</b><button class="pxcp" data-c="${vnd}">Sao chép</button></div>
    <div class="pxrow"><span>Nội dung chuyển khoản</span><b class="cd">${code}</b><button class="pxcp" data-c="${code}">Sao chép</button></div>
-   <div class="pxst pxwarn"><b>Cách thanh toán</b><ol><li>Chuyển <b>đúng số tiền</b> và ghi <b>đúng nội dung ${code}</b>.</li><li>Bấm <b>"Tôi đã chuyển khoản"</b> bên dưới.</li><li>Chủ game kiểm tra tiền về và xác nhận — vật phẩm tự vào tài khoản của bạn (khi bạn đang mở game).</li></ol></div>
-   <div class="pxbt"><button class="go" data-a="sent">Tôi đã chuyển khoản</button><button data-a="x">Để sau</button></div><div class="pxsm" data-msg style="margin-top:6px"></div>`);
+   <div class="pxst pxwarn"><b>Cách nhận vật phẩm</b><ol><li>Chuyển <b>đúng số tiền</b>, ghi <b>đúng nội dung ${code}</b>.</li><li>Bấm <b>"Đã chuyển — gửi mã đơn qua Zalo"</b>: game chép sẵn mã đơn và mở Zalo ${esc(CFG.zalo)}, bạn <b>dán</b> vào tin nhắn rồi gửi.</li><li>Chủ game kiểm tra tiền về và gửi lại <b>mã nhận quà</b>. Vào <b>🧾 Đơn của tôi</b>, dán mã đó để nhận vật phẩm.</li></ol></div>
+   <div class="pxbt"><button class="go" data-a="sent">Đã chuyển — gửi mã đơn qua Zalo</button><button data-a="x">Để sau</button></div>`);
   x.querySelector('.pxqr').appendChild(qrCanvas(vietqr(vnd,code),440));
   x.querySelectorAll('.pxcp').forEach(bt=>bt.onclick=()=>copy(bt.dataset.c,bt));
-  x.querySelector('[data-a="x"]').onclick=close;
-  x.querySelector('[data-a="sent"]').onclick=async e=>{const bt=e.currentTarget;bt.disabled=true;const msg=x.querySelector('[data-msg]');msg.textContent='Đang gửi đơn…';
-    const ord={id,code,src:o.src,spec:o.spec,name:o.name,get:o.get||'',vnd,t:Date.now(),st:'local'};
-    if(FB()){let ok=false,tries=0;
-      while(!ok&&tries<3){tries++;try{await rq('orders/'+ord.id,{m:'PUT',b:{u:me(),it:String(o.name).slice(0,110),g:String(o.get||'').slice(0,200),vnd,code:ord.code,t:ord.t}});ok=true}
-        catch(err){if(err.denied&&tries<3){ord.id=rid(6);ord.code=CFG.prefix+' '+ord.id;continue}break}}
-      if(ok)ord.st='sent';else{msg.textContent='Không gửi được đơn lên máy chủ. Kiểm tra mạng rồi bấm lại.';bt.disabled=false;return}}
+  x.querySelector('[data-a="sent"]').onclick=()=>{
+    const ord={id,code,src:o.src,spec:o.spec,key:o.key||null,name:o.name,get:o.get||'',vnd,t:Date.now(),st:'wait'};
     P().orders.unshift(ord);P().orders=P().orders.slice(0,60);try{save()}catch(e){}
     if(o.after)AFTER[ord.id]=o.after;
-    showSent(ord)};
+    copy(zaloMsg(ord));sent(ord,true)};
 }
-const AFTER={};
-function showSent(o){const on=o.st==='sent';
-  open(`<h3>ĐÃ GỬI ĐƠN ${esc(o.code)}</h3><div class="pxit">${esc(o.name)} · ${NF(o.vnd)} VNĐ</div>
-   <div class="pxst ${on?'pxok':'pxwarn'}">${on?'Đơn đã gửi tới chủ game. Khi chủ game xác nhận đã nhận tiền, vật phẩm sẽ <b>tự động</b> vào tài khoản của bạn — chỉ cần mở game. Bạn có thể xem trạng thái ở "🧾 Đơn của tôi".'
-     :'Game chưa kết nối máy chủ xác nhận nên đơn mới chỉ lưu trên máy này. Hãy báo chủ game mã <b>'+esc(o.code)+'</b> để được hỗ trợ.'}</div>
+function sent(o,auto){
+  const m=zaloMsg(o);
+  const x=open(`<h3>GỬI MÃ ĐƠN ${esc(o.code)}</h3><div class="pxit">${esc(o.name)} · ${NF(o.vnd)} VNĐ</div>
+   <div class="pxst pxok">${auto?'Đã chép mã đơn. ':''}Mở Zalo <b>${esc(CFG.zalo)}</b>, <b>dán</b> tin nhắn bên dưới và gửi cho chủ game. Khi nhận được <b>mã nhận quà</b>, vào <b>🧾 Đơn của tôi</b> để dán mã.</div>
+   <div class="pxbox">${esc(m).replace(/\n/g,'<br>')}</div>
+   <div class="pxbt"><button data-a="cp">📋 Chép tin nhắn</button><a class="zl" href="${zaloUrl()}" target="_blank" rel="noopener">💬 Mở Zalo ${esc(CFG.zalo)}</a></div>
    <div class="pxbt"><button class="go" data-a="my">🧾 Đơn của tôi</button><button data-a="x">Đóng</button></div>`);
-  ov.querySelector('[data-a="x"]').onclick=close;ov.querySelector('[data-a="my"]').onclick=my}
+  x.querySelector('[data-a="cp"]').onclick=e=>copy(m,e.currentTarget);
+  x.querySelector('[data-a="my"]').onclick=my;
+  if(auto)try{window.open(zaloUrl(),'_blank','noopener')}catch(e){}}
 
-/* ---------- 2) đơn của tôi ---------- */
-const TG={sent:['Chờ xác nhận','w'],local:['Chưa gửi máy chủ','w'],done:['Đã nhận','k'],no:['Bị từ chối','n']};
-function my(){const L=P().orders;
-  open(`<h3>🧾 ĐƠN CỦA TÔI</h3><div class="pxsm">Mã người chơi: <b>${esc(me())}</b>${FB()?'':' · <span style="color:#ffd45a">chưa kết nối máy chủ xác nhận</span>'}</div><div data-l></div>
-   <div class="pxbt"><button data-a="r">↻ Kiểm tra lại</button><button data-a="x">Đóng</button></div>
-   <div class="pxsm" style="margin-top:10px;text-align:right"><a href="#" data-a="adm" style="color:#6f8fd0">Quản lý đơn (dành cho chủ game)</a></div>`);
-  ov.dataset.my=1;myRender();
-  ov.querySelector('[data-a="x"]').onclick=close;ov.querySelector('[data-a="r"]').onclick=async()=>{await check();myRender()};
-  ov.querySelector('[data-a="adm"]').onclick=e=>{e.preventDefault();admin()}}
+/* ---------- 2) đơn của tôi + nhập mã nhận quà ---------- */
+function my(){
+  const x=open(`<h3>🧾 ĐƠN CỦA TÔI</h3>
+   <div class="pxst"><b>Nhập mã nhận quà</b> chủ game gửi qua Zalo:<textarea data-g placeholder="SEQ1-…"></textarea>
+     <div class="pxbt" style="margin-top:6px"><button data-a="pg">📋 Dán</button><button class="go" data-a="rd">🎁 Nhận quà</button></div><div class="pxsm" data-m></div></div>
+   <div data-l></div>
+   <div class="pxbt"><button data-a="x">Đóng</button></div>
+   <div class="pxsm" style="margin-top:10px;text-align:right"><a href="#" data-a="adm" style="color:#6f8fd0">Quản lý đơn (dành cho chủ game)</a></div>`,'my');
+  const ta=x.querySelector('[data-g]'),mm=x.querySelector('[data-m]');
+  x.querySelector('[data-a="pg"]').onclick=()=>pasteInto(ta);
+  x.querySelector('[data-a="rd"]').onclick=async e=>{const b=e.currentTarget;b.disabled=true;mm.textContent='Đang kiểm tra…';const r=await redeem(ta.value);b.disabled=false;mm.textContent=r[1];mm.style.color=r[0]?'#7dffb4':'#ffb3bf';if(r[0]){ta.value='';say(r[1])}myRender()};
+  x.querySelector('[data-a="adm"]').onclick=e=>{e.preventDefault();admin()};
+  myRender()}
+const TG={wait:['Chờ mã nhận quà','w'],done:['Đã nhận','k']};
 function myRender(){if(!ov||!ov.dataset.my)return;const el=ov.querySelector('[data-l]');if(!el)return;const L=P().orders;
-  el.innerHTML=L.length?L.map(o=>{const t=TG[o.st]||['?',''];return `<div class="pxl"><div><b>${esc(o.code)}</b> · ${esc(o.name)}<small>${NF(o.vnd)} VNĐ · ${new Date(o.t).toLocaleString('vi-VN')}${o.st==='done'&&o.msg?' · '+esc(o.msg):''}</small></div><span class="tg ${t[1]}">${t[0]}</span></div>`}).join(''):'<div class="pxsm" style="padding:10px 0">Bạn chưa có đơn nào.</div>'}
+  el.innerHTML=L.length?L.map(o=>{const t=TG[o.st]||TG.wait;return `<div class="pxl"><div><b>${esc(o.code)}</b> · ${esc(o.name)}<small>${NF(o.vnd)} VNĐ · ${new Date(o.t).toLocaleString('vi-VN')}${o.st==='done'&&o.msg?' · '+esc(o.msg):''}</small></div>`+
+    (o.st==='done'?`<span class="tg k">${t[0]}</span>`:`<div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end"><span class="tg w">${t[0]}</span><button class="pxcp" data-z="${esc(o.id)}">Gửi lại Zalo</button></div>`)+`</div>`}).join(''):'<div class="pxsm" style="padding:10px 0">Bạn chưa có đơn nào.</div>';
+  el.querySelectorAll('[data-z]').forEach(b=>b.onclick=()=>{const o=P().orders.find(x=>x.id===b.dataset.z);if(o)sent(o,false)})}
 
 /* ---------- 3) quản lý đơn — dành cho chủ game ---------- */
-const AK='se_admin_key';
-const akey=()=>{try{return localStorage.getItem(AK)||''}catch(e){return''}};
-let AD={tab:'w',list:[],st:{},got:{},busy:false,seen:null,last:0};
-async function adPull(){if(!FB())return;
-  const o=await rq('orders',{q:'?orderBy=%22t%22&limitToLast=200'});
-  const L=Object.keys(o||{}).map(k=>Object.assign({id:k},o[k])).filter(x=>x&&typeof x.t==='number').sort((a,b)=>b.t-a.t);
-  const need=L.filter(x=>AD.st[x.id]!==1&&AD.st[x.id]!==-1).slice(0,120);
-  for(let i=0;i<need.length;i+=12)await Promise.all(need.slice(i,i+12).map(async x=>{try{const v=await rq('ok/'+x.id+'/v');AD.st[x.id]=v===1?1:v===-1?-1:0}catch(e){}}));
-  const gotNeed=L.filter(x=>AD.st[x.id]===1&&!AD.got[x.id]).slice(0,60);
-  await Promise.all(gotNeed.map(async x=>{try{const g=await rq('got/'+x.id);if(g)AD.got[x.id]=1}catch(e){}}));
-  AD.list=L;AD.last=Date.now();return L}
-const pend=()=>AD.list.filter(x=>!AD.st[x.id]);
+const AK='se_owner_key',LOG='se_owner_log';
+const lsg=k=>{try{return localStorage.getItem(k)||''}catch(e){return''}},lss=(k,v)=>{try{localStorage.setItem(k,v);return true}catch(e){return false}};
+const logs=()=>{try{return JSON.parse(lsg(LOG)||'[]')}catch(e){return[]}};
+let PRIV=null;
+async function privKey(){const t=lsg(AK).trim();const m=t.match(/^SEK1\.([A-Za-z0-9_-]{43})\.([A-Za-z0-9_-]{43})\.([A-Za-z0-9_-]{43})$/);if(!m)return null;
+  if(m[2]!==CFG.pub.x||m[3]!==CFG.pub.y)return null;
+  if(PRIV&&PRIV.t===t)return PRIV.k;const k=await SUB().importKey('jwk',{kty:'EC',crv:'P-256',d:m[1],x:m[2],y:m[3],ext:true},{name:'ECDSA',namedCurve:'P-256'},false,['sign']);PRIV={t,k};return k}
+/* đối chiếu gói với bảng giá trên máy chủ game */
+const PRICE=s=>+String(s).replace(/[^\d]/g,'')||0;
+function official(o){try{
+  const k=o.key||{};
+  if(k.t==='nap'){const c=(NAP[k.k]||[])[k.i];if(!c)return null;const p=napPack(k.k,k.i);return {name:p.name,vnd:p.vnd,spec:p.spec}}
+  if(k.t==='promo'){const p=PROMO[k.i];return p?{name:p.name,vnd:p.vnd,spec:p.spec}:null}
+  if(k.t==='psh'&&window.PSHT){const L0=typeof PSHT[k.tab]==='function'?PSHT[k.tab]():PSHT[k.tab];const p=(L0||[]).find(x=>x[0]===o.name);return p?{name:p[0],vnd:p[1],spec:p[4]}:null}
+  if(o.src==='ev'&&typeof EVO!=='undefined'){const e=EVO.find(x=>x.id===o.spec.id);return e?{name:e.n,vnd:e.p,spec:o.spec}:null}
+  }catch(e){}return null}
 function admin(){
-  open(`<h3>🔔 QUẢN LÝ ĐƠN NẠP</h3><div class="pxsm">Dành cho chủ game. Đối chiếu <b>nội dung chuyển khoản</b> và <b>số tiền</b> trong app Agribank rồi bấm xác nhận.</div>
-   <div data-cfg></div><div class="pxtab"><button data-t="w">Chờ xác nhận</button><button data-t="a">Tất cả</button></div><div data-l class="pxsm">Đang tải…</div>
-   <div class="pxbt"><button data-a="r">↻ Tải lại</button><button data-a="n">🔔 Bật thông báo</button><button data-a="x">Đóng</button></div>`);
-  ov.dataset.adm=1;
-  ov.querySelector('[data-a="x"]').onclick=close;ov.querySelector('[data-a="r"]').onclick=()=>adLoad(true);
-  ov.querySelector('[data-a="n"]').onclick=async e=>{try{const r=await Notification.requestPermission();e.currentTarget.textContent=r==='granted'?'🔔 Đã bật':'🔕 Trình duyệt chặn'}catch(_){e.currentTarget.textContent='🔕 Không hỗ trợ'}};
-  ov.querySelectorAll('.pxtab button').forEach(b=>b.onclick=()=>{AD.tab=b.dataset.t;adRender()});
-  adCfg();adLoad(true)}
-function adCfg(){const el=ov&&ov.querySelector('[data-cfg]');if(!el)return;
-  if(!FB()){el.innerHTML='<div class="pxst pxwarn">Game chưa kết nối máy chủ Firebase nên chưa nhận được đơn. Hãy tạo Firebase theo hướng dẫn rồi điền địa chỉ vào cấu hình game.</div>';return}
-  const k=akey();
-  el.innerHTML=k?`<div class="pxsm" style="margin:6px 0">Mật khẩu chủ game đã lưu trên máy này · <a href="#" data-a="k" style="color:#6f8fd0">đổi</a></div>`
-    :`<div class="pxst"><b>Nhập mật khẩu chủ game</b> (đúng như trong luật Firebase) để xác nhận đơn:<div style="display:flex;gap:6px;margin-top:6px"><input type="password" data-k autocomplete="off"><button class="pxcp" data-a="ks">Lưu</button></div></div>`;
-  const s=el.querySelector('[data-a="ks"]');if(s)s.onclick=()=>{const v=el.querySelector('[data-k]').value.trim();if(!v)return;try{localStorage.setItem(AK,v)}catch(e){}adCfg();adLoad(true)};
-  const c=el.querySelector('[data-a="k"]');if(c)c.onclick=e=>{e.preventDefault();try{localStorage.removeItem(AK)}catch(_){}adCfg()}}
-async function adLoad(force){if(!ov||!ov.dataset.adm||!FB())return;if(!akey()){const l=ov.querySelector('[data-l]');if(l)l.textContent='Nhập mật khẩu chủ game để xem danh sách đơn.';return}try{await adPull()}catch(e){const l=ov&&ov.querySelector('[data-l]');if(l)l.textContent='Không tải được đơn (kiểm tra mạng hoặc luật Firebase).';return}adRender();bell()}
-function adRender(){if(!ov||!ov.dataset.adm)return;ov.querySelectorAll('.pxtab button').forEach(b=>b.classList.toggle('on',b.dataset.t===AD.tab));
-  const el=ov.querySelector('[data-l]');const L=AD.tab==='w'?pend():AD.list;
-  el.innerHTML=L.length?L.map(x=>{const s=AD.st[x.id],t=s===1?(AD.got[x.id]?['Người chơi đã nhận','k']:['Đã xác nhận','k']):s===-1?['Đã từ chối','n']:['Chờ xác nhận','w'];
-    return `<div class="pxl"><div><b style="font-family:ui-monospace,Consolas,monospace;color:#ffd45a">${esc(x.code)}</b> · <b>${NF(x.vnd)} VNĐ</b><small>${esc(x.it)}${x.g?' — '+esc(x.g):''}</small><small>Người chơi ${esc(x.u)} · ${new Date(x.t).toLocaleString('vi-VN')}</small></div>`+
-      (s?`<span class="tg ${t[1]}">${t[0]}</span>`:`<div class="pxa"><button data-ok="${esc(x.id)}">✓ Đã nhận tiền</button><button class="no" data-no="${esc(x.id)}">✕</button></div>`)+`</div>`}).join('')
-    :`<div style="padding:10px 0">${AD.tab==='w'?'Không có đơn nào đang chờ.':'Chưa có đơn nào.'}</div>`;
-  el.querySelectorAll('[data-ok],[data-no]').forEach(b=>b.onclick=()=>adSet(b.dataset.ok||b.dataset.no,b.dataset.ok?1:-1,b))}
-async function adSet(id,v,b){const k=akey();if(!k){say('Nhập mật khẩu chủ game trước');adCfg();return}
-  const x=AD.list.find(o=>o.id===id);if(v===-1&&b.dataset.sure!=='1'){b.dataset.sure='1';b.textContent='Từ chối?';return}
-  b.disabled=true;
-  try{await rq('ok/'+id,{m:'PUT',b:{v,t:Date.now(),k}});AD.st[id]=v;say(v===1?'Đã xác nhận '+(x?x.code:id):'Đã từ chối '+(x?x.code:id));adRender();bell()}
-  catch(e){b.disabled=false;say(e.denied?'Sai mật khẩu chủ game (không khớp luật Firebase)':'Không gửi được, thử lại')}}
-/* chuông báo đơn mới trên máy của chủ game */
-const bellEl=document.createElement('button');bellEl.id='pxbell';bellEl.onclick=admin;document.body.appendChild(bellEl);
-function bell(){const n=pend().length;bellEl.style.display=akey()&&FB()&&n?'block':'none';bellEl.textContent='🔔 '+n+' đơn nạp chờ xác nhận'}
-function beep(){try{const A=new (window.AudioContext||window.webkitAudioContext)(),o=A.createOscillator(),g=A.createGain();o.frequency.value=880;g.gain.value=.08;o.connect(g);g.connect(A.destination);o.start();o.frequency.setValueAtTime(1320,A.currentTime+.15);o.stop(A.currentTime+.32)}catch(e){}}
-async function adWatch(){if(!akey()||!FB())return;try{await adPull()}catch(e){return}
-  const ids=pend().map(x=>x.id);
-  if(AD.seen){const fresh=pend().filter(x=>!AD.seen.has(x.id));
-    if(fresh.length){const x=fresh[0];beep();say('🔔 Đơn nạp mới '+x.code+' · '+NF(x.vnd)+' VNĐ');
-      try{if(document.hidden&&window.Notification&&Notification.permission==='granted')new Notification('Đơn nạp mới · '+x.code,{body:NF(x.vnd)+' VNĐ — '+x.it})}catch(e){}}}
-  AD.seen=new Set(ids);bell();adRender()}
+  const x=open(`<h3>🔑 QUẢN LÝ ĐƠN NẠP</h3><div class="pxsm">Dành cho chủ game. Người chơi gửi tin nhắn đơn qua Zalo → bạn kiểm tra tiền về trong app Agribank → dán tin nhắn vào đây → tạo mã nhận quà gửi lại cho họ.</div>
+   <div data-k></div><div data-w></div><div data-h></div><div class="pxbt"><button data-a="x">Đóng</button></div>`,'adm');
+  adRender()}
+async function adRender(){if(!ov||!ov.dataset.adm)return;const kEl=ov.querySelector('[data-k]'),wEl=ov.querySelector('[data-w]'),hEl=ov.querySelector('[data-h]');
+  if(!SUB()){kEl.innerHTML='<div class="pxst pxbad">Trình duyệt này không hỗ trợ tạo mã. Hãy dùng Chrome hoặc Safari bản mới.</div>';return}
+  const k=await privKey();
+  if(!k){kEl.innerHTML=`<div class="pxst pxwarn"><b>Nhập khoá chủ game</b> (chuỗi bắt đầu bằng SEK1., trong tệp KHOA-CHU-GAME.txt). Chỉ cần nhập một lần trên máy này.<textarea data-kv placeholder="SEK1.…"></textarea><div class="pxbt" style="margin-top:6px"><button data-a="kp">📋 Dán</button><button class="go" data-a="ks">Lưu khoá</button></div><div class="pxsm" data-km></div></div>`;
+    wEl.innerHTML='';hEl.innerHTML='';
+    const ta=kEl.querySelector('[data-kv]');kEl.querySelector('[data-a="kp"]').onclick=()=>pasteInto(ta);
+    kEl.querySelector('[data-a="ks"]').onclick=async()=>{const v=ta.value.replace(/\s+/g,'');const old=lsg(AK);lss(AK,v);PRIV=null;if(await privKey().catch(()=>null)){adRender()}else{if(old)lss(AK,old);else try{localStorage.removeItem(AK)}catch(e){}kEl.querySelector('[data-km]').textContent='Khoá không đúng. Hãy chép lại nguyên dòng trong tệp KHOA-CHU-GAME.txt.'}};
+    return}
+  kEl.innerHTML=`<div class="pxsm" style="margin:8px 0">✓ Đã có khoá chủ game trên máy này · <a href="#" data-a="kd" style="color:#6f8fd0">gỡ khoá</a></div>`;
+  kEl.querySelector('[data-a="kd"]').onclick=e=>{e.preventDefault();if(e.currentTarget.dataset.s!=='1'){e.currentTarget.dataset.s='1';e.currentTarget.textContent='bấm lần nữa để gỡ';return}try{localStorage.removeItem(AK)}catch(_){}PRIV=null;adRender()};
+  wEl.innerHTML=`<div class="pxst"><b>Dán tin nhắn đơn</b> người chơi gửi qua Zalo:<textarea data-o placeholder="ĐƠN NẠP SE …  Mã đơn: SEO1.…"></textarea><div class="pxbt" style="margin-top:6px"><button data-a="op">📋 Dán</button><button class="go" data-a="oc">Xem đơn</button></div></div><div data-od></div>`;
+  const ta=wEl.querySelector('[data-o]'),od=wEl.querySelector('[data-od]');
+  wEl.querySelector('[data-a="op"]').onclick=async()=>{await pasteInto(ta);show()};
+  wEl.querySelector('[data-a="oc"]').onclick=show;
+  function show(){const o=parseOrder(ta.value);if(!o){od.innerHTML='<div class="pxst pxbad">Không đọc được mã đơn. Hãy dán nguyên tin nhắn có dòng "Mã đơn: SEO1.…".</div>';return}
+    const off=official(o),done=logs().find(l=>l.id===o.id);
+    const priceOk=off&&Math.round(off.vnd)===Math.round(o.vnd),specOk=off&&canon(off.spec)===canon(o.spec);
+    const chk=!off?'<div class="pxst pxwarn">⚠ Không đối chiếu được với bảng giá hiện tại. Hãy kiểm tra kỹ gói và số tiền.</div>'
+      :(priceOk&&specOk)?'<div class="pxst pxok">✓ Gói và giá khớp bảng giá của game.</div>'
+      :'<div class="pxst pxbad">⚠ Đơn KHÔNG khớp bảng giá: '+(!priceOk?'giá đúng là '+NF(off.vnd)+' VNĐ. ':'')+(!specOk?'nội dung gói bị sửa. ':'')+'Không nên duyệt.</div>';
+    od.innerHTML=`<div class="pxrow"><span>Nội dung chuyển khoản cần thấy</span><b class="cd">${esc(CFG.prefix+' '+o.id)}</b></div>
+      <div class="pxrow"><span>Số tiền cần nhận</span><b>${NF(o.vnd)} VNĐ</b></div><div class="pxrow"><span>Gói</span><b>${esc(o.name)}</b></div>
+      ${o.get?`<div class="pxrow"><span>Người chơi nhận</span><b style="font-size:13px">${esc(o.get)}</b></div>`:''}<div class="pxrow"><span>Người chơi · lúc đặt</span><b style="font-size:13px">${esc(o.u||'?')} · ${o.t?new Date(o.t).toLocaleString('vi-VN'):'?'}</b></div>${chk}
+      ${done?'<div class="pxst pxok">Đơn này đã được duyệt lúc '+new Date(done.t).toLocaleString('vi-VN')+'. Mã nhận quà cũ ở dưới.</div>':''}
+      <div class="pxbt"><button class="go" data-a="ok">${done?'Hiện lại mã nhận quà':'✓ Đã nhận đủ tiền — tạo mã nhận quà'}</button></div><div data-gc></div>`;
+    od.querySelector('[data-a="ok"]').onclick=async e=>{const b=e.currentTarget;b.disabled=true;let code=done&&done.code;
+      if(!code){try{const sig=await SUB().sign({name:'ECDSA',hash:'SHA-256'},await privKey(),enc.encode(msgOf(o)));code='SEQ1-'+o.id+'-'+b64u(sig)}catch(err){b.disabled=false;od.querySelector('[data-gc]').innerHTML='<div class="pxst pxbad">Không tạo được mã.</div>';return}
+        const L=logs();L.unshift({id:o.id,name:o.name,vnd:o.vnd,u:o.u,code,t:Date.now()});lss(LOG,JSON.stringify(L.slice(0,300)))}
+      const gc=od.querySelector('[data-gc]');gc.innerHTML=`<div class="pxst pxok"><b>Mã nhận quà</b> — chép và gửi lại cho người chơi qua Zalo:<div class="pxbox" style="margin-top:6px">${esc(code)}</div><div class="pxbt" style="margin-top:6px"><button data-a="gcp">📋 Chép mã nhận quà</button></div></div>`;
+      gc.querySelector('[data-a="gcp"]').onclick=ev=>copy(code,ev.currentTarget);copy(code);hist()}}
+  function hist(){const L=logs();hEl.innerHTML=L.length?'<div class="pxsm" style="margin-top:12px"><b>Đơn đã duyệt trên máy này</b></div>'+L.slice(0,30).map(l=>`<div class="pxl"><div><b style="font-family:ui-monospace,Consolas,monospace;color:#ffd45a">${esc(CFG.prefix+' '+l.id)}</b> · ${NF(l.vnd)} VNĐ<small>${esc(l.name)} · ${new Date(l.t).toLocaleString('vi-VN')}</small></div><button class="pxcp" data-cc="${esc(l.code)}">Chép mã</button></div>`).join(''):'';
+    hEl.querySelectorAll('[data-cc]').forEach(b=>b.onclick=()=>copy(b.dataset.cc,b))}
+  hist()}
 
 /* ---------- 4) nối vào các nơi trả tiền thật trong game ---------- */
-const PRICE=s=>+String(s).replace(/[^\d]/g,'')||0;
-function nap(k,i){const c=(typeof NAP!=='undefined'&&NAP[k]||[])[i];if(!c)return;
+function napPack(k,i){const c=(typeof NAP!=='undefined'&&NAP[k]||[])[i];if(!c)return null;
   const unit=/Sao/.test(c[2]||c[1])?'sao':'da',base=PRICE(c[2]||c[1]),bonus=PRICE(c[0]),tot=Math.round(base*(1+bonus/100));
-  start({src:'g',spec:{g:{[unit]:tot}},name:(c[2]?c[1]:'Nạp '+c[1]),vnd:PRICE(c[3]),get:NF(tot)+' '+(unit==='sao'?'Sao':'Đá')+(bonus?' ('+NF(base)+' + thưởng '+bonus+'%)':'')})}
-function promo(btn){const c=btn.closest('.pc');if(!c)return;const g={};let bad=false;
-  const take=(t)=>{const m=String(t).match(/^(Đá|Sao)\s*x\s*([\d.,]+)/);if(!m){bad=true;return}const k=m[1]==='Đá'?'da':'sao';g[k]=(g[k]||0)+PRICE(m[2])};
-  const h=(c.querySelector('h4')||{}).textContent||'',b=c.querySelector('.pa b'),lis=[...c.querySelectorAll('ul li')].map(x=>x.textContent.trim()).filter(Boolean);
-  if(b&&!lis.length)take(h.trim()+' '+b.textContent.trim());else if(lis.length)lis.forEach(take);else bad=true;
-  if(bad||!Object.keys(g).length){say('Gói này chưa mở bán');return}
-  start({src:'g',spec:{g},name:h,vnd:PRICE(btn.textContent),get:Object.keys(g).map(k=>NF(g[k])+' '+(k==='sao'?'Sao':'Đá')).join(' + ')})}
+  return {name:(c[2]?c[1]:'Nạp '+c[1]),vnd:PRICE(c[3]),spec:{g:{[unit]:tot}},get:NF(tot)+' '+(unit==='sao'?'Sao':'Đá')+(bonus?' ('+NF(base)+' + thưởng '+bonus+'%)':'')}}
+function nap(k,i){const p=napPack(k,i);if(!p)return;start({src:'g',key:{t:'nap',k,i},spec:p.spec,name:p.name,vnd:p.vnd,get:p.get})}
+/* 5 gói Đá/Sao ở tab Khuyến mãi (đọc từ thẻ tĩnh lúc tải game) */
+const PROMO=[];
+(function(){const g=document.querySelector('#psh .pgrid');if(!g)return;[...g.querySelectorAll('.pc')].forEach((c,i)=>{const sp={};let bad=false;
+  const take=t=>{const m=String(t).match(/^(Đá|Sao)\s*x\s*([\d.,]+)/);if(!m){bad=true;return}const k=m[1]==='Đá'?'da':'sao';sp[k]=(sp[k]||0)+PRICE(m[2])};
+  const h=((c.querySelector('h4')||{}).textContent||'').trim(),b=c.querySelector('.pa b'),lis=[...c.querySelectorAll('ul li')].map(x=>x.textContent.trim()).filter(Boolean);
+  if(b&&!lis.length)take(h+' '+b.textContent.trim());else if(lis.length)lis.forEach(take);else bad=true;
+  PROMO[i]=bad||!Object.keys(sp).length?null:{name:h,vnd:PRICE((c.querySelector('.pb')||{}).textContent),spec:{g:sp},get:Object.keys(sp).map(k=>NF(sp[k])+' '+(k==='sao'?'Sao':'Đá')).join(' + ')}})})();
+function promo(btn){const c=btn.closest('.pc'),i=[...btn.closest('.pgrid').querySelectorAll('.pc')].indexOf(c),p=PROMO[i];
+  if(!p||(c.querySelector('h4')||{}).textContent.trim()!==p.name){say('Gói này chưa mở bán');return}
+  start({src:'g',key:{t:'promo',i},spec:p.spec,name:p.name,vnd:p.vnd,get:p.get})}
+function psh(tab,p,after){start({src:'psh',key:{t:'psh',tab},name:p[0],vnd:p[1],spec:p[4],get:window.PSHL?PSHL(p[4]).join(' · '):'',after})}
 if(typeof evPay==='function')evPay=function(o,done,x){start({src:'ev',spec:{id:o.id,ship:x&&x.ship||null},name:o.n,vnd:o.p,get:x&&x.ship?'Mở khóa tàu '+((KSH.find(k=>k.id===x.ship)||{}).n||''):''})};
 /* nút "Đơn của tôi" ở Shop khuyến mãi và màn Nạp */
-['psh','nap'].forEach(id=>{const s=document.getElementById(id);if(!s)return;const b=document.createElement('button');b.className='pxmy';b.textContent='🧾 Đơn của tôi';b.onclick=my;
+['psh','nap'].forEach(id=>{const s=document.getElementById(id);if(!s)return;const b=document.createElement('button');b.className='pxmy';b.textContent='🧾 Đơn của tôi · nhập mã quà';b.onclick=my;
   if(getComputedStyle(s).position==='static')s.style.position='relative';s.appendChild(b)});
-window.PAYX={start,nap,promo,my,admin,check,vietqr,crc16,cfg:CFG,_ad:AD,_watch:adWatch};
-/* kiểm tra định kỳ: người chơi nhận vật phẩm, chủ game nhận chuông báo */
-setTimeout(()=>{check();adWatch()},2500);
-setInterval(()=>{if(P().orders.some(o=>o.st==='sent'))check()},20000);
-setInterval(()=>{if(ov&&ov.dataset.adm)adLoad();else adWatch()},20000);
-setInterval(()=>{if(ov&&ov.dataset.my)check()},8000);
+window.PAYX={start,nap,promo,psh,my,admin,redeem,parseOrder,parseGift,orderToken,zaloMsg,vietqr,crc16,cfg:CFG,msgOf};
 })();
 
 /* gộp pháo công trình hạng nặng vào pháo hạng nặng */
@@ -12619,7 +12645,7 @@ function give(s){const t=[];
     pick(L,u[1]).forEach(x=>{setLv(x.id,Math.min(GMAX,lvOf(x.id)+u[2]));t.push(x.n+' +'+u[2]+' cấp')})});
   (s.fu||[]).forEach(f=>{const F=fuS(),mx=(FUI.find(x=>x.k===f[0])||{max:100}).max;F[f[0]]=Math.min(mx,F[f[0]]+f[1]);t.push(FN[f[0]]+' +'+f[1]+(f[0]==='sl'?' slot':' cấp'))});
   return t}
-window.PSHG=give;window.PSHL=lines;function canBuy(s){
+window.PSHG=give;window.PSHL=lines;window.PSHT=T;function canBuy(s){
   if(s.capLv&&!S.caps.some(n=>clv(n)<100))return 'Bạn chưa có thuyền trưởng nào để nâng cấp';
   if(s.own&&shopOwn(s.own))return 'Bạn đã sở hữu vật phẩm này';
   if(s.lvup&&lvOf(s.lvup[0])>=GMAX)return 'Vật phẩm đã đạt cấp tối đa';
@@ -12641,7 +12667,7 @@ function show(tab){
     c.classList.add('wpvc');c.title='Bấm để xem mô phỏng khai hỏa';const vb=document.createElement('button');vb.className='wpvb';vb.type='button';vb.title='Xem mô phỏng khai hỏa';vb.textContent='▶';c.appendChild(vb);
     c.onclick=e=>{if(e.target.closest('.pb'))return;if(window.WPV)WPV.open(wid)}});
   grid.querySelectorAll('.pb').forEach(b=>b.onclick=()=>{const p=L[+b.dataset.i],why=canBuy(p[4]);if(why){toast(why);return}
-    PAYX.start({src:'psh',name:p[0],vnd:p[1],spec:p[4],get:lines(p[4]).join(' · '),after:()=>{try{if($('psh').style.display!=='none')show(tab)}catch(e){}}})})}
+    PAYX.psh(tab,p,()=>{try{if($('psh').style.display!=='none')show(tab)}catch(e){}})})}
 root.querySelectorAll('.pt[data-t]').forEach(b=>{if(b.dataset.t==='Khuyến mãi'||T[b.dataset.t])b.onclick=()=>show(b.dataset.t)});
 const st=document.createElement('style');
 st.textContent='#psh .pgrid.pk2{grid-template-rows:none;grid-auto-rows:minmax(0,1fr);overflow:auto}#psh .pk2 .pc h4{padding:0 4px;max-width:none;width:100%;box-sizing:border-box}#psh .pk2 .pa{gap:2px;align-items:center;min-height:30px}#psh .pk2 .pa img{max-height:100%;min-width:0;object-fit:contain}#psh .pk2 ul{line-height:1.25}#psh .pk2 li{white-space:normal;font-size:.9em;line-height:1.2}#psh .pc.wpvc{position:relative;cursor:pointer}#psh .pk2 .pc.wpvc h4{padding:0 28px}#psh .pc .wpvb{top:4px;right:4px;width:24px;height:24px;line-height:22px;font-size:12px}';
@@ -12739,7 +12765,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL=(window.SE_CFG&&SE_CFG.fb)||'';
-  const VER='v163';
+  const VER='v164';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`
