@@ -2577,10 +2577,10 @@ function dfStep(dt){
     const engOff=P.engDrain>0&&!P.eOn,spE=(P.spT?P.spT[(engOff?'0':'1')+(P.mdrain>0&&!P.mOn?'0':'1')]:P.sp)*(P.boostT>0?1+P.boostP/100:1)*(P.c17sp||1),accE=engOff?0:(P.acc||0);
     const d=Math.hypot(P.tx-P.x,P.ty-P.y);let dvx=0,dvy=0;
     if(d>.15){const s2=Math.min(spE,d*4);dvx=(P.tx-P.x)/d*s2;dvy=(P.ty-P.y)/d*s2}
-    const kk=Math.min(1,3*(1+accE/100)*dt);P.vx=(P.vx||0)+(dvx-(P.vx||0))*kk;P.vy=(P.vy||0)+(dvy-(P.vy||0))*kk;P.x+=P.vx*dt;P.y+=P.vy*dt;
+    if(window.c25Move)c25Move(P,dvx,dvy,accE,dt);else{const kk=Math.min(1,3*(1+accE/100)*dt);P.vx=(P.vx||0)+(dvx-(P.vx||0))*kk;P.vy=(P.vy||0)+(dvy-(P.vy||0))*kk;P.x+=P.vx*dt;P.y+=P.vy*dt}
     P.x=Math.max(.5,Math.min(G.wd.Wd-.5,P.x));P.y=Math.max(.5,Math.min(G.wd.Hd-.5,P.y));
     let tg=null,bd=1e9;G.en.forEach(e=>{if(!e.dead&&e.spawn<=G.t){const dd2=dd(P,e);if(dd2<bd){bd=dd2;tg=e}}});
-    if(tg)P.ang=Math.atan2(tg.y-P.y,tg.x-P.x);else if(d>.3)P.ang=Math.atan2(P.ty-P.y,P.tx-P.x);
+    {const a0=tg?Math.atan2(tg.y-P.y,tg.x-P.x):(d>.3?Math.atan2(P.ty-P.y,P.tx-P.x):null);if(a0!=null)P.ang=window.c25Turn?c25Turn(P,a0,dt):a0}
     P.ws.forEach(w=>{w.t-=dt*frK(P);if(w.t>0)return;
       let t2=null,b2=1e9;G.en.forEach(e=>{if(!e.dead&&e.spawn<=G.t){const q=dd(P,e);if(q<w.rng&&q<b2){b2=q;t2=e}}});
       {const mk=bmkFor(P);if(mk)t2=mk}
@@ -2948,7 +2948,7 @@ function wAt(w,l){l=l||wLv(w.id);const dm=1+.06*(l-1),rf=1+.004*(l-1),rg=1+.005*
   return {l,dm,rf,rg,dmg:Math.round(wNum(w)*dm)+' '+unit,rof:f1(wSec(w)/rf)+' giây',rng:f1((parseInt(w.rng)||8)*rg)+' đv'}}
 function arAt(a,l){l=l||aLv(a.id);
   return {l,dur:Math.round(a.dur*(1+.05*(l-1))),blk:Math.round(a.blk*(1+.01*(l-1))*10)/10,reg:Math.round(a.reg*(1+.03*(l-1))*10)/10,dly:Math.round(a.dly/(1+.004*(l-1))*10)/10,mass:a.mass}}
-function gCost(kind,it){const l=kind==='w'?wLv(it.id):aLv(it.id),m=kind==='w'?.6+it.mass/80:.5+it.mass/150;
+function gCost(kind,it){const l=kind==='w'?wLv(it.id):aLv(it.id),m=kind==='w'?.6+it.mass/80:.5+(it.m0!=null?it.m0:it.mass)/150;
   return {da:Math.round(600*(1+(l-1)*.5+Math.pow(l,1.8)/15)*m/100)*100,sao:l>=10?5*Math.floor(l/10):0}}
 var gKind='w',gSel={w:'w1',a:'a1'};
 var SHL=null;const gList=()=>gKind==='h'?((SHL&&SHL.length===KSH.length?SHL:(SHL=KSH.map(x=>({id:x.id,n:x.n,img:x.img,w:2,h:2,mass:90,d:'Thân '+x.hull+' · khung ô '+x.g[0].length+'×'+x.g.length+'.',ship:1})))).filter(x=>shipOpen(x.id)).concat(bkList())):gKind==='w'?WP.filter(shopOwn):gKind==='t'?NUC.concat(TNK,MRD,SKL):ARM.concat(ENG);
@@ -3174,12 +3174,12 @@ function khRender(){
     wr.innerHTML=P.list().map(w=>{
       const geo=!!khPlaceFree(reg,w,0,occ0,null,w.norot),free=!!khPlaceFree(reg,w,0,occ,null,w.norot),cnt=items.filter(it=>it.id===w.id).length;
       let l1,l2;
-      if(w.eng){const q=enAt(w);l1=`Cấp ${q.l} · Lực đẩy ${q.thr.toLocaleString('vi-VN')} · Tốc +${String(q.vmax).replace('.',',')}%`;l2=`Gia tốc +${String(q.acc).replace('.',',')}% · NL ${q.en}/s · KL ${w.mass}`}
+      if(w.eng){const q=enAt(w);l1=`Cấp ${q.l} · Tốc chạy +${f2(q.sp)} · Gia tốc +${f2(q.acc)}%`;l2=`Cần ${q.en} năng lượng · KL ${w.mass}`}
       else if(w.skl){const q=sAt(w);l1=`Cấp ${q.l} · ${SKN[w.t]} ${f2(q.pw)}%${q.dur?' · '+f2(q.dur)+'s':''}`;l2=`Hồi chiêu ${f2(q.cd)}s · NL ${f2(q.ec)} · KL ${w.mass}`}
-      else if(w.mrd){const q=mAt(w);l1=`Cấp ${q.l} · Giảm KL ${f2(q.pct)}% · Tải tối đa ${q.cap.toLocaleString('vi-VN')}`;l2=`NL ${q.en}/s · Ổn định ${f2(q.stab)}% · KL ${w.mass}`}
-      else if(w.nuc){const q=nAt(w);l1=`Cấp ${q.l} · Công suất ${f2(q.pw)}/s · Hiệu suất ${f2(q.eff)}%`;l2=`Ổn định ${f2(q.stab)}% · Dự trữ ${q.res.toLocaleString('vi-VN')} E · KL ${w.mass}`}
+      else if(w.mrd){const q=mAt(w);l1=`Cấp ${q.l} · Giảm ${q.red.toLocaleString('vi-VN')} KL`;l2=`Cần ${q.en} năng lượng`}
+      else if(w.nuc){const q=nAt(w);l1=`Cấp ${q.l} · Cấp +${f2(q.pw)} năng lượng`;l2=`KL ${w.mass}`}
       else if(w.tnk){const q=tAt(w);l1=`Cấp ${q.l} · Sức chứa ${q.cap.toLocaleString('vi-VN')} đv · Chắn xạ ${f2(q.blk)}%`;l2=`Sức bền ${q.hp.toLocaleString('vi-VN')} HP · An toàn ${f2(q.safe)}% · KL ${w.mass}`}
-      else{const q=arAt(w);l1=`Cấp ${q.l} · Máu ${q.dur.toLocaleString('vi-VN')}`;l2=`Hồi ${q.reg}/s · Trễ ${String(q.dly).replace('.',',')}s · KL ${w.mass}`}
+      else{const q=arAt(w);l1=`Cấp ${q.l} · Máu +${q.dur.toLocaleString('vi-VN')}`;l2=`KL ${w.mass}`}
       return `<div class="khw2 ${P.cls} ${geo?'':'no'} ${cnt?'on':''}" data-id="${w.id}"><div class="im"><img src="${w.img}" alt="" draggable="false"></div><div><b>${w.n}</b><small>${l1}</small><small>${l2}</small></div><div class="fp"><div style="grid-template-columns:repeat(${w.w},auto)">${fpCells(w)}</div>${w.w}×${w.h}</div><div class="ft ${free?'ok':'nk'}">${cnt?'✓ ĐANG LẮP ×'+cnt+' · ':''}${free?'Còn chỗ trên ô '+P.col:geo?'Các ô '+P.col+' đã đầy':'Tàu không có ô '+P.col+' '+w.w+'×'+w.h}</div></div>`}).join('');
     wr.scrollTop=sct;
   }else{wr.style.display='none';wr.innerHTML=''}
@@ -3196,6 +3196,7 @@ function khEquip(wid,force,pl){
     const P=KPAR[w.kind],reg=khPReg(cur,w.kind),items=P.get(cur);
     pl=pl||khPlaceFree(reg,w,0,khOcc2(cur,w.kind,items),{gx:reg.cx,gy:reg.cy},w.norot);
     if(!pl){toast(khPlaceFree(reg,w,0,khXOcc(cur,w.kind),null,w.norot)?'Các ô '+P.col+' đã đầy — chạm '+P.n+' trên tàu để tháo':'Tàu này không có ô '+P.col+' '+w.w+'×'+w.h);return}
+    if(window.c25Can&&!c25Can(cur,w))return;
     items.push({id:wid,ax:pl.ax,ay:pl.ay,rot:pl.rot?1:0});K[P.key][cur.id]=items;save();khRender();toast('Đã lắp '+w.n);return;
   }
   const sl=khSlots(cur),wm=khWpMap(cur);
@@ -3225,14 +3226,14 @@ function khTarget(wid,x,y){
 $('khst').onclick=e=>{
   const r=e.target.closest('.khrect');
   if(r){const K=khS(),cur=KSH.find(v=>v.id===K.sel),sk=r.dataset.s;
-    if(sk==='a'||sk==='y'||sk==='n'||sk==='t'||sk==='m'||sk==='k'){const P=KPAR[{a:'b',y:'y',n:'g',t:'s',m:'m',k:'k'}[sk]],items=P.get(cur),it=items.splice(+r.dataset.n,1)[0];K[P.key][cur.id]=items;save();khRender();toast('Đã tháo '+(it?wpGet(it.id).n:P.n));return}
+    if(sk==='a'||sk==='y'||sk==='n'||sk==='t'||sk==='m'||sk==='k'){if(window.c25CanRemove&&!c25CanRemove(cur,sk,+r.dataset.n))return;const P=KPAR[{a:'b',y:'y',n:'g',t:'s',m:'m',k:'k'}[sk]],items=P.get(cur),it=items.splice(+r.dataset.n,1)[0];K[P.key][cur.id]=items;save();khRender();toast('Đã tháo '+(it?wpGet(it.id).n:P.n));return}
     const wm=khWpMap(cur),a=wm[+sk]||[],it=a.splice(+r.dataset.n,1)[0],w=it&&wpGet(it.id);
     if(!a.length)delete wm[+sk];save();khRender();toast('Đã tháo '+(w?w.n:'vũ khí'));return}
   const m=e.target.closest('.khsl');if(m){khS().slot=+m.dataset.s;khRender()}};
 $('khgo').onclick=()=>{
   const K=khS(),cur=KSH.find(x=>x.id===K.sel),m=KMOD.find(x=>x.k===K.mod),P=KPAR[K.mod];
   if(K.mod==='r'){openWpn(null);return}
-  if(P){if(!P.get(cur).length){toast('Chưa lắp '+P.n+' nào');return}K[P.key][cur.id]=[];save();khRender();toast('Đã tháo tất cả '+P.nn+' của '+cur.n);return}
+  if(P){if(!P.get(cur).length){toast('Chưa lắp '+P.n+' nào');return}if(K.mod==='g'&&window.c25CanRemove&&!c25CanRemove(cur,'all:g'))return;K[P.key][cur.id]=[];save();khRender();toast('Đã tháo tất cả '+P.nn+' của '+cur.n);return}
   const f=(K.fit[cur.id]=K.fit[cur.id]||{});f[K.mod]=!f[K.mod];save();khRender();
   toast((f[K.mod]?'Đã lắp mô-đun ':'Đã tháo mô-đun ')+m.n+' cho '+cur.n);
 };
@@ -4415,7 +4416,7 @@ R.forEach(r=>ARM.push({id:r.id,n:r.n,w:r.w,h:r.h,dur:r.dur,blk:0,reg:r.reg,dly:r
 /* ===== Cửa hàng ở sảnh: bán vũ khí, modul tốc chạy, khiên, thuyền trưởng, kỹ năng; trả bằng Đá + Sao ===== */
 var ST={tab:'w',q:'',n:40};
 const STT=[['w','Vũ khí'],['y','Modul tốc chạy'],['a','Khiên'],['k','Kỹ năng']];
-function stBase(it){return it.c?Math.round((it.c[9]*60+30000)/1000)*1000:Math.round((39000+(it.mass||100)*380)/1000)*1000}
+function stBase(it){return it.c?Math.round((it.c[9]*60+30000)/1000)*1000:Math.round((39000+((it.it&&it.it.m0!=null?it.it.m0:it.mass)||100)*380)/1000)*1000}
 function stCost(it){const v=stBase(it);return {da:Math.max(100,Math.round(v*5*(2000/210000)/100)*100),sao:Math.max(1,Math.round(v/1000*3/42))}}
 function stList(){
   const q=ST.q.trim().toLowerCase();let L;
@@ -12076,7 +12077,7 @@ function weapon(it){
 }
 
 /* ---------- Số liệu thật của game: lấy tàu đang chọn trong Kho làm tàu mẫu ---------- */
-const DEF={hp:90,speed:77,mass:1380,enMax:1,enGen:1,reg:0,dly:5,acc:0};
+const DEF={hp:90,speed:16.8,turn:16.8,mass:1380,enMax:1,enGen:1,reg:0,dly:5,acc:0};
 function refCtx(){let sh=null;try{sh=KSH.find(x=>x.id===khS().sel)||KSH[0]}catch(e){sh=KSH&&KSH[0]}
   const c={sh,wm:{},E0:[],A0:[]};try{c.wm=khWpMap(sh);c.E0=khEngines(sh).map(x=>({id:x.id}));c.A0=khArmor(sh).map(x=>({id:x.id}))}catch(e){}return c}
 function stats(c,eng,arm){try{const t=khStats(c.sh,c.wm,null,arm||c.A0,eng||c.E0);if(t&&isFinite(t.hp)&&isFinite(t.speed))return t}catch(e){}return Object.assign({},DEF)}
@@ -12096,8 +12097,9 @@ const floatTx=(q,list,col)=>{list.forEach(f=>{const k=f.t/f.max;if(!(k<1))return
 
 /* ---------- 1) MODUL TỐC CHẠY: đua 10 ô giữa tàu hiện tại và tàu đã lắp động cơ ---------- */
 function sceneEng(it,c){
-  const m=it.it,A=stats(c,c.E0),B=stats(c,c.E0.concat([{id:m.id}])),D=10,T=18;
-  const mk=t=>({vt:Math.max(.8,t.speed/55),acc:t.acc||0,d:0,v:0,fin:null,t90:null,top:0});
+  const m=it.it,A=stats(c,c.E0);window.c25Force=true;let B;try{B=stats(c,c.E0.concat([{id:m.id}]))}finally{window.c25Force=false}const D=10,T=18,SD=(window.C25&&C25.SP_DIV)||12;
+  const PWr=window.C25?C25.power((()=>{try{return khReactors(c.sh)}catch(e){return[]}})(),c.E0,(()=>{try{return khMassMods(c.sh)}catch(e){return[]}})()):{left:0},need=2*(window.C25?C25.cellsOf(m):m.w*m.h);
+  const mk=t=>({vt:Math.max(.5,t.speed/SD),acc:t.acc||0,d:0,v:0,fin:null,t90:null,top:0});
   const L=[mk(A),mk(B)];let done=false;
   const fin=()=>L.map(s=>s.fin!=null?s.fin:T+(D-s.d)/Math.max(.05,s.v));
   return {T,isDone:()=>done,
@@ -12113,15 +12115,15 @@ function sceneEng(it,c){
         if(s.fin==null){for(let k=0;k<12;k++){const yy=((k*61.7+s.d*pu*1.6)%(y0-y1+40))+y1-20;q.strokeStyle='rgba(255,255,255,.10)';q.beginPath();q.moveTo(x-lw/2+8+(k*37)%(lw-16),yy);q.lineTo(x-lw/2+8+(k*37)%(lw-16),yy+10);q.stroke()}
           const k2=Math.min(1,s.v/Math.max(.5,s.vt));flame(q,x,y+22,12+34*k2,14,i?'#ffd45a':'#7fb4ff')}
         spr(q,c.sh,x,y,50);
-        tx(q,NF(s.v*55)+' đv/s',x,Math.min(H-8,y+44),col[i],11,'center');
+        tx(q,N1(s.v*SD)+' điểm',x,Math.min(H-8,y+44),col[i],11,'center');
         if(s.fin!=null){q.fillStyle=i?'#7dffb0':'#cfd8ee';q.font='bold 14px system-ui,sans-serif';q.textAlign='center';q.fillText('⏱ '+N1(s.fin)+' s',x,y1+30)}});
       tx(q,'Thời gian: '+N1(t)+' s',W/2,H-10,'#8fa6d8',11,'center')},
     result(){const f=fin(),dv=B.speed-A.speed;
       return {hd:dv>0?'Chạy nhanh hơn +'+PCT(B.speed,A.speed)+'% · đến đích sớm hơn '+N1(f[0]-f[1])+' giây':'Động cơ này không làm tàu nhanh hơn so với hiện tại',
-        rows:[['Tốc chạy',NF(A.speed)+' → '+NF(B.speed)+' đv/giây',dv>0?'up':''],['Chạy hết '+D+' ô',N1(f[0])+' s → '+N1(f[1])+' s',f[1]<f[0]?'up':''],
+        rows:[['Tốc chạy',N1(A.speed)+' → '+N1(B.speed)+' điểm',dv>0?'up':''],['Quay đầu',N1(A.turn)+' → '+N1(B.turn)+' điểm (tàu nặng hơn)',B.turn<A.turn?'dn':''],['Chạy hết '+D+' ô',N1(f[0])+' s → '+N1(f[1])+' s',f[1]<f[0]?'up':''],
           ['Gia tốc','+'+NF(A.acc||0)+'% → +'+NF(B.acc||0)+'%',(B.acc||0)>(A.acc||0)?'up':''],['Đạt 90% tốc độ tối đa sau',(L[0].t90==null?'—':N1(L[0].t90)+' s')+' → '+(L[1].t90==null?'—':N1(L[1].t90)+' s')],
-          ['Khối lượng tàu',NF(A.mass)+' → '+NF(B.mass),B.mass>A.mass?'dn':'']],
-        nt:'Tính trên tàu đang chọn trong Kho ('+(c.sh&&c.sh.n||'tàu mẫu')+'), cộng thêm 1 động cơ này vào các động cơ đang lắp. Chưa tính việc còn đủ ô vàng để lắp hay không.'}}}}
+          ['Khối lượng tàu',NF(A.mass)+' → '+NF(B.mass),B.mass>A.mass?'dn':''],['Năng lượng cần',need+' NL · tàu đang dư '+N1(Math.max(0,PWr.left))+' NL',need>PWr.left?'dn':'up']],
+        nt:'Tính trên tàu đang chọn trong Kho ('+(c.sh&&c.sh.n||'tàu mẫu')+'), cộng thêm 1 động cơ này vào các động cơ đang lắp. '+(need>PWr.left?'⚠ Tàu chưa đủ năng lượng để lắp động cơ này: cần lắp thêm lõi hạt nhân (mỗi ô +3 NL). ':'')+'Chưa tính việc còn đủ ô vàng để lắp hay không.'}}}}
 
 /* ---------- 2 + 5) Hai tàu bị bắn cùng một loạt đạn: dùng cho KHIÊN và kỹ năng CHẮN ---------- */
 function sceneDuel(o,c){
@@ -12157,13 +12159,13 @@ function sceneDuel(o,c){
 
 function sceneArm(it,c){
   const m=it.it,qa=arAt(m),A=stats(c,null,c.A0),B=stats(c,null,c.A0.concat([{id:m.id}])),hA=Math.max(1,A.hp),hB=Math.max(hA,B.hp),dps=hA/6,P1=8,LAP=10;
-  const d=sceneDuel({hA,hB,regA:A.reg||0,regB:B.reg||0,dlyA:A.dly||5,dlyB:B.dly||5,dps,tFire:P1,lapseAt:P1+.6,lapse:LAP,T:P1+.6+6,labels:['TÀU HIỆN TẠI','CÓ KHIÊN NÀY'],
-    footer:t=>t<P1+.6?'Địch bắn liên tục cùng một loạt đạn vào cả hai tàu':'⏩ Tua nhanh ×'+LAP+': tàu tự hồi phục khi hết bị bắn'},c);
+  const RG=(B.reg||0)>0,d=sceneDuel({hA,hB,regA:A.reg||0,regB:B.reg||0,dlyA:A.dly||5,dlyB:B.dly||5,dps,tFire:P1,lapseAt:RG?P1+.6:null,lapse:LAP,T:P1+.6+(RG?6:1.4),labels:['TÀU HIỆN TẠI','CÓ KHIÊN NÀY'],
+    footer:t=>t<P1+.6||!RG?'Địch bắn liên tục cùng một loạt đạn vào cả hai tàu':'⏩ Tua nhanh ×'+LAP+': tàu tự hồi phục khi hết bị bắn'},c);
   d.result=()=>{const tA=hA/dps,tB=hB/dps,s=d.S[1],pc=Math.round(Math.max(0,(hB-dps*P1))/hB*100),rB=B.reg||0,dly=B.dly||5;
     return {hd:'Chịu thêm '+NF(hB-hA)+' sát thương (+'+PCT(hB,hA)+'% máu) · sống thêm '+N1(tB-tA)+' giây dưới hỏa lực',
       rows:[['Máu tối đa',NF(hA)+' → '+NF(hB),'up'],['Tàu hiện tại dưới loạt đạn','bị hạ sau '+N1(tA)+' s'],
         ['Khi có khiên này',tB<=P1?'bị hạ sau '+N1(tB)+' s (+'+N1(tB-tA)+' s)':'còn '+pc+'% máu sau '+P1+' s (trụ được '+N1(tB)+' s)','up'],
-        ['Hồi phục',rB>0?N1(rB)+' máu/giây, sau '+N1(dly)+' s không bị bắn':'Không hồi phục',rB>0?'up':''],
+        ['Hồi phục',rB>0?N1(rB)+' máu/giây, sau '+N1(dly)+' s không bị bắn':'Khiên không tự hồi máu',rB>0?'up':''],['Tốc chạy · quay đầu',N1(A.speed)+' · '+N1(A.turn)+' → '+N1(B.speed)+' · '+N1(B.turn)+' điểm',B.speed<A.speed?'dn':''],
         ['Máu cuối mô phỏng',s.dead?'Bị phá hủy':NF(s.hp)+' / '+NF(s.max)],['Khối lượng tàu',NF(A.mass)+' → '+NF(B.mass),B.mass>A.mass?'dn':'']],
       nt:'Tính trên tàu đang chọn trong Kho ('+(c.sh&&c.sh.n||'tàu mẫu')+') có thêm khiên này; địch bắn một loạt đạn đủ hạ tàu hiện tại sau 6 giây. Khiên cộng thẳng vào máu tàu (phần xanh) và bị tiêu hao cuối cùng.'}};
   return d}
@@ -12200,7 +12202,7 @@ function sceneSkl(it,c){
       result(){return {hd:'Tăng +'+N1(pw)+'% sát thương trong '+N1(dur)+' giây · tổng sát thương +'+PCT(tot1,tot0)+'% trong '+N1(T-.6)+' giây',
           rows:[['Sát thương mỗi phát',N1(base)+' → '+N1(base*(1+pw/100))+' khi bật','up'],['Số phát trong lúc bật',String(nb)],['Tổng sát thương',N1(tot0)+' → '+N1(tot1),'up'],['Thời gian hiệu lực',N1(dur)+' giây']].concat(meta,[['Khối lượng',NF(m.mass)]]),
           nt:'Mô phỏng với vũ khí mẫu 2 phát/giây, 10 sát thương/phát, bắn vào mục tiêu giả đứng yên. Thực tế bonus nhân lên sát thương của mọi vũ khí trên tàu.'}}}}
-  if(kind==='boost'){const vt=Math.max(.8,ref.speed/55),ac=ref.acc||0,pw=q.pw,T=tc+dur+2.5;
+  if(kind==='boost'){const SD=(window.C25&&C25.SP_DIV)||12,vt=Math.max(.5,ref.speed/SD),ac=ref.acc||0,pw=q.pw,T=tc+dur+2.5;
     const run=bf=>{let v=0,d=0,t=0;while(t<T){const w=vt*((bf&&t>=tc&&t<tc+dur)?1+pw/100:1);v+=(w-v)*Math.min(1,3*(1+ac/100)*.02);d+=v*.02;t+=.02}return d};
     const dA=run(false),dB=run(true),Lg=Math.max(4,dB*1.08),sA={v:0,d:0},sB={v:0,d:0};
     return {T,step(dt,t){[sA,sB].forEach((s,i)=>{const w=vt*((i&&t>=tc&&t<tc+dur)?1+pw/100:1);s.v+=(w-s.v)*Math.min(1,3*(1+ac/100)*dt);s.d+=s.v*dt})},
@@ -12209,11 +12211,11 @@ function sceneSkl(it,c){
         for(let i=0;i<=Lg;i+=step){const y=y0-i*pu;g.strokeStyle='rgba(143,180,255,.22)';g.beginPath();g.moveTo(6,y);g.lineTo(W-6,y);g.stroke();tx(g,i+' ô',8,y-3,'#6f8fd0',9)}
         [sA,sB].forEach((s,i)=>{const x=lx[i],y=y0-s.d*pu;tx(g,i?'DÙNG KỸ NĂNG':'KHÔNG DÙNG',x,14,i?'#ffd45a':'#9fb4d8',10,'center');
           const boost=i&&on;flame(g,x,y+24,12+(boost?60:26)*Math.min(1,s.v/Math.max(.5,vt)),boost?20:14,boost?'#7fd8ff':'#ffd45a');
-          if(boost)ringD(g,x,y,40+Math.sin(t*16)*3,'#7fd8ff',.7,3);spr(g,c.sh,x,y,50);tx(g,NF(s.v*55)+' đv/s',x,Math.min(H-8,y+46),i?'#ffd45a':'#cfd8ee',11,'center')});
+          if(boost)ringD(g,x,y,40+Math.sin(t*16)*3,'#7fd8ff',.7,3);spr(g,c.sh,x,y,50);tx(g,N1(s.v*SD)+' điểm',x,Math.min(H-8,y+46),i?'#ffd45a':'#cfd8ee',11,'center')});
         icon(g,W,on);tx(g,on?'🚀 TĂNG TỐC +'+N1(pw)+'% (còn '+N1(Math.max(0,tc+dur-t))+' s)':(t<tc?'Chạy bình thường…':'Hết hiệu lực'),W/2,H-8,on?'#ffd45a':'#8fa6d8',11,'center')},
       result(){return {hd:'Tăng +'+N1(pw)+'% tốc chạy trong '+N1(dur)+' giây · đi xa hơn +'+PCT(dB,dA)+'% trong '+N1(T)+' giây',
-          rows:[['Tốc chạy khi bật',NF(ref.speed)+' → '+NF(ref.speed*(1+pw/100))+' đv/giây','up'],['Quãng đường '+N1(T)+' giây',N1(dA)+' → '+N1(dB)+' ô','up'],['Thời gian hiệu lực',N1(dur)+' giây']].concat(meta,[['Khối lượng',NF(m.mass)]]),
-          nt:'Tính trên tàu đang chọn trong Kho ('+(c.sh&&c.sh.n||'tàu mẫu')+'), tốc chạy gốc '+NF(ref.speed)+' đv/giây.'}}}}
+          rows:[['Tốc chạy khi bật',N1(ref.speed)+' → '+N1(ref.speed*(1+pw/100))+' điểm','up'],['Quãng đường '+N1(T)+' giây',N1(dA)+' → '+N1(dB)+' ô','up'],['Thời gian hiệu lực',N1(dur)+' giây']].concat(meta,[['Khối lượng',NF(m.mass)]]),
+          nt:'Tính trên tàu đang chọn trong Kho ('+(c.sh&&c.sh.n||'tàu mẫu')+'), tốc chạy hiện tại '+N1(ref.speed)+' điểm.'}}}}
   if(kind==='shield'){const pw=q.pw,T=tc+dur+2,dps=Hm/6;
     const d=sceneDuel({hA:Hm,hB:Hm,regA:0,regB:0,dlyA:5,dlyB:5,dps,tFire:T-.7,T,sh:{t:tc,d:dur,pw},labels:['KHÔNG DÙNG','DÙNG CHẮN NĂNG LƯỢNG'],
       footer:t=>t<tc?'Địch đang bắn cả hai tàu…':(t<tc+dur?'🛡 CHẮN BẬT: giảm '+N1(pw)+'% sát thương nhận (còn '+N1(Math.max(0,tc+dur-t))+' s)':'Chắn hết hiệu lực')},c);
@@ -12267,9 +12269,9 @@ function custom(it,spec){
   S1.raf=requestAnimationFrame(loop);return S1}
 const SPEC={
   eng:(it)=>{const q=enAt(it.it);return {tags:['MODUL TỐC CHẠY','Cấp '+q.l,it.it.w+'×'+it.it.h+' ô'],
-    stats:[['LỰC ĐẨY',NF(q.thr)],['TỐC CHẠY','+'+N1(q.vmax)+'%'],['GIA TỐC','+'+N1(q.acc)+'%'],['NĂNG LƯỢNG',it.it.en+'/s'],['KHỐI LƯỢNG',it.it.mass]],hint:'Đua 10 ô: tàu hiện tại và tàu đã lắp động cơ này',scene:c=>sceneEng(it,c)}},
+    stats:[['TỐC CHẠY','+'+N1(q.sp)],['GIA TỐC','+'+N1(q.acc)+'%'],['NĂNG LƯỢNG','cần '+q.en],['KHỐI LƯỢNG',it.it.mass]],hint:'Đua 10 ô: tàu hiện tại và tàu đã lắp động cơ này',scene:c=>sceneEng(it,c)}},
   arm:(it)=>{const q=arAt(it.it);return {tags:['KHIÊN','Cấp '+q.l,it.it.w+'×'+it.it.h+' ô'],
-    stats:[['MÁU THÊM',NF(q.dur)],['HỒI/GIÂY',N1(q.reg/12)],['TRỄ HỒI',N1(q.dly)+'s'],['KHỐI LƯỢNG',it.it.mass]],hint:'Hai tàu chịu cùng một loạt đạn, rồi tự hồi phục',scene:c=>sceneArm(it,c)}},
+    stats:[['MÁU THÊM',NF(q.dur)],['KHỐI LƯỢNG',it.it.mass]],hint:'Hai tàu chịu cùng một loạt đạn',scene:c=>sceneArm(it,c)}},
   skl:(it)=>{const q=sAt(it.it);return {tags:[SKN[it.it.t]||'KỸ NĂNG','Cấp '+q.l,it.it.w+'×'+it.it.h+' ô'],
     stats:[['SỨC MẠNH',N1(q.pw)+'%'],['THỜI GIAN',q.dur?N1(q.dur)+'s':'Tức thì'],['HỒI CHIÊU',N1(q.cd)+'s'],['NĂNG LƯỢNG',N1(q.ec)],['KHỐI LƯỢNG',it.it.mass]],hint:'Tự động dùng kỹ năng ở giây thứ 1,5',scene:c=>sceneSkl(it,c)}}
 };
@@ -12514,6 +12516,132 @@ if(typeof evPay==='function')evPay=function(o,done,x){start({src:'ev',spec:{id:o
 window.PAYX={start,nap,promo,psh,my,admin,redeem,parseOrder,parseGift,orderToken,zaloMsg,vietqr,crc16,cfg:CFG,msgOf};
 })();
 
+
+/* ===== c25: Kho tàu — ô đối xứng hai bên · tốc chạy 40 + quay đầu 40 giảm theo độ nặng · năng lượng từ lõi hạt nhân · modul tính theo số ô ===== */
+(function(){
+const N1=n=>String(Math.round((+n||0)*10)/10).replace('.',',');
+const NF=n=>Math.round(+n||0).toLocaleString('vi-VN');
+const cellsOf=x=>x&&x.cells?x.cells.length:((x&&x.w||1)*(x&&x.h||1));
+/* mỗi cấp: 1 ô +4%, 2 ô +5%, 3 ô +6%, … */
+const LVK=(x,l)=>1+(3+cellsOf(x))/100*(((l||aLv(x.id))|0)-1);
+/* độ nặng: 1.000 KL còn 50%, 2.000 KL còn 33% */
+const MF=m=>1000/(1000+Math.max(0,m));
+const BASE_SP=40,BASE_TURN=40,TURN_DEG=6,SP_DIV=12;
+const C=window.C25={cellsOf,LVK,MF,BASE_SP,BASE_TURN,TURN_DEG,SP_DIV};
+
+/* ---------- 1) ô trong kho tàu đều hai bên ---------- */
+function mirror(g){if(!g||!g.length)return g;const W=g[0].length;
+  return g.map(r=>{const a=r.split('');for(let i=0;i<Math.floor(W/2);i++){const j=W-1-i,L=a[i],R=a[j];if(L===R)continue;const v=L!=='.'?L:R;a[i]=v;a[j]=v}return a.join('')})}
+C.mirror=mirror;
+function fixShip(sh){if(!sh||sh._c25)return;sh._c25=1;const d=Object.getOwnPropertyDescriptor(sh,'g');
+  if(sh.gFull){sh.gFull=mirror(sh.gFull);if(sh.nolock||!(d&&d.get))sh._mg=sh.gFull}
+  else if(d&&'value' in d)sh.g=mirror(sh.g);
+  sh._pool=null;sh._mlv=null;if(!sh.nolock)sh._mg=null;sh._pr={};sh._sl=null;sh._br=null}
+(typeof KSH!=='undefined'?KSH:[]).forEach(fixShip);
+try{(typeof BSH!=='undefined'?BSH:[]).forEach(fixShip)}catch(e){}
+/* ô khóa theo cấp: khóa và mở theo từng cặp đối xứng (ô giữa trục đi một mình) */
+shPool=function(sh){
+  if(sh._pool)return sh._pool;const G=sh.gFull,W=G[0].length,by={r:[],b:[],g:[],y:[]};
+  G.forEach((row,j)=>[...row].forEach((c,i)=>{if(by[c])by[c].push([i,j])}));
+  const q={b:Math.floor(by.b.length/2),g:Math.floor(by.g.length/2),y:Math.floor(by.y.length/2),r:by.r.length>=20?Math.floor(by.r.length/4):0},ord={};
+  Object.keys(by).forEach(k=>{const a=by[k],n=a.length||1,cx=a.reduce((t,c)=>t+c[0],0)/n,cy=a.reduce((t,c)=>t+c[1],0)/n,seen=new Set(),gs=[];
+    a.map(c=>[c[0],c[1],Math.hypot(c[0]-cx,c[1]-cy)]).sort((u,v)=>v[2]-u[2]||u[1]-v[1]||u[0]-v[0]).forEach(c=>{const key=c[0]+','+c[1];if(seen.has(key))return;seen.add(key);
+      const grp=[[c[0],c[1],k]],mx=W-1-c[0],mk=mx+','+c[1];if(mx!==c[0]&&G[c[1]][mx]===k&&!seen.has(mk)){seen.add(mk);grp.push([mx,c[1],k])}gs.push(grp)});
+    let cnt=0;ord[k]=[];for(const g of gs){if(cnt+g.length>q[k])continue;ord[k].push(g);cnt+=g.length}});
+  const seq=['b','g','y','b','r','b','g','y','b','b'],pool=[];let guard=0,tot=0;
+  while(tot<20&&guard++<600){const k=seq[guard%seq.length];if(!ord[k].length)continue;const g=ord[k][0];if(tot+g.length>20){ord[k].shift();continue}pool.push(ord[k].shift());tot+=g.length}
+  return sh._pool=pool};
+shSync=function(sh){if(sh.nolock)return;const l=shLv(sh.id);if(sh._mlv!==l||!sh._mg){sh._mlv=l;sh._pr={};sh._sl=null;
+  const u=shU(l),P=shPool(sh),rows=sh.gFull.map(r=>r.split(''));let open=0,i=0;
+  for(;i<P.length;i++){if(open+P[i].length>u)break;open+=P[i].length}
+  P.slice(i).forEach(g=>g.forEach(c=>{rows[c[1]][c[0]]='.'}));sh._mg=rows.map(r=>r.join(''))}};
+
+/* ---------- 2) số liệu modul mới ---------- */
+const M0=x=>{if(x.m0==null)x.m0=x.mass};
+ENG.forEach(e=>{M0(e);e.mass=Math.round(e.m0*3.5);e.en=2*cellsOf(e)});          /* tốc chạy: khối lượng +250% */
+ARM.forEach(a=>{M0(a);a.mass=Math.round(a.m0*4);a.reg=0});                         /* khiên: khối lượng +300%, không hồi máu */
+NUC.forEach(n=>{M0(n);n.mass=30*cellsOf(n)});                                       /* lõi hạt nhân: 30 KL mỗi ô */
+MRD.forEach(m=>{M0(m);m.mass=0;m.en=2*cellsOf(m)});                                 /* giảm KL: bản thân không nặng */
+/* súng: năng lượng tiêu hao +300% */
+WP.forEach(w=>{const c=WPE[w.id]!=null?WPE[w.id]:.3;WPE[w.id]=Math.round(c*4*100)/100;const u=(String(w.en||'').match(/\/\s*(.+)$/)||[])[1]||'phát';w.en=String(WPE[w.id]).replace('.',',')+' / '+u});
+enAt=function(e,l){l=l||aLv(e.id);const c=cellsOf(e),k=LVK(e,l);return {l,cells:c,sp:Math.round(6*c*k*10)/10,acc:Math.round(6*c*k*10)/10,en:2*c,mass:e.mass,thr:0,vmax:0}};
+mAt=function(m,l){l=l||aLv(m.id);const c=cellsOf(m),k=LVK(m,l);return {l,cells:c,red:Math.round(50*c*k),en:2*c,mass:0,pct:0,cap:0,stab:0}};
+nAt=function(n,l){l=l||aLv(n.id);const c=cellsOf(n),k=LVK(n,l);return {l,cells:c,pw:Math.round(3*c*k*10)/10,mass:30*c,eff:0,stab:0,res:0}};
+{const _A=arAt;arAt=function(a,l){const q=_A(a,l);q.reg=0;q.mass=a.mass;return q}}
+
+/* ---------- 3) năng lượng: lõi cấp, động cơ + giảm KL dùng (2 mỗi ô) ---------- */
+function power(nuc,eng,mrd,force){let sup=0;(nuc||[]).forEach(it=>{const n=NUC.find(x=>x.id===it.id);if(n)sup+=nAt(n).pw});
+  let left=sup;const take=(L,list)=>(L||[]).map(it=>{const m=list.find(x=>x.id===it.id);if(!m)return false;const c=2*cellsOf(m);if(force||c<=left+1e-9){left-=c;return true}return false});
+  const engOn=take(eng,ENG),mrdOn=take(mrd,MRD);
+  return {sup:Math.round(sup*10)/10,use:Math.round((sup-left)*10)/10,left:Math.round(left*10)/10,engOn,mrdOn,off:engOn.filter(x=>!x).length+mrdOn.filter(x=>!x).length}}
+C.power=power;
+
+/* ---------- 4) chỉ số tàu ---------- */
+khStats=function(cur,wm,fit,arm,eng,nuc,tnk,mrd,skl,hlv){const HQ=hAt(hlv===undefined?shLv(cur.id):hlv);
+  wm=wm||khWpMap(cur);arm=arm||khArmor(cur);eng=eng||khEngines(cur);nuc=nuc||khReactors(cur);tnk=tnk||khTanks(cur);mrd=mrd||khMassMods(cur);skl=skl||khSkills(cur);
+  const b=khCount(cur,'b'),g=khCount(cur,'g'),y=khCount(cur,'y'),wmass=khUsed(wm).ms,A=khArmSum(arm),T=khTnkSum(tnk),Sk=khSkSum(skl);
+  const N={n:nuc.length,mass:0,cells:0};nuc.forEach(it=>{const n=NUC.find(x=>x.id===it.id);if(!n)return;N.mass+=n.mass;N.cells+=cellsOf(n)});
+  const PW=power(nuc,eng,mrd,window.c25Force);
+  const E={n:eng.length,sp:0,acc:0,mass:0,cells:0,on:0};eng.forEach((it,i)=>{const e=ENG.find(x=>x.id===it.id);if(!e)return;E.mass+=e.mass;E.cells+=cellsOf(e);if(PW.engOn[i]){const q=enAt(e);E.sp+=q.sp;E.acc+=q.acc;E.on++}});
+  const Mm={n:mrd.length,red:0,cells:0,on:0};mrd.forEach((it,i)=>{const m=MRD.find(x=>x.id===it.id);if(!m)return;Mm.cells+=cellsOf(m);if(PW.mrdOn[i]){Mm.red+=mAt(m).red;Mm.on++}});
+  const hull=150+6*(b+g+y),mass0=Math.round(hull+wmass+A.mass+E.mass+N.mass+T.mass+Sk.mass);
+  const red=Math.min(Mm.red,mass0*.8),mass=Math.round(mass0-red),mf=MF(mass);
+  const hp=Math.max(10,Math.round((1200+45*b+25*g+T.hp)/100)+HQ.hp+Math.round(A.dur));
+  const spRaw=BASE_SP+E.sp+(HQ.sp||0),speed=Math.round(spRaw*mf*10)/10,turn=Math.round(BASE_TURN*mf*10)/10;
+  let wd=0,wmax=0;Object.keys(wm).forEach(i=>wm[i].forEach(it=>{const w=wpGet(it.id);if(!w)return;const c=wCost(w.id);wd+=c/Math.max(.1,wSec(w));wmax=Math.max(wmax,c)}));
+  return {b,g,y,wmass,amass:A.mass,emass:E.mass,nmass:N.mass,tmass:T.mass,mmass:0,kmass:Sk.mass,hull,mass,mass0,red,hp,
+    speed,speed0:speed,spT:{'11':speed,'10':speed,'01':speed,'00':speed},spRaw,espd:E.sp,turn,mf,blk:A.blk,reg:0,dly:A.dly,anum:A.n,acells:A.cells,
+    enum:E.n,eon:E.on,ecells:E.cells,vmax:0,acc:E.acc,thr:0,en:2*E.cells,nnum:N.n,ncells:N.cells,tnum:T.n,mnum:Mm.n,mon:Mm.on,mred:Mm.red,mcells:Mm.cells,
+    enMax:1+T.cap,enGen:1+Math.max(0,PW.left),pwSup:PW.sup,pwUse:PW.use,pwLeft:PW.left,pwOff:PW.off,wdrain:wd,wmaxc:wmax,edrain:0,mdrain:0,res:0}};
+let LAST=null;
+dfStats=function(sh,wm,fit,arm,eng,nuc,tnk,mrd,skl,hlv){const t=khStats(sh,wm,fit,arm,eng,nuc,tnk,mrd,skl,hlv),sp=Math.max(.5,t.speed/SP_DIV);LAST={turn:t.turn*TURN_DEG};
+  return {hp:t.hp,speed:sp,speed0:sp,spT:{'11':sp,'10':sp,'01':sp,'00':sp},mass:t.mass,blk:t.blk,reg:0,dly:t.dly,acc:t.acc,enMax:t.enMax,enGen:t.enGen,edrain:0,mdrain:0,turn:t.turn*TURN_DEG}};
+{const _M=dfMakeShip;dfMakeShip=function(){LAST=null;const r=_M.apply(this,arguments);if(r&&LAST)r.turn=LAST.turn;return r}}
+
+/* ---------- 5) trong trận: tàu quay đầu và đổi hướng theo chỉ số QUAY ĐẦU ---------- */
+const wrapA=a=>{while(a>Math.PI)a-=2*Math.PI;while(a<-Math.PI)a+=2*Math.PI;return a};
+const omega=P=>(P.turn>0?P.turn:240)*Math.PI/180;
+window.c25Turn=function(P,a,dt){if(P.ang==null||!isFinite(P.ang))return a;const w=omega(P)*dt,d=wrapA(a-P.ang);return P.ang+Math.max(-w,Math.min(w,d))};
+window.c25Move=function(P,dvx,dvy,accE,dt){const kk=Math.min(1,3*(1+(accE||0)/100)*dt),w=omega(P)*dt;
+  let vx=P.vx||0,vy=P.vy||0;const ds=Math.hypot(dvx,dvy);
+  if(P.mh==null||!isFinite(P.mh))P.mh=Math.hypot(vx,vy)>.05?Math.atan2(vy,vx):(isFinite(P.ang)?P.ang:-Math.PI/2);
+  if(ds<1e-4){vx+=(0-vx)*kk;vy+=(0-vy)*kk}
+  else{const ta=Math.atan2(dvy,dvx),d=wrapA(ta-P.mh);P.mh=wrapA(P.mh+Math.max(-w,Math.min(w,d)));
+    const rem=Math.abs(wrapA(ta-P.mh)),tgt=ds*Math.max(.25,Math.cos(Math.min(rem,Math.PI/2))),sp=Math.hypot(vx,vy),ns=sp+(tgt-sp)*kk;
+    vx=Math.cos(P.mh)*ns;vy=Math.sin(P.mh)*ns}
+  P.vx=vx;P.vy=vy;P.x+=vx*dt;P.y+=vy*dt};
+
+/* ---------- 6) Kho: chặn lắp khi thiếu năng lượng, chặn tháo lõi đang cấp điện ---------- */
+const say=m=>{try{toast(m)}catch(e){}};
+window.c25Can=function(cur,w){if(!w||!(w.eng||w.mrd))return true;
+  const PW=power(khReactors(cur),khEngines(cur),khMassMods(cur)),need=2*cellsOf(w);
+  if(need>PW.left+1e-9){say('Không đủ năng lượng: '+w.n+' cần '+need+' NL, tàu còn '+N1(Math.max(0,PW.left))+' NL. Lắp thêm lõi hạt nhân (mỗi ô +3 NL).');return false}return true};
+window.c25CanRemove=function(cur,sk,idx){if(sk!=='n'&&sk!=='all:g')return true;
+  const nuc=khReactors(cur).slice(),eng=khEngines(cur),mrd=khMassMods(cur),before=power(nuc,eng,mrd).off;
+  if(sk==='n')nuc.splice(idx,1);else nuc.length=0;const after=power(nuc,eng,mrd);
+  if(after.off>before){say('Không tháo được: động cơ và bộ giảm KL đang dùng năng lượng của lõi này. Tháo bớt chúng trước.');return false}return true};
+
+/* ---------- 7) bảng chỉ số trong Kho (bỏ ô KHIÊN) ---------- */
+khInfo=function(cur,wm,fit){
+  const t=khStats(cur,wm,fit),f=n=>Math.round(n).toLocaleString('vi-VN'),pct=Math.round(t.mf*100),warn=t.wmaxc>t.enMax;
+  const el=$('khinfo');if(!el)return;
+  el.innerHTML=
+   `<div class="khin"><h5><i style="background:#ff5a6a"></i>MÁU</h5><strong>${f(t.hp)}</strong><small>${t.b} ô giáp · ${t.g} ô lõi${t.anum?' · +'+f(khArmSum(khArmor(cur)).dur)+' từ '+t.anum+' khiên':''}</small><div class="bar"><i style="width:${Math.min(100,t.hp)}%;background:#ff5a6a"></i></div></div>`+
+   `<div class="khin"><h5><i style="background:#ffc53d"></i>TỐC CHẠY</h5><strong>${N1(t.speed)}<em> điểm</em></strong><small>Gốc ${BASE_SP}${t.espd?' + động cơ '+N1(t.espd):''} = ${N1(t.spRaw)} · độ nặng còn ${pct}%${t.acc?' · gia tốc +'+N1(t.acc)+'%':''}</small><div class="bar"><i style="width:${Math.min(100,t.speed/1.2)}%;background:#ffc53d"></i></div></div>`+
+   `<div class="khin"><h5><i style="background:#ff9f43"></i>QUAY ĐẦU</h5><strong>${N1(t.turn)}<em> điểm</em></strong><small>Gốc ${BASE_TURN} · độ nặng còn ${pct}% · càng nặng càng khó quay đầu</small><div class="bar"><i style="width:${Math.min(100,t.turn/.4)}%;background:#ff9f43"></i></div></div>`+
+   `<div class="khin"><h5><i style="background:#34e08a"></i>NĂNG LƯỢNG</h5><strong>${N1(t.pwLeft)}<em> / ${N1(t.pwSup)} còn dư</em></strong><small style="${t.pwOff||warn?'color:#ff9aa5':''}">Lõi hạt nhân cấp ${N1(t.pwSup)} · động cơ + giảm KL dùng ${N1(t.pwUse)}${t.pwOff?' · ⚠ '+t.pwOff+' modul thiếu năng lượng, chưa hoạt động':''} · súng: dự trữ ${N1(t.enMax)}, hồi +${N1(t.enGen)}/s, bắn −${N1(t.wdrain)}/s${warn?' · ⚠ súng cần ≥'+N1(t.wmaxc):''}</small><div class="bar"><i style="width:${t.pwSup?Math.min(100,t.pwUse/t.pwSup*100):0}%;background:#34e08a"></i></div></div>`+
+   `<div class="khin"><h5><i style="background:#35d4ff"></i>ĐỘ NẶNG</h5><strong>${f(t.mass)}<em>KL${t.red>0?' · −'+f(t.red):''}</em></strong><small>Thân ${f(t.hull)} + vũ khí ${f(t.wmass)} + khiên ${f(t.amass)} + động cơ ${f(t.emass)} + hạt nhân ${f(t.nmass)} + thùng ${f(t.tmass)} + kỹ năng ${f(t.kmass)}${t.red>0?' − giảm KL '+f(t.red):''}</small><div class="bar"><i style="width:${Math.min(100,t.mass/20)}%;background:#35d4ff"></i></div></div>`};
+
+/* ---------- 8) màn nâng cấp modul ---------- */
+{const _R=window.gRows;window.gRows=function(it,l){
+  const nx=Math.min(GMAX,l+1),c=cellsOf(it),per=(3+c)+'% mỗi cấp ('+c+' ô)';
+  if(it.eng){const a=enAt(it,l),b=enAt(it,nx);return [['Tốc chạy','+'+N1(a.sp),'+'+N1(b.sp)],['Gia tốc','+'+N1(a.acc)+'%','+'+N1(b.acc)+'%'],['Tăng theo cấp',per,null],['Năng lượng cần',a.en+' NL',null],['Khối lượng',it.mass,null],['Ô vàng',it.w+'×'+it.h,null]]}
+  if(it.mrd){const a=mAt(it,l),b=mAt(it,nx);return [['Giảm khối lượng',NF(a.red)+' KL',NF(b.red)+' KL'],['Tăng theo cấp',per,null],['Năng lượng cần',a.en+' NL',null],['Ô xanh lá',it.w+'×'+it.h,null]]}
+  if(it.nuc){const a=nAt(it,l),b=nAt(it,nx);return [['Năng lượng cấp','+'+N1(a.pw),'+'+N1(b.pw)],['Tăng theo cấp',per,null],['Khối lượng',it.mass,null],['Ô xanh lá',it.w+'×'+it.h,null]]}
+  if(it.armor){const a=arAt(it,l),b=arAt(it,nx);return [['Máu',NF(a.dur),NF(b.dur)],['Khối lượng',it.mass,null],['Ô xanh',it.w+'×'+it.h,null]]}
+  return _R(it,l)}}
+})();
+
 /* gộp pháo công trình hạng nặng vào pháo hạng nặng */
 WP.forEach(w=>{if(w.cat===5){w.cat=4;w.tag='PHÁO HẠNG NẶNG'}});
 /* ===== Sở hữu vật phẩm bán ở Shop khuyến mãi ===== */
@@ -12557,7 +12685,7 @@ const IMG={gem:()=>LA.gem,st:()=>LA.st,m1:()=>IM2.m1,m2:()=>IM2.m2,cap:i=>pic(CA
 const imgOf=(k,i)=>{if(k.startsWith('i:')){const q=wpGet(k.slice(2));return q?q.img:''}if(k.startsWith('c:'))return pic(CAP.findIndex(c=>c[0]===k.slice(2)));if(IMG[k])return IMG[k](i||0);const p=POOL[k]&&POOL[k]();return p&&p.length?p[(i||0)%p.length].img:''};
 const lvOf=id=>id[0]==='w'?wLv(id):aLv(id);
 const setLv=(id,l)=>{if(id[0]==='w'){S.wlv=S.wlv||{};S.wlv[id]=l}else{S.alv=S.alv||{};S.alv[id]=l}};
-const ownPrice=it=>Math.round((39000+it.mass*380)/1000)*1000;
+const ownPrice=it=>Math.round((39000+(it.m0!=null?it.m0:it.mass)*380)/1000)*1000;
 const upPrice=it=>Math.round(ownPrice(it)*.4/1000)*1000;
 const kindOf=id=>id[0]==='w'?'Vũ khí':id[0]==='a'?'Khiên':'Modul';
 function shopItems(tab){return SHOPFEAT[tab].map(id=>wpGet(id)).filter(Boolean).map(it=>{
@@ -12766,7 +12894,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL=(window.SE_CFG&&SE_CFG.fb)||'';
-  const VER='v164';
+  const VER='v165';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`

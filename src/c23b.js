@@ -1,6 +1,6 @@
 
 /* ---------- Số liệu thật của game: lấy tàu đang chọn trong Kho làm tàu mẫu ---------- */
-const DEF={hp:90,speed:77,mass:1380,enMax:1,enGen:1,reg:0,dly:5,acc:0};
+const DEF={hp:90,speed:16.8,turn:16.8,mass:1380,enMax:1,enGen:1,reg:0,dly:5,acc:0};
 function refCtx(){let sh=null;try{sh=KSH.find(x=>x.id===khS().sel)||KSH[0]}catch(e){sh=KSH&&KSH[0]}
   const c={sh,wm:{},E0:[],A0:[]};try{c.wm=khWpMap(sh);c.E0=khEngines(sh).map(x=>({id:x.id}));c.A0=khArmor(sh).map(x=>({id:x.id}))}catch(e){}return c}
 function stats(c,eng,arm){try{const t=khStats(c.sh,c.wm,null,arm||c.A0,eng||c.E0);if(t&&isFinite(t.hp)&&isFinite(t.speed))return t}catch(e){}return Object.assign({},DEF)}
@@ -20,8 +20,9 @@ const floatTx=(q,list,col)=>{list.forEach(f=>{const k=f.t/f.max;if(!(k<1))return
 
 /* ---------- 1) MODUL TỐC CHẠY: đua 10 ô giữa tàu hiện tại và tàu đã lắp động cơ ---------- */
 function sceneEng(it,c){
-  const m=it.it,A=stats(c,c.E0),B=stats(c,c.E0.concat([{id:m.id}])),D=10,T=18;
-  const mk=t=>({vt:Math.max(.8,t.speed/55),acc:t.acc||0,d:0,v:0,fin:null,t90:null,top:0});
+  const m=it.it,A=stats(c,c.E0);window.c25Force=true;let B;try{B=stats(c,c.E0.concat([{id:m.id}]))}finally{window.c25Force=false}const D=10,T=18,SD=(window.C25&&C25.SP_DIV)||12;
+  const PWr=window.C25?C25.power((()=>{try{return khReactors(c.sh)}catch(e){return[]}})(),c.E0,(()=>{try{return khMassMods(c.sh)}catch(e){return[]}})()):{left:0},need=2*(window.C25?C25.cellsOf(m):m.w*m.h);
+  const mk=t=>({vt:Math.max(.5,t.speed/SD),acc:t.acc||0,d:0,v:0,fin:null,t90:null,top:0});
   const L=[mk(A),mk(B)];let done=false;
   const fin=()=>L.map(s=>s.fin!=null?s.fin:T+(D-s.d)/Math.max(.05,s.v));
   return {T,isDone:()=>done,
@@ -37,15 +38,15 @@ function sceneEng(it,c){
         if(s.fin==null){for(let k=0;k<12;k++){const yy=((k*61.7+s.d*pu*1.6)%(y0-y1+40))+y1-20;q.strokeStyle='rgba(255,255,255,.10)';q.beginPath();q.moveTo(x-lw/2+8+(k*37)%(lw-16),yy);q.lineTo(x-lw/2+8+(k*37)%(lw-16),yy+10);q.stroke()}
           const k2=Math.min(1,s.v/Math.max(.5,s.vt));flame(q,x,y+22,12+34*k2,14,i?'#ffd45a':'#7fb4ff')}
         spr(q,c.sh,x,y,50);
-        tx(q,NF(s.v*55)+' đv/s',x,Math.min(H-8,y+44),col[i],11,'center');
+        tx(q,N1(s.v*SD)+' điểm',x,Math.min(H-8,y+44),col[i],11,'center');
         if(s.fin!=null){q.fillStyle=i?'#7dffb0':'#cfd8ee';q.font='bold 14px system-ui,sans-serif';q.textAlign='center';q.fillText('⏱ '+N1(s.fin)+' s',x,y1+30)}});
       tx(q,'Thời gian: '+N1(t)+' s',W/2,H-10,'#8fa6d8',11,'center')},
     result(){const f=fin(),dv=B.speed-A.speed;
       return {hd:dv>0?'Chạy nhanh hơn +'+PCT(B.speed,A.speed)+'% · đến đích sớm hơn '+N1(f[0]-f[1])+' giây':'Động cơ này không làm tàu nhanh hơn so với hiện tại',
-        rows:[['Tốc chạy',NF(A.speed)+' → '+NF(B.speed)+' đv/giây',dv>0?'up':''],['Chạy hết '+D+' ô',N1(f[0])+' s → '+N1(f[1])+' s',f[1]<f[0]?'up':''],
+        rows:[['Tốc chạy',N1(A.speed)+' → '+N1(B.speed)+' điểm',dv>0?'up':''],['Quay đầu',N1(A.turn)+' → '+N1(B.turn)+' điểm (tàu nặng hơn)',B.turn<A.turn?'dn':''],['Chạy hết '+D+' ô',N1(f[0])+' s → '+N1(f[1])+' s',f[1]<f[0]?'up':''],
           ['Gia tốc','+'+NF(A.acc||0)+'% → +'+NF(B.acc||0)+'%',(B.acc||0)>(A.acc||0)?'up':''],['Đạt 90% tốc độ tối đa sau',(L[0].t90==null?'—':N1(L[0].t90)+' s')+' → '+(L[1].t90==null?'—':N1(L[1].t90)+' s')],
-          ['Khối lượng tàu',NF(A.mass)+' → '+NF(B.mass),B.mass>A.mass?'dn':'']],
-        nt:'Tính trên tàu đang chọn trong Kho ('+(c.sh&&c.sh.n||'tàu mẫu')+'), cộng thêm 1 động cơ này vào các động cơ đang lắp. Chưa tính việc còn đủ ô vàng để lắp hay không.'}}}}
+          ['Khối lượng tàu',NF(A.mass)+' → '+NF(B.mass),B.mass>A.mass?'dn':''],['Năng lượng cần',need+' NL · tàu đang dư '+N1(Math.max(0,PWr.left))+' NL',need>PWr.left?'dn':'up']],
+        nt:'Tính trên tàu đang chọn trong Kho ('+(c.sh&&c.sh.n||'tàu mẫu')+'), cộng thêm 1 động cơ này vào các động cơ đang lắp. '+(need>PWr.left?'⚠ Tàu chưa đủ năng lượng để lắp động cơ này: cần lắp thêm lõi hạt nhân (mỗi ô +3 NL). ':'')+'Chưa tính việc còn đủ ô vàng để lắp hay không.'}}}}
 
 /* ---------- 2 + 5) Hai tàu bị bắn cùng một loạt đạn: dùng cho KHIÊN và kỹ năng CHẮN ---------- */
 function sceneDuel(o,c){
@@ -81,13 +82,13 @@ function sceneDuel(o,c){
 
 function sceneArm(it,c){
   const m=it.it,qa=arAt(m),A=stats(c,null,c.A0),B=stats(c,null,c.A0.concat([{id:m.id}])),hA=Math.max(1,A.hp),hB=Math.max(hA,B.hp),dps=hA/6,P1=8,LAP=10;
-  const d=sceneDuel({hA,hB,regA:A.reg||0,regB:B.reg||0,dlyA:A.dly||5,dlyB:B.dly||5,dps,tFire:P1,lapseAt:P1+.6,lapse:LAP,T:P1+.6+6,labels:['TÀU HIỆN TẠI','CÓ KHIÊN NÀY'],
-    footer:t=>t<P1+.6?'Địch bắn liên tục cùng một loạt đạn vào cả hai tàu':'⏩ Tua nhanh ×'+LAP+': tàu tự hồi phục khi hết bị bắn'},c);
+  const RG=(B.reg||0)>0,d=sceneDuel({hA,hB,regA:A.reg||0,regB:B.reg||0,dlyA:A.dly||5,dlyB:B.dly||5,dps,tFire:P1,lapseAt:RG?P1+.6:null,lapse:LAP,T:P1+.6+(RG?6:1.4),labels:['TÀU HIỆN TẠI','CÓ KHIÊN NÀY'],
+    footer:t=>t<P1+.6||!RG?'Địch bắn liên tục cùng một loạt đạn vào cả hai tàu':'⏩ Tua nhanh ×'+LAP+': tàu tự hồi phục khi hết bị bắn'},c);
   d.result=()=>{const tA=hA/dps,tB=hB/dps,s=d.S[1],pc=Math.round(Math.max(0,(hB-dps*P1))/hB*100),rB=B.reg||0,dly=B.dly||5;
     return {hd:'Chịu thêm '+NF(hB-hA)+' sát thương (+'+PCT(hB,hA)+'% máu) · sống thêm '+N1(tB-tA)+' giây dưới hỏa lực',
       rows:[['Máu tối đa',NF(hA)+' → '+NF(hB),'up'],['Tàu hiện tại dưới loạt đạn','bị hạ sau '+N1(tA)+' s'],
         ['Khi có khiên này',tB<=P1?'bị hạ sau '+N1(tB)+' s (+'+N1(tB-tA)+' s)':'còn '+pc+'% máu sau '+P1+' s (trụ được '+N1(tB)+' s)','up'],
-        ['Hồi phục',rB>0?N1(rB)+' máu/giây, sau '+N1(dly)+' s không bị bắn':'Không hồi phục',rB>0?'up':''],
+        ['Hồi phục',rB>0?N1(rB)+' máu/giây, sau '+N1(dly)+' s không bị bắn':'Khiên không tự hồi máu',rB>0?'up':''],['Tốc chạy · quay đầu',N1(A.speed)+' · '+N1(A.turn)+' → '+N1(B.speed)+' · '+N1(B.turn)+' điểm',B.speed<A.speed?'dn':''],
         ['Máu cuối mô phỏng',s.dead?'Bị phá hủy':NF(s.hp)+' / '+NF(s.max)],['Khối lượng tàu',NF(A.mass)+' → '+NF(B.mass),B.mass>A.mass?'dn':'']],
       nt:'Tính trên tàu đang chọn trong Kho ('+(c.sh&&c.sh.n||'tàu mẫu')+') có thêm khiên này; địch bắn một loạt đạn đủ hạ tàu hiện tại sau 6 giây. Khiên cộng thẳng vào máu tàu (phần xanh) và bị tiêu hao cuối cùng.'}};
   return d}
@@ -124,7 +125,7 @@ function sceneSkl(it,c){
       result(){return {hd:'Tăng +'+N1(pw)+'% sát thương trong '+N1(dur)+' giây · tổng sát thương +'+PCT(tot1,tot0)+'% trong '+N1(T-.6)+' giây',
           rows:[['Sát thương mỗi phát',N1(base)+' → '+N1(base*(1+pw/100))+' khi bật','up'],['Số phát trong lúc bật',String(nb)],['Tổng sát thương',N1(tot0)+' → '+N1(tot1),'up'],['Thời gian hiệu lực',N1(dur)+' giây']].concat(meta,[['Khối lượng',NF(m.mass)]]),
           nt:'Mô phỏng với vũ khí mẫu 2 phát/giây, 10 sát thương/phát, bắn vào mục tiêu giả đứng yên. Thực tế bonus nhân lên sát thương của mọi vũ khí trên tàu.'}}}}
-  if(kind==='boost'){const vt=Math.max(.8,ref.speed/55),ac=ref.acc||0,pw=q.pw,T=tc+dur+2.5;
+  if(kind==='boost'){const SD=(window.C25&&C25.SP_DIV)||12,vt=Math.max(.5,ref.speed/SD),ac=ref.acc||0,pw=q.pw,T=tc+dur+2.5;
     const run=bf=>{let v=0,d=0,t=0;while(t<T){const w=vt*((bf&&t>=tc&&t<tc+dur)?1+pw/100:1);v+=(w-v)*Math.min(1,3*(1+ac/100)*.02);d+=v*.02;t+=.02}return d};
     const dA=run(false),dB=run(true),Lg=Math.max(4,dB*1.08),sA={v:0,d:0},sB={v:0,d:0};
     return {T,step(dt,t){[sA,sB].forEach((s,i)=>{const w=vt*((i&&t>=tc&&t<tc+dur)?1+pw/100:1);s.v+=(w-s.v)*Math.min(1,3*(1+ac/100)*dt);s.d+=s.v*dt})},
@@ -133,11 +134,11 @@ function sceneSkl(it,c){
         for(let i=0;i<=Lg;i+=step){const y=y0-i*pu;g.strokeStyle='rgba(143,180,255,.22)';g.beginPath();g.moveTo(6,y);g.lineTo(W-6,y);g.stroke();tx(g,i+' ô',8,y-3,'#6f8fd0',9)}
         [sA,sB].forEach((s,i)=>{const x=lx[i],y=y0-s.d*pu;tx(g,i?'DÙNG KỸ NĂNG':'KHÔNG DÙNG',x,14,i?'#ffd45a':'#9fb4d8',10,'center');
           const boost=i&&on;flame(g,x,y+24,12+(boost?60:26)*Math.min(1,s.v/Math.max(.5,vt)),boost?20:14,boost?'#7fd8ff':'#ffd45a');
-          if(boost)ringD(g,x,y,40+Math.sin(t*16)*3,'#7fd8ff',.7,3);spr(g,c.sh,x,y,50);tx(g,NF(s.v*55)+' đv/s',x,Math.min(H-8,y+46),i?'#ffd45a':'#cfd8ee',11,'center')});
+          if(boost)ringD(g,x,y,40+Math.sin(t*16)*3,'#7fd8ff',.7,3);spr(g,c.sh,x,y,50);tx(g,N1(s.v*SD)+' điểm',x,Math.min(H-8,y+46),i?'#ffd45a':'#cfd8ee',11,'center')});
         icon(g,W,on);tx(g,on?'🚀 TĂNG TỐC +'+N1(pw)+'% (còn '+N1(Math.max(0,tc+dur-t))+' s)':(t<tc?'Chạy bình thường…':'Hết hiệu lực'),W/2,H-8,on?'#ffd45a':'#8fa6d8',11,'center')},
       result(){return {hd:'Tăng +'+N1(pw)+'% tốc chạy trong '+N1(dur)+' giây · đi xa hơn +'+PCT(dB,dA)+'% trong '+N1(T)+' giây',
-          rows:[['Tốc chạy khi bật',NF(ref.speed)+' → '+NF(ref.speed*(1+pw/100))+' đv/giây','up'],['Quãng đường '+N1(T)+' giây',N1(dA)+' → '+N1(dB)+' ô','up'],['Thời gian hiệu lực',N1(dur)+' giây']].concat(meta,[['Khối lượng',NF(m.mass)]]),
-          nt:'Tính trên tàu đang chọn trong Kho ('+(c.sh&&c.sh.n||'tàu mẫu')+'), tốc chạy gốc '+NF(ref.speed)+' đv/giây.'}}}}
+          rows:[['Tốc chạy khi bật',N1(ref.speed)+' → '+N1(ref.speed*(1+pw/100))+' điểm','up'],['Quãng đường '+N1(T)+' giây',N1(dA)+' → '+N1(dB)+' ô','up'],['Thời gian hiệu lực',N1(dur)+' giây']].concat(meta,[['Khối lượng',NF(m.mass)]]),
+          nt:'Tính trên tàu đang chọn trong Kho ('+(c.sh&&c.sh.n||'tàu mẫu')+'), tốc chạy hiện tại '+N1(ref.speed)+' điểm.'}}}}
   if(kind==='shield'){const pw=q.pw,T=tc+dur+2,dps=Hm/6;
     const d=sceneDuel({hA:Hm,hB:Hm,regA:0,regB:0,dlyA:5,dlyB:5,dps,tFire:T-.7,T,sh:{t:tc,d:dur,pw},labels:['KHÔNG DÙNG','DÙNG CHẮN NĂNG LƯỢNG'],
       footer:t=>t<tc?'Địch đang bắn cả hai tàu…':(t<tc+dur?'🛡 CHẮN BẬT: giảm '+N1(pw)+'% sát thương nhận (còn '+N1(Math.max(0,tc+dur-t))+' s)':'Chắn hết hiệu lực')},c);
@@ -191,9 +192,9 @@ function custom(it,spec){
   S1.raf=requestAnimationFrame(loop);return S1}
 const SPEC={
   eng:(it)=>{const q=enAt(it.it);return {tags:['MODUL TỐC CHẠY','Cấp '+q.l,it.it.w+'×'+it.it.h+' ô'],
-    stats:[['LỰC ĐẨY',NF(q.thr)],['TỐC CHẠY','+'+N1(q.vmax)+'%'],['GIA TỐC','+'+N1(q.acc)+'%'],['NĂNG LƯỢNG',it.it.en+'/s'],['KHỐI LƯỢNG',it.it.mass]],hint:'Đua 10 ô: tàu hiện tại và tàu đã lắp động cơ này',scene:c=>sceneEng(it,c)}},
+    stats:[['TỐC CHẠY','+'+N1(q.sp)],['GIA TỐC','+'+N1(q.acc)+'%'],['NĂNG LƯỢNG','cần '+q.en],['KHỐI LƯỢNG',it.it.mass]],hint:'Đua 10 ô: tàu hiện tại và tàu đã lắp động cơ này',scene:c=>sceneEng(it,c)}},
   arm:(it)=>{const q=arAt(it.it);return {tags:['KHIÊN','Cấp '+q.l,it.it.w+'×'+it.it.h+' ô'],
-    stats:[['MÁU THÊM',NF(q.dur)],['HỒI/GIÂY',N1(q.reg/12)],['TRỄ HỒI',N1(q.dly)+'s'],['KHỐI LƯỢNG',it.it.mass]],hint:'Hai tàu chịu cùng một loạt đạn, rồi tự hồi phục',scene:c=>sceneArm(it,c)}},
+    stats:[['MÁU THÊM',NF(q.dur)],['KHỐI LƯỢNG',it.it.mass]],hint:'Hai tàu chịu cùng một loạt đạn',scene:c=>sceneArm(it,c)}},
   skl:(it)=>{const q=sAt(it.it);return {tags:[SKN[it.it.t]||'KỸ NĂNG','Cấp '+q.l,it.it.w+'×'+it.it.h+' ô'],
     stats:[['SỨC MẠNH',N1(q.pw)+'%'],['THỜI GIAN',q.dur?N1(q.dur)+'s':'Tức thì'],['HỒI CHIÊU',N1(q.cd)+'s'],['NĂNG LƯỢNG',N1(q.ec)],['KHỐI LƯỢNG',it.it.mass]],hint:'Tự động dùng kỹ năng ở giây thứ 1,5',scene:c=>sceneSkl(it,c)}}
 };
