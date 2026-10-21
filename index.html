@@ -12357,6 +12357,7 @@ async function redeem(text){const g=parseGift(text);if(!g)return [0,'Mã nhận 
 const css=document.createElement('style');
 css.textContent=`.pxo{position:fixed;inset:0;z-index:97;background:#000c;display:flex;align-items:center;justify-content:center;padding:8px;font:14px system-ui,sans-serif;color:#fff}
 .pxo>div{width:min(460px,96vw);max-height:96vh;overflow:auto;background:linear-gradient(#0b1840,#060f2e);border:1.5px solid #2b5ac9;border-radius:14px;padding:14px;box-shadow:0 0 30px #1b4fe066}
+.pxo .pxhd{display:flex;align-items:center;gap:10px;margin-bottom:4px}.pxo .pxhd h3{margin:0}.pxo .pxx{flex:none;width:34px;height:34px;border-radius:50%;border:1.5px solid #ff6a78;background:#c0192f;color:#fff;font:900 17px/1 system-ui;cursor:pointer;box-shadow:0 0 10px #ff3a4a88;padding:0}
 .pxo h3{margin:0 0 4px;font-size:17px;color:#bfe3ff;letter-spacing:.04em}.pxo .pxit{font-weight:700;color:#fff}.pxo .pxsm{font-size:12px;color:#8fa6d8;line-height:1.45}
 .pxo .pxam{font-size:24px;font-weight:900;color:#ffd45a;margin:6px 0}.pxo .pxget{font-size:12.5px;color:#9fe8c0;margin-bottom:8px;line-height:1.4}
 .pxo .pxqr{display:flex;justify-content:center;margin:8px 0}.pxo .pxqr canvas{width:min(220px,62vw);height:auto;border-radius:8px;border:4px solid #fff;background:#fff}
@@ -12387,7 +12388,7 @@ async function pasteInto(ta){try{const t=await navigator.clipboard.readText();if
 /* ---------- 1) hộp thanh toán ---------- */
 function start(o){
   const b=BK(),id=rid(6),code=CFG.prefix+' '+id,vnd=Math.round(o.vnd||0);
-  const x=open(`<h3>THANH TOÁN CHUYỂN KHOẢN</h3><div class="pxit">${esc(o.name)}</div><div class="pxam">${NF(vnd)} VNĐ</div>
+  const x=open(`<div class="pxhd"><button class="pxx" data-a="x" aria-label="Hủy thanh toán" title="Hủy">✕</button><h3>THANH TOÁN CHUYỂN KHOẢN</h3></div><div class="pxit">${esc(o.name)}</div><div class="pxam">${NF(vnd)} VNĐ</div>
    ${o.get?`<div class="pxget">Bạn nhận: ${esc(o.get)}</div>`:''}
    <div class="pxqr"></div><div class="pxsm" style="text-align:center">Quét mã bằng app ngân hàng bất kỳ (VietQR) — số tiền và nội dung đã điền sẵn</div>
    <div class="pxrow"><span>Ngân hàng</span><b>${esc(b.name)}</b></div>
@@ -12395,8 +12396,8 @@ function start(o){
    ${b.holder?`<div class="pxrow"><span>Chủ tài khoản</span><b>${esc(b.holder)}</b></div>`:''}
    <div class="pxrow"><span>Số tiền</span><b>${NF(vnd)} VNĐ</b><button class="pxcp" data-c="${vnd}">Sao chép</button></div>
    <div class="pxrow"><span>Nội dung chuyển khoản</span><b class="cd">${code}</b><button class="pxcp" data-c="${code}">Sao chép</button></div>
-   <div class="pxst pxwarn"><b>Cách nhận vật phẩm</b><ol><li>Chuyển <b>đúng số tiền</b>, ghi <b>đúng nội dung ${code}</b>.</li><li>Bấm <b>"Đã chuyển — gửi mã đơn qua Zalo"</b>: game chép sẵn mã đơn và mở Zalo ${esc(CFG.zalo)}, bạn <b>dán</b> vào tin nhắn rồi gửi.</li><li>Chủ game kiểm tra tiền về và gửi lại <b>mã nhận quà</b>. Vào <b>🧾 Đơn của tôi</b>, dán mã đó để nhận vật phẩm.</li></ol></div>
-   <div class="pxbt"><button class="go" data-a="sent">Đã chuyển — gửi mã đơn qua Zalo</button><button data-a="x">Để sau</button></div>`);
+   <div class="pxst pxwarn"><b>Cách nhận vật phẩm</b><ol><li>Chuyển <b>đúng số tiền</b>, ghi <b>đúng nội dung ${code}</b>.</li><li>Chuyển xong, bấm <b>"Thanh toán"</b>: game chép sẵn mã đơn và mở Zalo ${esc(CFG.zalo)}, bạn <b>dán</b> vào tin nhắn rồi gửi.</li><li>Chủ game kiểm tra tiền về và gửi lại <b>mã nhận quà</b>. Vào <b>🧾 Đơn của tôi</b>, dán mã đó để nhận vật phẩm.</li></ol></div>
+   <div class="pxbt"><button class="go" data-a="sent">Thanh toán</button></div>`);
   x.querySelector('.pxqr').appendChild(qrCanvas(vietqr(vnd,code),440));
   x.querySelectorAll('.pxcp').forEach(bt=>bt.onclick=()=>copy(bt.dataset.c,bt));
   x.querySelector('[data-a="sent"]').onclick=()=>{
