@@ -421,6 +421,7 @@ function skill3d(G,dt){const C=G.csk;skInit();const S2=SK;
   try{skill3d4(G,dt)}catch(e){console.error(e)}
   try{skill3d5(G,dt)}catch(e){console.error(e)}
   try{skill3d6(G,dt)}catch(e){console.error(e)}
+  try{skill3d7(G,dt)}catch(e){console.error(e)}
   S2.R.end();S2.SW.end();S2.LZ.end();S2.ORB.end();S2.MAG.end();S2.LK.end();intelHud(C)}
 /* ===================== KỸ NĂNG 3D (đợt 2) =====================
    Tiến Công · Giảm Hồi Chiêu Kỹ Năng · Liên Kết Tam Giác · Sửa Chữa Tàu · Drone Hồi Phục · Truyền Năng Lượng · Drone Gây Nhiễu
@@ -695,6 +696,53 @@ function skill3d6(G,dt){const X=G.csk&&G.csk.vf&&G.csk.vf.x2;if(!X||!X.c5)return
     /* Lướt Bóng Đêm: vệt lướt tím phía sau tàu */
     else if(o.k==='dash'){const P=o.P;if(!P)return;for(let i=0;i<5;i++){const a0=new T.Vector3(P.x-o.dx*i*.8,Y,P.y-o.dy*i*.8),a1=new T.Vector3(P.x-o.dx*(i+1)*.8,Y,P.y-o.dy*(i+1)*.8);beam6(a0,a1,o.col,.25*(1-i/6),.5*a*(1-i/5))}const h=S6.DOT.get();h.position.set(P.x,Y,P.y);h.scale.setScalar(1.8);h.material.color.copy(col(o.col));h.material.opacity=.7*a}});
   S6.B.end();S6.DOT.end();S6.COM.end();S6.SHR.end();S6.PAT.end();S6.SEC.end()}
+/* ===================== KỸ NĂNG 3D (đợt 7) =====================
+   Khiên Thép Lạnh · Khiên Gương · Vỏ Giáp Nhím · Màn Chắn Đồng Đội · Tái Sinh Nhanh · Giáp Phản Xung · Bất Tử Ngắn · Lá Chắn Hành Tinh
+   · Mưa Thiên Thạch (+ vòng bất tử, vệ tinh quay quanh tàu) */
+Object.assign(R3.c5k,{farc:1,spiky:1,vbeam:1,heal:1,aura:1,planets:1,rain:1,inv:1,orbit:1});
+let SK7=null;
+function sk7Init(){if(SK7)return SK7;const AD=SK.AD,sm=(m,c)=>new T.MeshBasicMaterial({map:m,color:c||0xffffff,transparent:true,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide,toneMapped:false,fog:false});
+  const farcG=new T.CylinderGeometry(1,1,1,32,1,true,Math.PI/2-.95,1.9);/* cung ±0,95 rad quanh trục +x */
+  const spike=new T.ConeGeometry(.12,.42,6);spike.rotateZ(-Math.PI/2);spike.translate(.21,0,0);
+  const torus=new T.TorusGeometry(1,.035,6,64);torus.rotateX(Math.PI/2);
+  const dash=new T.TorusGeometry(1,.05,6,10,.5);dash.rotateX(Math.PI/2);
+  const pcol=['#7ec8ff','#ffb070','#b89aff','#8affc0'].map(c=>{const t=cvTex(64,64,(x)=>{const g=x.createRadialGradient(22,22,3,32,32,32);g.addColorStop(0,'#ffffff');g.addColorStop(.35,c);g.addColorStop(1,'#14203a');x.fillStyle=g;x.fillRect(0,0,64,64);for(let i=0;i<8;i++){x.fillStyle='rgba(255,255,255,.12)';x.fillRect(0,Math.random()*64,64,3)}},true);return new T.MeshStandardMaterial({map:t,roughness:.8,emissive:lin(c),emissiveIntensity:.25})});
+  SK7={farcG,pcol,
+    FARC:Pool(()=>{const g=new T.Group(),a=new T.Mesh(farcG,sm(SK3.hex,0x6ac8ff)),b=new T.Mesh(farcG,AD(0xe8fbff,.3));g.add(a,b);g.userData={a,b};scene.add(g);return g}),
+    SPK:Pool(()=>{const g=new T.Group(),sp=[];for(let i=0;i<12;i++){const m=new T.Mesh(spike,new T.MeshStandardMaterial({color:lin(0x9fd8ff),emissive:lin(0x3a8cff),emissiveIntensity:.8,metalness:.6,roughness:.3}));m.rotation.y=-i/12*TAU;g.add(m);sp.push(m)}const gl=new T.Sprite(ADDM(glowT()));g.add(gl);g.userData={sp,gl};scene.add(g);return g}),
+    VB:Pool(()=>{const g=new T.Group(),w=new T.Mesh(new T.CylinderGeometry(1,1,1,16,1,true),sm(SK.wall,0x6dff9a)),c=new T.Mesh(new T.CylinderGeometry(1,1,1,10,1,true),AD(0xffffff,.9)),r=new T.Mesh(torus,AD(0x6dff9a,.9));w.material.map=SK.wall;g.add(w,c,r);g.userData={w,c,r};scene.add(g);return g}),
+    AUR:Pool(()=>{const g=new T.Group(),ds=[];for(let i=0;i<8;i++){const m=new T.Mesh(dash,AD(0xffffff,.8));m.rotation.y=-i/8*TAU;g.add(m);ds.push(m)}const r2=new T.Mesh(torus,AD(0xffffff,.5)),gl=new T.Sprite(ADDM(glowT()));g.add(r2,gl);g.userData={ds,r2,gl};scene.add(g);return g}),
+    PL:Pool(()=>{const g=new T.Group(),m=new T.Mesh(new T.SphereGeometry(.42,20,14),pcol[0]),ring=new T.Mesh(new T.TorusGeometry(.55,.03,6,32,TAU).rotateX(Math.PI/2),AD(0x6dff9a,.9)),gl=new T.Sprite(ADDM(glowT()));m.castShadow=true;gl.material.color.set(0xff8a40);g.add(m,ring,gl);g.userData={m,ring,gl};scene.add(g);return g}),
+    MT:Pool(()=>{const g=new T.Group(),m=new T.Mesh(rockGeo(1),new T.MeshStandardMaterial({color:lin(0x5a463a),roughness:.9,flatShading:true,emissive:lin(0x501400)})),f=new T.Sprite(ADDM(glowT()));m.scale.setScalar(.2);f.material.color.set(0xff6a20);f.scale.setScalar(.9);g.add(m,f);g.userData={m,f};scene.add(g);return g}),
+    RING:Pool(()=>{const m=new T.Mesh(torus,AD(0xff7a30,.5));scene.add(m);return m}),
+    DOT:Pool(()=>{const s=new T.Sprite(ADDM(glowT()));scene.add(s);return s})};
+  return SK7}
+function skill3d7(G,dt){const X=G.csk&&G.csk.vf&&G.csk.vf.x2;if(!X||!X.c5)return;sk7Init();const S7=SK7,Y=HOV;
+  const fa=o=>o.max?Math.max(0,Math.min(1,(o.max-o.age)/.4,o.age/.1+.2)):1;
+  X.c5.forEach(o=>{if(o.dl>0||!o.k||!R3.c5k[o.k])return;const a=fa(o),P=o.P;
+    /* Khiên Gương: tấm gương cong vân lục giác trước mũi tàu */
+    if(o.k==='farc'){if(!P)return;const f=Math.max(0,Math.min(1,o.age/.2,(o.max-o.age)/.4)),g=S7.FARC.get(),U=g.userData,an=P.ang!=null?P.ang:-Math.PI/2,R=(P.size||2.2)*1.15;
+      g.position.set(P.x-Math.cos(an)*R*.35,Y,P.y-Math.sin(an)*R*.35);g.rotation.set(0,-an,0);g.scale.set(R*1.15,1,R*1.15);U.a.material.color.copy(col(o.col));U.a.material.opacity=.85*f*a;U.b.material.opacity=.3*f*a}
+    /* Vỏ Giáp Nhím: vòng gai kim loại xoay quanh tàu */
+    else if(o.k==='spiky'){if(!P)return;const f=Math.max(0,Math.min(1,o.age/.2,(o.max-o.age)/.4)),g=S7.SPK.get(),U=g.userData;g.position.set(P.x,Y,P.y);g.rotation.y=t3*.8;g.scale.setScalar(o.R*.9*f+.05);U.gl.material.color.copy(col(o.col));U.gl.scale.setScalar(2.6);U.gl.material.opacity=.35*f*a}
+    /* Tái Sinh Nhanh: cột sáng xanh lá từ trời chiếu xuống tàu được hồi sinh */
+    else if(o.k==='vbeam'){const p=o.age/o.max,f=p<.5?p/.5:Math.max(0,1-(p-.5)/.5),c=o.hex||'#ff3a3a',g=S7.VB.get(),U=g.userData;g.position.set(o.x,0,o.y);
+      U.w.scale.set(.4+.5*f,14,.4+.5*f);U.w.position.y=7;U.w.material.color.copy(col(c));U.w.material.opacity=.9*f;U.c.scale.set(.12+.1*f,14,.12+.1*f);U.c.position.y=7;U.c.material.opacity=.9*f;
+      U.r.scale.setScalar((o.col?1.2:4)*Math.min(1,p*2));U.r.position.y=.1;U.r.material.color.copy(col(c));U.r.material.opacity=.8*f}
+    /* hồi máu: dấu cộng xanh bay lên quanh tàu */
+    else if(o.k==='heal'){if(!P||P.dead)return;if(Math.random()<.4){const an=Math.random()*TAU,r=(P.size||2.2)*.4;spark(P.x+Math.cos(an)*r,Y-.3,P.y+Math.sin(an)*r,0,1.4,0,'#7fffaa',.8,.28)}}
+    /* Giáp Phản Xung / Bất Tử Ngắn: vòng nét đứt xoay + vòng ngoài + quầng sáng */
+    else if(o.k==='aura'||o.k==='inv'){if(!P||P.dead)return;const g=S7.AUR.get(),U=g.userData,R=(P.size||2.2)*(o.k==='inv'?.8+.1*Math.sin(t3*12):.95),c=o.k==='inv'?'#ffffff':o.col;g.position.set(P.x,Y,P.y);g.rotation.y=t3*1.5;g.scale.setScalar(R);
+      U.ds.forEach(m=>{m.material.color.copy(col(c));m.material.opacity=.8*a});U.r2.scale.setScalar(1.12);U.r2.material.color.copy(col(c));U.r2.material.opacity=.45*a;U.gl.scale.setScalar(2.4);U.gl.material.color.copy(col(o.col||c));U.gl.material.opacity=.3*a}
+    /* Lá Chắn Hành Tinh: 4 hành tinh nhỏ quay quanh tàu, sau đó lao vào kẻ địch */
+    else if(o.k==='planets'){if(!P)return;if(o.ph===0)(o.pl||[]).forEach((p,i)=>{if(p.hp<=0)return;const an=p.a+o.rot,g=S7.PL.get(),U=g.userData;g.position.set(P.x+Math.cos(an)*2.4,Y,P.y+Math.sin(an)*2.4);U.m.material=S7.pcol[i%4];U.m.rotation.y=t3;U.ring.visible=true;U.ring.scale.setScalar(Math.max(.05,p.hp/p.max));U.gl.material.opacity=p.fl>0?.8:0;U.gl.material.color.set(0xffffff)});
+      else(o.fl||[]).forEach((f,i)=>{if(f.done)return;const g=S7.PL.get(),U=g.userData;g.position.set(f.x,Y,f.y);U.m.material=S7.pcol[i%4];U.ring.visible=false;U.gl.material.color.set(0xff8a40);U.gl.scale.setScalar(2.2);U.gl.material.opacity=.7;if(Math.random()<.7)spark(f.x,Y,f.y,rand(-.5,.5),rand(0,.8),rand(-.5,.5),'#ffa060',.4,.3)})}
+    /* Mưa Thiên Thạch: vùng mưa cam, thiên thạch rực lửa rơi chéo, chớp sáng khi chạm đất */
+    else if(o.k==='rain'){const r=S7.RING.get();r.position.set(o.cx,.08,o.cy);r.scale.setScalar(o.R);r.rotation.y=-t3*.5;r.material.opacity=.45*a;
+      (o.ms||[]).forEach(m=>{const d=o.age-m.t;if(d<0||d>.55)return;if(d<.4){const u=1-d/.4,g=S7.MT.get();g.position.set(m.x+u*2.2,.2+u*7,m.y-u*1.4);g.userData.m.rotation.set(t3*5,t3*4,0)}else{const u=(d-.4)/.15,s=S7.DOT.get();s.position.set(m.x,.3,m.y);s.scale.setScalar(1.8*(1-u)+.3);s.material.color.set(0xff8a40);s.material.opacity=1-u}})}
+    /* vệ tinh đá quay quanh tàu */
+    else if(o.k==='orbit'){if(!P||P.dead)return;for(let i=0;i<3;i++){const aa=o.age*2.2+i*2.094,g=S7.PL.get(),U=g.userData;g.position.set(P.x+Math.cos(aa)*2.2,Y,P.y+Math.sin(aa)*2.2);U.m.material=MT.metal;U.ring.visible=false;U.gl.material.color.set(0x9fe0ff);U.gl.scale.setScalar(1.6);U.gl.material.opacity=.35*a}}});
+  S7.FARC.end();S7.SPK.end();S7.VB.end();S7.AUR.end();S7.PL.end();S7.MT.end();S7.RING.end();S7.DOT.end()}
 R3.tlbOn=()=>!!R3.live;
 
 /* ---------- nối vào vòng vẽ trận ---------- */
