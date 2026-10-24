@@ -13414,91 +13414,110 @@ window.C30={NEW,after,iceStep};
 })();
 
 
-/* ===== c31: Quảng cáo trong game — xem quảng cáo nhận Đá (rewarded) · quảng cáo giữa màn (interstitial)
-   Dùng chuẩn Google H5 Games Ads (Ad Placement API: adBreak / adConfig).
-   Chưa điền mã nhà xuất bản (ca-pub-…) thì chạy CHẾ ĐỘ THỬ: hiện quảng cáo mẫu của chính game để xem luồng hoạt động. ===== */
+/* ===== c31: Quảng cáo trong game (Monetag)
+   - Xem quảng cáo nhận thưởng: 15 giây · 30 giây · 60 giây (ở Shop khuyến mãi → tab "Xem quảng cáo" và đầu tab "Tài nguyên"; nút ở sảnh)
+   - Quảng cáo giữa màn: khi màn hình kết quả hiện (giới hạn tần suất)
+   Quảng cáo chạy trong một KHUNG RIÊNG (iframe ads.html, cách ly hoàn toàn với dữ liệu game) nên không bao giờ đè lên nút trong game.
+   Chỉ chạy quảng cáo thật khi mở game từ github.io; nơi khác (bản trên Claude, mở thử) hiện quảng cáo mẫu. ===== */
 (function(){
 const ADCFG=window.ADCFG={
-  client:'',          /* điền mã AdSense dạng 'ca-pub-1234567890123456' sau khi được duyệt H5 Games Ads */
-  test:true,          /* true: Google chỉ trả quảng cáo thử (data-adbreak-test="on") */
-  reward:50,          /* Đá nhận được mỗi lần xem hết quảng cáo */
-  maxPerDay:5,        /* số lần xem nhận thưởng mỗi ngày */
-  cool:180,           /* giây chờ giữa 2 lần xem nhận thưởng */
-  interEvery:2,       /* cứ mỗi 2 lần xong màn thì chiếu 1 quảng cáo giữa màn */
-  interGap:120,       /* tối thiểu 120 giây giữa 2 quảng cáo giữa màn */
-  demoSec:5           /* thời lượng quảng cáo mẫu ở chế độ thử */
+  hosts:/(^|\.)github\.io$/i,          /* chỉ bật quảng cáo thật ở các địa chỉ này */
+  frame:'ads.html',                     /* trang chứa mã Monetag, đặt cạnh index.html */
+  tiers:[                               /* thời lượng (giây) → phần thưởng */
+    {sec:15,sao:50,da:3000},
+    {sec:30,sao:100,da:5000},
+    {sec:60,sao:300,da:10000}],
+  perDay:5,                             /* mỗi mức xem tối đa 5 lần/ngày */
+  cool:60,                              /* chờ 60 giây giữa 2 lần xem nhận thưởng */
+  interEvery:2,interGap:120,interSec:5  /* quảng cáo giữa màn: mỗi 2 màn, cách nhau ≥120 giây, tắt được sau 5 giây */
 };
 const NF=n=>Math.round(+n||0).toLocaleString('vi-VN');
+const live=()=>ADCFG.hosts.test(location.hostname||'');
 const today=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()};
-const st=()=>{const A=S.ads=S.ads||{};if(A.d!==today()){A.d=today();A.n=0}A.last=A.last||0;A.lvn=A.lvn||0;A.ilast=A.ilast||0;A.tot=A.tot||0;return A};
-const real=()=>/^ca-pub-\d{10,}$/.test(String(ADCFG.client||'').trim());
-/* ---------- nạp thư viện Google khi đã có mã ---------- */
-let loaded=false;
-function boot(){if(loaded||!real())return;loaded=true;
-  window.adsbygoogle=window.adsbygoogle||[];window.adBreak=window.adConfig=function(o){window.adsbygoogle.push(o)};
-  const s=document.createElement('script');s.async=true;s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client='+encodeURIComponent(ADCFG.client.trim());s.crossOrigin='anonymous';
-  s.setAttribute('data-ad-frequency-hint',ADCFG.interGap+'s');if(ADCFG.test)s.setAttribute('data-adbreak-test','on');document.head.appendChild(s);
-  try{window.adConfig({preloadAdBreaks:'on',sound:'on'})}catch(e){}}
-/* ---------- tạm dừng / tiếp tục game khi chiếu quảng cáo ---------- */
-let wasPaused=null;
-const pause=()=>{try{wasPaused=typeof dfPause!=='undefined'?dfPause:null;if(typeof dfPause!=='undefined')dfPause=true}catch(e){}};
-const resume=()=>{try{if(wasPaused!==null&&typeof dfPause!=='undefined')dfPause=wasPaused}catch(e){}wasPaused=null};
-/* ---------- quảng cáo mẫu (chế độ thử) ---------- */
+const st=()=>{const A=S.ads=S.ads||{};if(A.d!==today()){A.d=today();A.c={}}A.c=A.c||{};A.last=A.last||0;A.lvn=A.lvn||0;A.ilast=A.ilast||0;A.tot=A.tot||0;return A};
+const left=t=>Math.max(0,ADCFG.perDay-(st().c[t.sec]||0));
+const coolLeft=()=>Math.max(0,Math.ceil(st().last+ADCFG.cool-Date.now()/1000));
+const img=k=>{try{return LA[k]||''}catch(e){return ''}};
+/* ---------- giao diện ---------- */
 const css=document.createElement('style');css.textContent=`
-#c31ad{position:fixed;inset:0;z-index:150;background:rgba(2,6,18,.94);display:flex;align-items:center;justify-content:center;padding:16px}
-#c31ad .bx{width:min(420px,100%);background:linear-gradient(160deg,#0d1f4a,#081230);border:1px solid #3a63c4;border-radius:16px;overflow:hidden;box-shadow:0 0 40px rgba(60,140,255,.35);color:#e8f0ff;position:relative}
-#c31ad .tg{position:absolute;top:10px;left:10px;background:#ffd23a;color:#3a2300;font:800 11px system-ui,sans-serif;padding:3px 8px;border-radius:6px;letter-spacing:.5px;white-space:nowrap;z-index:2;display:inline-block;width:auto;min-width:0;max-width:none;height:auto;line-height:1.3}
-#c31ad .x{position:absolute;top:8px;right:8px;min-width:34px;height:34px;border-radius:17px;border:1px solid #5a78c0;background:#14275a;color:#fff;font:700 13px system-ui,sans-serif;cursor:pointer;padding:0 10px}
-#c31ad .x[disabled]{opacity:.75;cursor:default}
-#c31ad .ar{height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:radial-gradient(circle at 50% 40%,#1d4bb0,#071232 70%);text-align:center;padding:16px}
-#c31ad .ar img{width:96px;height:96px;border-radius:18px;box-shadow:0 0 24px rgba(80,170,255,.6)}
-#c31ad .ar b{font-size:20px;text-shadow:0 0 12px #3fd8ff}
-#c31ad .ar small{color:#a9c4ff}
-#c31ad .pb{height:5px;background:#0a1430;border:0;padding:0;margin:0}#c31ad .pb>div{height:100%;width:0;background:linear-gradient(90deg,#3fd8ff,#ffd23a);transition:width .2s linear}
-#c31ad .ft{padding:12px 14px;font:13px system-ui,sans-serif;color:#b8c9ee;line-height:1.45}
-#c31ad .ft em{color:#ffd23a;font-style:normal;font-weight:700}
-.lvbtn.c31{background:linear-gradient(160deg,#3a2a06,#1a1404)!important;border-color:#c9952a!important}
-.lvbtn.c31[disabled]{opacity:.6}`;document.head.appendChild(css);
-function demo(kind,done){const sec=ADCFG.demoSec,lg=(document.querySelector('.evlg')||{}).src||'';
-  const m=document.createElement('div');m.id='c31ad';
-  m.innerHTML=`<div class="bx"><span class="tg">QUẢNG CÁO</span><button class="x" disabled>${sec}</button>
-    <div class="ar">${lg?`<img src="${lg}" alt="">`:''}<b>Shop khuyến mãi Ship event</b><small>Gói Đá ưu đãi · Thuyền trưởng mới · Vũ khí giới hạn</small></div><div class="pb"><div></div></div>
-    <div class="ft"><em>Chế độ thử:</em> đây là quảng cáo mẫu của chính game để bạn xem cách quảng cáo hoạt động. Khi điền mã AdSense, chỗ này sẽ hiện quảng cáo thật của Google.${kind==='reward'?`<br>Xem hết ${sec} giây để nhận <em>${NF(ADCFG.reward)} Đá</em>.`:''}</div></div>`;
-  document.body.appendChild(m);const x=m.querySelector('.x'),bar=m.querySelector('.pb>div');let t=0,ok=false;
-  const iv=setInterval(()=>{t+=.2;bar.style.width=Math.min(100,t/sec*100)+'%';const left=Math.ceil(sec-t);if(left>0){x.textContent=left}else if(!ok){ok=true;x.disabled=false;x.textContent='✕ Đóng'}},200);
-  x.onclick=()=>{if(!ok)return;clearInterval(iv);m.remove();done(true)};
-  if(kind==='reward'){const skip=document.createElement('button');skip.className='x';skip.style.cssText='top:auto;bottom:10px;right:10px';skip.textContent='Bỏ qua';
-    skip.onclick=()=>{if(ok)return;clearInterval(iv);m.remove();done(false)};m.querySelector('.bx').appendChild(skip);
-    const kill=setInterval(()=>{if(ok){skip.remove();clearInterval(kill)}},200)}}
-/* ---------- xem quảng cáo nhận Đá ---------- */
-function canReward(){const A=st(),now=Date.now()/1000;if(A.n>=ADCFG.maxPerDay)return {ok:false,why:'Hôm nay đã xem đủ '+ADCFG.maxPerDay+' lần, quay lại ngày mai nhé'};
-  const w=Math.ceil(A.last+ADCFG.cool-now);if(w>0)return {ok:false,why:'Chờ '+(w>=60?Math.floor(w/60)+' phút '+(w%60)+' giây':w+' giây')+' nữa'};return {ok:true}}
-function give(){const A=st();A.n++;A.last=Date.now()/1000;A.tot++;S.da=(S.da||0)+ADCFG.reward;try{save()}catch(e){}try{refresh()}catch(e){}
-  try{toast('Cảm ơn bạn đã xem quảng cáo! +'+NF(ADCFG.reward)+' Đá')}catch(e){}paint()}
-function reward(){const c=canReward();if(!c.ok){try{toast(c.why)}catch(e){}return}
-  if(real()){boot();let shown=false;
-    window.adBreak({type:'reward',name:'xem_qc_nhan_da',
-      beforeAd:pause,afterAd:resume,
-      beforeReward:showAdFn=>{shown=true;showAdFn()},
-      adDismissed:()=>{try{toast('Bạn đóng quảng cáo sớm nên chưa nhận được Đá')}catch(e){}},
-      adViewed:give,
-      adBreakDone:info=>{if(!shown){try{toast('Hiện chưa có quảng cáo, bạn thử lại sau nhé')}catch(e){}}paint()}});return}
-  pause();demo('reward',ok=>{resume();if(ok)give();else{try{toast('Bạn bỏ qua quảng cáo nên chưa nhận được Đá')}catch(e){}}})}
-/* ---------- quảng cáo giữa màn: khi màn hình kết quả hiện ---------- */
+#c31w{position:fixed;inset:0;z-index:160;background:#030817;display:flex;flex-direction:column;color:#e8f0ff;font-family:inherit}
+#c31w .c3h{display:flex;align-items:center;gap:10px;padding:calc(8px + env(safe-area-inset-top,0px)) 12px 8px;background:#081534;border-bottom:1px solid #1f3d7a}
+#c31w .c3h .t{color:#fff;font-weight:800;font-size:14px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#c31w .c3h .tg{display:inline-block;width:auto;min-width:0;max-width:none;flex:none;background:#ffd23a;color:#3a2300;font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:5px;white-space:nowrap}
+#c31w .c3g{width:40px;height:40px;flex:none;position:relative}#c31w .c3g svg{transform:rotate(-90deg)}#c31w .c3g b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px}
+#c31w .c3r{flex:1;min-height:0;position:relative;background:#050d24}
+#c31w iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#050d24}
+#c31w .c3f{display:flex;gap:8px;align-items:center;padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));background:#081534;border-top:1px solid #1f3d7a}
+#c31w .c3f small{flex:1;color:#9fb6e6;font-size:12px;line-height:1.3}
+#c31w .c3f button{border-radius:10px;padding:9px 14px;font:700 13px inherit;cursor:pointer;border:1px solid #4a5f95;background:#13265a;color:#fff;white-space:nowrap}
+#c31w .c3f button.go{background:linear-gradient(#ffd96a,#f0a316);color:#3a2300;border-color:#ffd96a}#c31w .c3f button[disabled]{opacity:.45;cursor:default}
+#c31w .c3d{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:24px;padding:16px;background:radial-gradient(circle at 50% 40%,#1d4bb0,#050d24 72%);text-align:center}
+#c31w .c3d img{width:min(30vh,150px);height:min(30vh,150px);border-radius:20px;box-shadow:0 0 30px rgba(80,170,255,.55)}
+#c31w .c3d b{display:block;font-size:20px;text-shadow:0 0 12px #3fd8ff;margin-bottom:6px}#c31w .c3d small{color:#bcd0ff;font-size:13px}
+#c31w .c3d .nt{margin-top:10px;font-size:11.5px;color:#ffd23a}
+#psh .pc.c31c{position:relative;background:linear-gradient(160deg,#3a2a06,#160f02)!important;border-color:#d9a43a!important}
+#psh .pc.c31c .c31t{position:absolute;top:4px;right:4px;background:#ffd23a;color:#3a2300;font-size:10px;font-weight:800;padding:1px 6px;border-radius:5px}
+#psh .pc.c31c .pb{background:linear-gradient(#ffd96a,#f0a316)!important;color:#3a2300!important}
+#psh .pc.c31c .pb[disabled]{filter:grayscale(.8);opacity:.6}
+#psh .pc.c31c .pa{font-size:26px}#psh .pc.c31c h4{color:#ffe08a!important;font-weight:800;font-size:14px!important}
+.lvbtn.c31{background:linear-gradient(160deg,#3a2a06,#1a1404)!important;border-color:#c9952a!important}`;document.head.appendChild(css);
+/* ---------- màn hình xem quảng cáo ---------- */
+let cur=null;
+function open(mode,tier,done){if(cur)return;const sec=mode==='reward'?tier.sec:ADCFG.interSec,need=sec;
+  const m=document.createElement('div');m.id='c31w';const C=2*Math.PI*16;
+  const title=mode==='reward'?'Xem quảng cáo '+sec+' giây · nhận '+NF(tier.sao)+' Sao + '+NF(tier.da)+' Đá':'Quảng cáo giữa màn';
+  m.innerHTML=`<div class="c3h"><span class="tg">QUẢNG CÁO</span><span class="t">${title}</span><div class="c3g"><svg width="40" height="40"><circle cx="20" cy="20" r="16" stroke="#1f3d7a" stroke-width="4" fill="none"/><circle class="pr" cx="20" cy="20" r="16" stroke="#ffd23a" stroke-width="4" fill="none" stroke-dasharray="${C}" stroke-dashoffset="${C}" stroke-linecap="round"/></svg><b>${sec}</b></div></div>
+    <div class="c3r"></div>
+    <div class="c3f"><small>${mode==='reward'?'Giữ màn hình này đến hết giờ để nhận thưởng. Thoát sớm sẽ không nhận được.':'Bạn có thể đóng sau '+sec+' giây.'}</small><button class="x">${mode==='reward'?'Thoát':'Đóng'}</button>${mode==='reward'?'<button class="go" disabled>🎁 Nhận thưởng</button>':''}</div>`;
+  document.body.appendChild(m);const fr=m.querySelector('.c3r');
+  if(live()){const f=document.createElement('iframe');f.src=ADCFG.frame+'?m='+mode+'&s='+sec+'&r='+Date.now();
+    /* không có allow-same-origin: mã quảng cáo bị cách ly, không đọc được dữ liệu/tiền của game */
+    f.setAttribute('sandbox','allow-scripts allow-popups allow-popups-to-escape-sandbox allow-forms');f.setAttribute('referrerpolicy','strict-origin-when-cross-origin');fr.appendChild(f)}
+  else{const lg=(document.querySelector('.evlg')||{}).src||'';fr.innerHTML=`<div class="c3d">${lg?`<img src="${lg}" alt="">`:''}<div><b>Shop khuyến mãi Ship event</b><small>Gói Đá ưu đãi · Thuyền trưởng mới · Vũ khí giới hạn</small><div class="nt">Quảng cáo mẫu — quảng cáo thật chỉ hiện khi chơi trên bản GitHub (github.io)</div></div></div>`}
+  let t=0,okk=false,last=performance.now();const pr=m.querySelector('.pr'),lb=m.querySelector('.c3g b'),go=m.querySelector('.go'),x=m.querySelector('.x');
+  const iv=setInterval(()=>{const now=performance.now(),dt=(now-last)/1000;last=now;if(document.hidden||okk)return;t=Math.min(need,t+Math.min(dt,.5));
+    pr.setAttribute('stroke-dashoffset',String(C*(1-t/need)));lb.textContent=Math.max(0,Math.ceil(need-t));
+    if(t>=need){okk=true;lb.textContent='✓';if(go){go.disabled=false}else{x.textContent='✕ Đóng'}}},200);
+  const close=got=>{clearInterval(iv);m.remove();cur=null;try{if(wasP!==null&&typeof dfPause!=='undefined')dfPause=wasP}catch(e){}done&&done(got)};
+  let wasP=null;try{if(typeof dfPause!=='undefined'){wasP=dfPause;dfPause=true}}catch(e){}
+  x.onclick=()=>{if(mode!=='reward'&&!okk)return;if(mode==='reward'&&!okk){if(!confirm('Thoát bây giờ sẽ không nhận được thưởng. Vẫn thoát?'))return}close(okk&&mode!=='reward')};
+  if(go)go.onclick=()=>{if(okk)close(true)};
+  if(mode!=='reward'){x.disabled=true;const k=setInterval(()=>{if(okk){x.disabled=false;clearInterval(k)}},200)}
+  cur=m}
+/* ---------- nhận thưởng ---------- */
+function canWatch(t){if(left(t)<=0)return 'Hôm nay đã xem đủ '+ADCFG.perDay+' lần mức '+t.sec+' giây';const c=coolLeft();if(c>0)return 'Chờ '+c+' giây nữa rồi xem tiếp nhé';return ''}
+function watch(i){const t=ADCFG.tiers[i];const why=canWatch(t);if(why){try{toast(why)}catch(e){}return}
+  open('reward',t,got=>{if(!got){try{toast('Bạn thoát sớm nên chưa nhận được thưởng')}catch(e){}paint();return}
+    const A=st();A.c[t.sec]=(A.c[t.sec]||0)+1;A.last=Date.now()/1000;A.tot++;S.sao=(S.sao||0)+t.sao;S.da=(S.da||0)+t.da;
+    try{save()}catch(e){}try{refresh()}catch(e){}try{toast('Cảm ơn bạn! +'+NF(t.sao)+' Sao, +'+NF(t.da)+' Đá')}catch(e){}paint()})}
+/* ---------- thẻ trong Shop khuyến mãi ---------- */
+const psh=document.getElementById('psh'),grid=psh&&psh.querySelector('.pgrid'),side=psh&&psh.querySelector('.pside');
+function cardsHTML(){return ADCFG.tiers.map((t,i)=>{const w=canWatch(t),n=left(t);
+  return `<div class="pc c31c" data-c31="${i}"><h4>📺 Xem ${t.sec} giây</h4><div class="pa">${img('st')?`<img src="${img('st')}" alt="" style="max-width:44%;mix-blend-mode:screen">`:'⭐'}${img('gem')?`<img src="${img('gem')}" alt="" style="max-width:44%;mix-blend-mode:screen">`:'💎'}</div><ul><li>Sao x ${NF(t.sao)}</li><li>Đá x ${NF(t.da)}</li><li>Còn ${n}/${ADCFG.perDay} lần hôm nay</li></ul><button class="pb" data-c31b="${i}" ${w?'disabled':''}>${w&&n>0?'Chờ '+coolLeft()+'s':w?'Hết lượt':'▶ Xem ngay'}</button></div>`}).join('')}
+function bind(){grid.querySelectorAll('[data-c31b]').forEach(b=>b.onclick=e=>{e.stopPropagation();watch(+b.dataset.c31b)})}
+function curTab(){const b=side&&side.querySelector('.pt.on');return b&&b.dataset.t}
+let busy=false;
+function inject(){if(!grid||busy)return;const tab=curTab();busy=true;try{
+  if(tab==='Xem quảng cáo'){if(!grid.querySelector('.c31c')||grid.children.length!==ADCFG.tiers.length){grid.classList.add('pk2');grid.innerHTML=cardsHTML();bind()}}
+  else if(tab==='Tài nguyên'){if(!grid.querySelector('.c31c')){grid.insertAdjacentHTML('afterbegin',cardsHTML());bind()}}}finally{busy=false}}
+function paint(){if(!grid)return;const tab=curTab();if(tab!=='Xem quảng cáo'&&tab!=='Tài nguyên')return;busy=true;try{grid.querySelectorAll('.c31c').forEach(c=>c.remove());if(tab==='Xem quảng cáo'){grid.innerHTML=cardsHTML()}else grid.insertAdjacentHTML('afterbegin',cardsHTML());bind()}finally{busy=false}paintBtn()}
+if(grid){new MutationObserver(()=>{if(!busy)inject()}).observe(grid,{childList:true})}
+if(side&&!side.querySelector('[data-t="Xem quảng cáo"]')){const b=document.createElement('button');b.className='pt';b.dataset.t='Xem quảng cáo';b.innerHTML='<i style="background:none;display:flex;align-items:center;justify-content:center;font-style:normal">📺</i>Xem quảng cáo';
+  const ref=side.querySelector('[data-t="Tài nguyên"]');side.insertBefore(b,ref||side.firstChild);
+  b.onclick=()=>{side.querySelectorAll('.pt[data-t]').forEach(x=>x.classList.toggle('on',x===b));busy=true;try{grid.classList.add('pk2');grid.innerHTML=cardsHTML();bind()}finally{busy=false}}}
+setInterval(()=>{try{if(psh&&psh.style.display!=='none'&&coolLeft()>=0){const tab=curTab();if(tab==='Xem quảng cáo'||tab==='Tài nguyên'){const b=grid.querySelector('[data-c31b]');if(b&&(coolLeft()>0||b.disabled))paint()}}}catch(e){}},1000);
+/* ---------- nút ở sảnh: mở thẳng tab Xem quảng cáo ---------- */
+let lb=null;
+function paintBtn(){if(!lb)return;const tot=ADCFG.tiers.reduce((s,t)=>s+left(t),0),c=coolLeft();lb.querySelector('small').textContent=tot?(c>0?'Chờ '+c+' giây · ':'')+'Còn '+tot+' lượt hôm nay':'Hết lượt hôm nay'}
+function mountBtn(){const col=document.querySelector('#lobby .lvcol');if(!col||document.getElementById('c31b'))return;
+  lb=document.createElement('button');lb.id='c31b';lb.className='lvbtn c31';lb.innerHTML='<span>📺</span><b>Xem quảng cáo nhận thưởng</b><small></small>';
+  lb.onclick=()=>{try{$('pshopen').click()}catch(e){}setTimeout(()=>{const b=side&&side.querySelector('[data-t="Xem quảng cáo"]');if(b)b.click()},60)};col.appendChild(lb);paintBtn()}
+mountBtn();setInterval(paintBtn,1000);
+/* ---------- quảng cáo giữa màn ---------- */
 function inter(){const A=st(),now=Date.now()/1000;A.lvn++;try{save()}catch(e){}
-  if(A.lvn%ADCFG.interEvery!==0||now-A.ilast<ADCFG.interGap)return;A.ilast=now;
-  if(real()){boot();window.adBreak({type:'next',name:'sau_man_choi',beforeAd:pause,afterAd:resume});return}
-  demo('next',()=>{})}
-{const r=document.getElementById('result');if(r){let vis=false;new MutationObserver(()=>{const v=r.style.display==='flex';if(v&&!vis)setTimeout(()=>{try{inter()}catch(e){console.error(e)}},700);vis=v}).observe(r,{attributes:true,attributeFilter:['style']})}}
-/* ---------- nút ở sảnh ---------- */
-let btn=null;
-function paint(){if(!btn)return;const A=st(),c=canReward();btn.querySelector('small').textContent=c.ok?'Còn '+(ADCFG.maxPerDay-A.n)+'/'+ADCFG.maxPerDay+' lần hôm nay':c.why}
-function mount(){const col=document.querySelector('#lobby .lvcol');if(!col||document.getElementById('c31b'))return;
-  btn=document.createElement('button');btn.id='c31b';btn.className='lvbtn c31';btn.innerHTML='<span>📺</span><b>Xem quảng cáo · +'+NF(ADCFG.reward)+' Đá</b><small></small>';
-  btn.onclick=reward;col.appendChild(btn);paint()}
-mount();setInterval(paint,1000);
-if(real())boot();
-window.C31={ADCFG,reward,inter,demo,canReward,boot};
+  if(A.lvn%ADCFG.interEvery!==0||now-A.ilast<ADCFG.interGap||cur)return;A.ilast=now;try{save()}catch(e){}open('next',null,()=>{})}
+{const r=document.getElementById('result');if(r){let vis=false;new MutationObserver(()=>{const v=r.style.display==='flex';if(v&&!vis)setTimeout(()=>{try{inter()}catch(e){console.error(e)}},800);vis=v}).observe(r,{attributes:true,attributeFilter:['style']})}}
+window.C31={ADCFG,watch,inter,open,canWatch,live};
 })();
 
 /* gộp pháo công trình hạng nặng vào pháo hạng nặng */
@@ -13753,7 +13772,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL=(window.SE_CFG&&SE_CFG.fb)||'';
-  const VER='v172';
+  const VER='v173';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`
