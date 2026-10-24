@@ -776,7 +776,7 @@ function skill3d8(G,dt){const X=G.csk&&G.csk.vf&&G.csk.vf.x2;if(!X||!X.c5)return
     if(k==='nwave'){if(!P)return;const R=Math.max(.01,o.R),f=Math.max(0,1-o.age/.9),b=S8.BAND.get();b.position.set(P.x,Y*.6,P.y);b.scale.set(R,1.2*f+.2,R);b.material.color.set(0x3a9ad8);b.material.opacity=.6*f*a;
       const t=S8.TOR.get();t.position.set(P.x,Y*.6,P.y);t.scale.setScalar(R);t.material.color.set(0xa8ecff);t.material.opacity=.75*f*a;if(o.age>.12){const t2=S8.TOR.get();t2.position.set(P.x,Y*.6,P.y);t2.scale.setScalar(R*.62);t2.material.color.set(0x8fe8ff);t2.material.opacity=.6*f*a}}
     /* Bom Từ Trường: quả bom cam bay ra, hút địch bằng các vòng co dần */
-    else if(k==='mbomb'){const f=Math.min(1,o.age/.2,o.ph===2?Math.max(0,1-(o.t2||0)/.5):1),b=S8.BALL.get();b.position.set(o.x,Y,o.y);b.scale.setScalar(.35+.05*Math.sin(t3*10));b.material.color.set(0xffd27a);b.material.opacity=f*a;dot8(o.x,Y,o.y,3.2,'#ff8a20',.6*f*a);
+    else if(k==='mbomb'){const f=Math.min(1,o.age/.2,o.ph===2?Math.max(0,1-(o.t2||0)/.5):1),b=S8.BALL.get();b.position.set(o.x,Y,o.y);b.scale.setScalar(.3+.05*Math.sin(t3*10));b.material.color.set(0xd85a00);b.material.opacity=.7*f*a;dot8(o.x,Y,o.y,2.4,'#c04a00',.5*f*a);if(o.ph===2){const u=Math.min(1,(o.t2||0)/.5),t=S8.TOR.get();t.position.set(o.x,Y*.7,o.y);t.scale.setScalar(.5+4*u);t.material.color.set(0xffb040);t.material.opacity=(1-u)*a}
       if(o.ph===1)for(let i=0;i<3;i++){const ph=(t3*1.5+i/3)%1,t=S8.TOR.get();t.position.set(o.x,Y*.7,o.y);t.scale.setScalar(4*(1-ph*.85));t.material.color.set(0xff9a30);t.material.opacity=(1-ph)*.7*f*a}}
     /* Lưới Điện Tím: sét tím nhảy dây chuyền qua tối đa 13 kẻ địch */
     else if(k==='pbolt'){const f=1-o.age/o.max,A=V3a(o.x1,o.y1),B=V3a(o.x2,o.y2);zap8(A,B,'#9a4aff',f*a,o.x1*7);dot8(B.x,Y,B.z,1.8,'#b070ff',.75*f*a)}
@@ -790,7 +790,7 @@ function skill3d8(G,dt){const X=G.csk&&G.csk.vf&&G.csk.vf.x2;if(!X||!X.c5)return
     /* băng phủ tàu địch: khối lục giác băng trong suốt */
     else if(k==='ice'){const e=o.e;if(!e||e.dead)return;const g=S8.ICE.get(),U=g.userData,R=(e.size||2)*.55;g.position.set(e.x,Y,e.y);g.scale.set(R,.9,R);g.rotation.y=.3;U.a.material.opacity=.35*a;U.b.material.opacity=.5*a}
     /* Vòng Xoáy Tử Thần: quả cầu tím bay ra, nở thành vòng xoáy hút và phóng sét tím */
-    else if(k==='vxtt'){const f=Math.min(1,o.age/.15,o.ph===2?Math.max(0,1-(o.t2||0)/.5):1);dot8(o.x,Y,o.y,2.2,'#b060ff',.8*f*a);const b=S8.BALL.get();b.position.set(o.x,Y,o.y);b.scale.setScalar(.3);b.material.color.set(0x2a0050);b.material.opacity=f*a;
+    else if(k==='vxtt'){const f=Math.min(1,o.age/.15,o.ph===2?Math.max(0,1-(o.t2||0)/.5):1);dot8(o.x,Y,o.y,2.2,'#7a30d0',.55*f*a);const b=S8.BALL.get();b.position.set(o.x,Y,o.y);b.scale.setScalar(.3+.04*Math.sin(t3*12));b.material.color.set(0x5a20c0);b.material.opacity=.7*f*a;if(o.ph===2){const u=Math.min(1,(o.t2||0)/.5),t=S8.TOR.get();t.position.set(o.x,Y*.7,o.y);t.scale.setScalar(.5+3.5*u);t.material.color.set(0xb070ff);t.material.opacity=(1-u)*a}
       if(o.ph===1){for(let i=0;i<3;i++){const an=Math.random()*TAU,r=3.4*Math.random()+.5;spark(o.x+Math.cos(an)*r,Y,o.y+Math.sin(an)*r,-Math.sin(an)*3-(Math.cos(an)*r)*.8,rand(-.2,.2),Math.cos(an)*3-(Math.sin(an)*r)*.8,i%2?'#d8a0ff':'#9a4aff',.5,.25)}
         (o.ts||[]).forEach((e,i)=>{if(!e.dead)zap8(V3a(o.x,o.y),V3a(e.x,e.y),'#9a4aff',.8*f*a,i*3)})}}
     /* Tia Laser Xanh: tia laser xanh liên tục bám mục tiêu */
