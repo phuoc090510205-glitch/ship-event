@@ -419,6 +419,7 @@ function skill3d(G,dt){const C=G.csk;skInit();const S2=SK;
   try{skill3d2(G,dt)}catch(e){console.error(e)}
   try{skill3d3(G,dt)}catch(e){console.error(e)}
   try{skill3d4(G,dt)}catch(e){console.error(e)}
+  try{skill3d5(G,dt)}catch(e){console.error(e)}
   S2.R.end();S2.SW.end();S2.LZ.end();S2.ORB.end();S2.MAG.end();S2.LK.end();intelHud(C)}
 /* ===================== KỸ NĂNG 3D (đợt 2) =====================
    Tiến Công · Giảm Hồi Chiêu Kỹ Năng · Liên Kết Tam Giác · Sửa Chữa Tàu · Drone Hồi Phục · Truyền Năng Lượng · Drone Gây Nhiễu
@@ -606,6 +607,55 @@ function skill3d4(G,dt){const C=G.csk,P=G.pl;if(!C)return;sk4Init();const S4=SK4
   (C.sb||[]).forEach(b=>{if(b.done)return;const g=S4.SB.get(),U=g.userData,L=Math.min(b.d+1.2,5);g.position.set(b.x,HOV,b.y);g.rotation.set(0,Math.atan2(-b.vx,-b.vy),0);
     U.c.scale.set(.9,.9,1);U.t.scale.set(.2,.2,L);U.t.position.z=0;U.r.scale.setScalar(.55);U.r.position.z=-.15;U.r.rotation.z=t3*6;if(Math.random()<.6)spark(b.x,HOV,b.y,rand(-.3,.3),rand(-.2,.3),rand(-.3,.3),'#8fe0ff',.35,.2)});
   S4.PIL.end();S4.PLK.end();S4.ARC.end();S4.SB.end();S4.TOR.end();S4.BUB.end();S4.COL.end()}
+/* ===================== KỸ NĂNG 3D (đợt 5) — nhóm đạn / tia / vùng kỹ năng =====================
+   Cặp Tia Đỏ · Đạn Lửa Ba · Viên Đạn Vàng · Cầu Sét Lam · Tên Lửa Đôi · Chùm Laser Lam · Sét Chuỗi Cơ Bản · Mưa Đạn Đỏ
+   (bộ dựng chung này cũng áp dụng cho các đạn / tia / vùng cùng loại của kỹ năng phía sau: Đạn Xuyên Thời Không, Đạn Choáng Diện Rộng,
+   Tia Sét Ba Nhánh, Pháo Lửa Trình Diễn, Vòng Cung Đỏ, Tia Nảy Thời Không, Tên Lửa Nhắm Mục Tiêu...) */
+let SK5=null;
+const VBC={fire:'#ff8a2a',gold:'#ffd34a',rbul:'#ff4a4a',sil:'#dfeaff',stb:'#c79bff',pyro:'#ff8a2a',bolt:'#9fe0ff',lring:'#6fd0ff',brk:'#8fdcff',vb:'#9a5cff',comet:'#6fd0ff',shd:'#bfeaff'};
+function sk5Init(){if(SK5)return SK5;const AD=SK.AD,beamG=new T.CylinderGeometry(1,1,1,8,1,true);
+  const mb=new T.CylinderGeometry(.054,.054,.375,8);mb.rotateX(Math.PI/2);const mc=new T.ConeGeometry(.054,.15,8);mc.rotateX(-Math.PI/2);mc.translate(0,0,-.26);
+  const mkB=()=>{const g=new T.Group(),a=new T.Mesh(beamG,AD(0xffffff,.5)),b=new T.Mesh(beamG,AD(0xffffff,1));a.frustumCulled=b.frustumCulled=false;g.add(a,b);g.userData={a,b};scene.add(g);return g};
+  SK5={B:Pool(mkB),
+    DOT:Pool(()=>{const s=new T.Sprite(ADDM(glowT()));scene.add(s);return s}),
+    MS:Pool(()=>{const g=new T.Group(),a=new T.Mesh(mb,MT.gray),b=new T.Mesh(mc,MT.red),f=new T.Sprite(ADDM(glowT()));f.material.color.set(0xff7a3c);f.position.z=.21;f.scale.set(.66,.66,1);g.add(a,b,f);scene.add(g);return g}),
+    ZN:Pool(()=>{const g=new T.Group(),w=new T.Mesh(new T.CylinderGeometry(1,1,1,48,1,true),new T.MeshBasicMaterial({map:SK.wall,color:0xffffff,transparent:true,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide,toneMapped:false,fog:false})),
+      d=new T.Mesh(new T.CircleGeometry(1,48).rotateX(-Math.PI/2),new T.MeshBasicMaterial({map:SK.disc,color:0xffffff,transparent:true,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide,toneMapped:false,fog:false})),
+      hole=new T.Mesh(new T.SphereGeometry(1,24,16),new T.MeshBasicMaterial({color:0x000000})),rim=new T.Mesh(new T.TorusGeometry(1,.04,6,48).rotateX(Math.PI/2),AD(0xc9a0ff,.9));g.add(w,d,hole,rim);g.userData={w,d,hole,rim};scene.add(g);return g})};
+  return SK5}
+function beam5(a,b,c,w,o){const g=SK5.B.get(),U=g.userData,d=b.clone().sub(a),L=d.length()||.01;g.position.copy(a).addScaledVector(d,.5);g.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),d.multiplyScalar(1/L));U.a.scale.set(w,L,w);U.b.scale.set(w*.32,L,w*.32);U.a.material.color.copy(col(c));U.b.material.color.copy(col(c)).lerp(WH3,.6);U.a.material.opacity=o*.6;U.b.material.opacity=o}
+function zap5(a,b,c,o,seed){const n=8,d=b.clone().sub(a),L=d.length()||.01,nx=-d.z/L,nz=d.x/L;let p0=a.clone();const fr=Math.floor(t3*30);
+  for(let i=1;i<=n;i++){const f=i/n,off=i<n?Math.sin(seed*13+i*7.3+fr*3.1)*.35:0,up=i<n?Math.cos(seed*7+i*5.1+fr*2.3)*.25:0,p1=a.clone().addScaledVector(d,f).add(new T.Vector3(nx*off,up,nz*off));beam5(p0,p1,c,.07,o);p0=p1}
+  const h=SK5.DOT.get();h.position.copy(b);h.scale.setScalar(1.1);h.material.color.copy(col(c));h.material.opacity=o}
+function skill3d5(G,dt){const V=G.csk&&G.csk.vf;if(!V)return;sk5Init();const S5=SK5,Y=HOV;
+  /* tia: Cặp Tia Đỏ (2 tia đỏ lệch), Cầu Sét Lam / Sét Chuỗi (sét gấp khúc), Chùm Laser Lam (laser xanh dài), Tia Nảy, Vòng Cung Đỏ */
+  (V.l||[]).forEach(l=>{
+    if(l.k==='arcr'){const p=1-Math.max(0,l.t)/l.max,cur=l.a0-Math.PI/2+Math.PI*p,fa=Math.min(1,l.t/.15),a=new T.Vector3(l.P.x,Y,l.P.y),b=new T.Vector3(l.P.x+Math.cos(cur)*4,Y,l.P.y+Math.sin(cur)*4);beam5(a,b,'#ff2832',.32,fa);
+      for(let k=1;k<5;k++){const c2=cur-k*.12;if(c2<l.a0-Math.PI/2)break;beam5(a,new T.Vector3(l.P.x+Math.cos(c2)*4,Y,l.P.y+Math.sin(c2)*4),'#ff2832',.2,fa*.25*(1-k/5))}return}
+    if(l.k==='lbeam'){const p=1-l.t/l.max;beam5(new T.Vector3(l.x,Y,l.y),new T.Vector3(l.ex,Y,l.ey),'#3a8cff',.45*(1-p*.6),1-p);return}
+    if(!l.tg||l.tg.dead)return;const p=1-l.t/l.max,a=new T.Vector3(l.P.x,Y,l.P.y),b=new T.Vector3(l.tg.x,Y,l.tg.y);
+    if(l.k==='lzr'){beam5(a,b,'#3a8cff',.25*(1-p*.4),1-p);const h=S5.DOT.get();h.position.copy(b);h.scale.setScalar(1.2);h.material.color.set(0x5ab4ff);h.material.opacity=1-p;return}
+    if(l.k==='beam'){const d=b.clone().sub(a),L=d.length()||1,o=new T.Vector3(-d.z/L*.22*l.off,0,d.x/L*.22*l.off);beam5(a.clone().add(o),b,'#ff2d3a',.1*(1-p*.5),(1-p)*(.75+.25*Math.sin(t3*60)));const h=S5.DOT.get();h.position.copy(b);h.scale.setScalar(.8*(1-p)+.2);h.material.color.set(0xff6a5a);h.material.opacity=1-p;return}
+    zap5(a,b,'#5aa8ff',1-p,l.seed||1)});
+  /* đạn kỹ năng: lõi sáng + vệt sáng theo đường bay; tên lửa 3D có khói; sao chổi rơi từ trên xuống */
+  (V.b||[]).forEach(b=>{if(b.done)return;const k=b.k;
+    if(k==='msl'||k==='msl3'||k==='msl9'||k==='rmsl'){const m=S5.MS.get(),an=b.a!=null?b.a:Math.atan2(b.vy||0,b.vx||1);m.position.set(b.x,Y,b.y);m.rotation.set(0,Math.atan2(-Math.cos(an),-Math.sin(an)),0);if(Math.random()<.9)smoke(b.x,Y,b.y,rand(.5,.9),.32);return}
+    const c=VBC[k]||'#ffb347';let y=Y;if(k==='comet'){const pp=Math.min(1,b.p||0);y=Y+9*(1-pp*pp)}
+    const hd=S5.DOT.get();hd.position.set(b.x,k==='comet'?y:Y,k==='comet'?(b.ty!=null?b.ty:b.y):b.y);hd.scale.setScalar(k==='gold'||k==='comet'?1.1:k==='vb'?1:.75);hd.material.color.copy(col(c));hd.material.opacity=1;
+    (b.h||[]).forEach((p,i)=>{if(i%1)return;const s=S5.DOT.get(),f=1-i/((b.h.length||1)+1);s.position.set(p.x,k==='comet'?hd.position.y+i*.9:Y,k==='comet'?hd.position.z:p.y);s.scale.setScalar(.6*f+.15);s.material.color.copy(col(c));s.material.opacity=.7*f});
+    if(k==='fire'||k==='pyro'){if(Math.random()<.5)spark(b.x,Y,b.y,rand(-.4,.4),rand(.2,.8),rand(-.4,.4),Math.random()<.5?'#ffd060':'#ff6a1a',.35,.22)}
+    else if(k==='vb'){if(Math.random()<.6)spark(b.x,Y,b.y,rand(-.5,.5),rand(-.3,.3),rand(-.5,.5),'#b98cff',.3,.2)}});
+  /* vùng kỹ năng: mưa đạn đỏ, vùng lửa, hố đen, vùng thời gian, vùng điện, cầu lửa */
+  (V.z||[]).forEach(z=>{const a=Math.min(1,z.t/.6),g=S5.ZN.get(),U=g.userData,r=z.r;g.position.set(z.x,0,z.y);const K={rain:['#ff3c3c','#ff7a5a'],fire4:['#ff6a14','#ffb347'],hole:['#7a3cff','#c9a0ff'],clock:['#5ab4ff','#cfe9ff'],circ:['#3a8cff','#dff3ff']}[z.k]||['#ff6e14','#ffe678'];
+    U.w.scale.set(r,z.k==='hole'?.6:1.2,r);U.w.position.y=z.k==='hole'?.3:.6;U.w.material.color.copy(col(K[0]));U.w.material.opacity=.5*a;U.d.scale.setScalar(r);U.d.position.y=.05;U.d.material.color.copy(col(K[0]));U.d.material.opacity=.9*a;
+    U.hole.visible=z.k==='hole';U.rim.visible=z.k==='hole'||z.k==='clock';U.rim.scale.setScalar(r);U.rim.position.y=Y*.5;U.rim.material.color.copy(col(K[1]));U.rim.material.opacity=.8*a;U.rim.rotation.y=t3*1.5;
+    if(z.k==='hole'){U.hole.scale.setScalar(r*.6);U.hole.position.y=Y*.5;for(let i=0;i<2;i++){const an=Math.random()*TAU,pr=(z.pull||r*3)*rand(.5,1);const x=z.x+Math.cos(an)*pr,zz=z.y+Math.sin(an)*pr;spark(x,Y*.5,zz,(z.x-x)*1.4,0,(z.y-zz)*1.4,K[1],.6,.22)}}
+    else if(z.k==='rain'){for(let i=0;i<2;i++){const an=Math.random()*TAU,rr=r*Math.sqrt(Math.random()),x=z.x+Math.cos(an)*rr,zz=z.y+Math.sin(an)*rr;spark(x-1,5,zz-1.5,3.3,-9,5,K[1],.5,.25)}}
+    else if(z.k==='circ'){if(Math.random()<.5){const an=Math.random()*TAU;zap5(new T.Vector3(z.x+Math.cos(an)*r*.95,.3,z.y+Math.sin(an)*r*.95),new T.Vector3(z.x+Math.cos(an+1)*r*.3,.5,z.y+Math.sin(an+1)*r*.3),'#bfe6ff',.8,Math.random()*9)}}
+    else for(let i=0;i<2;i++){const an=Math.random()*TAU,rr=r*.9*Math.sqrt(Math.random());spark(z.x+Math.cos(an)*rr,.15,z.y+Math.sin(an)*rr,0,rand(1,2.2),0,Math.random()<.5?K[1]:K[0],.6,.3)}});
+  /* đốt cháy trên tàu địch (Cặp Tia Đỏ...): lửa bốc lên trên thân tàu */
+  (V.d||[]).forEach(o=>{const e=o.e;if(!e||e.dead)return;if(Math.random()<.5){const r=(e.size||2)*.35;spark(e.x+rand(-r,r),Y,e.y+rand(-r,r),0,1.3,0,o.col||'#ff5a1a',.45,.26)}});
+  S5.B.end();S5.DOT.end();S5.MS.end();S5.ZN.end()}
 R3.tlbOn=()=>!!R3.live;
 
 /* ---------- nối vào vòng vẽ trận ---------- */
