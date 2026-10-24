@@ -307,7 +307,7 @@ function render(G,L){const now=performance.now(),dt=Math.min(.05,(now-lastT)/100
       M.emissiveIntensity=(o.stun>0||o.stT>0)?1.4+Math.sin(t3*30)*.6:1.4;
       const f=.85+Math.random()*.3,sp=.6+Math.min(1,spd/6)*.8;U.fl.forEach(F=>{F.a.scale.set(F.r,F.r,F.r*5*sp*f);F.b.scale.set(F.r*.45,F.r*.45,F.r*3*sp*f);F.g.scale.setScalar(F.r*4.2*f);F.a.visible=F.b.visible=F.g.visible=op>.3});
       if(U.cores){let e=.75+.2*Math.sin(t3*6+U.ph);if(o===G.pl&&o.nrgMax)e=.12+1.5*(o.nrg/o.nrgMax)*(.8+.2*Math.sin(t3*6));U.cores.forEach(m=>m.emissiveIntensity=e)}
-      let sf=0;if(typeof c7ShF==='function')sf=c7ShF(o);if(o.cs&&o.cs.abs&&o.cs.abs.v>0)sf=Math.max(sf,.5);
+      let sf=0;if(typeof c7ShF==='function')sf=c7ShF(o);
       U.shield.visible=sf>0&&op>.3;if(U.shield.visible){U.sfl=o.hit>0?.22:Math.max(0,(U.sfl||0)-dt);U.shield.material.opacity=.035+.04*sf+U.sfl}
       const big=o.boss,bw=big?Math.max(2.9,o.size*1.2):Math.max(.9,o.size*.55),by=y+(big?3.7:1.1)*sc,bz=o.y,show=big||o.team!=='p'||o.hp<o.max||o===G.pl;
       if(show){bar(o.x,by,bz,bw+.04,1,'#0a1020',.75,big?.22:.14);bar(o.x,by,bz,bw,Math.max(0,o.hp/o.max),big?'#ff4d5e':o.team==='p'?(o===G.pl?'#5dffa1':'#5dffa1'):'#ff6a3c',1,big?.14:.085);if(sf>0)bar(o.x,by,bz,bw,sf,'#ffffff',.9,big?.14:.085)}
@@ -417,6 +417,7 @@ function skill3d(G,dt){const C=G.csk;skInit();const S2=SK;
     U.tk.forEach((t,i)=>{const a=a0*-1.3+i*Math.PI/2;t.position.set(Math.cos(a)*R2*1.07,0,Math.sin(a)*R2*1.07);t.scale.set(1,1,R2*.6);t.rotation.y=Math.atan2(Math.cos(a),Math.sin(a))});
     U.dot.scale.setScalar(.5+.15*Math.sin(t3*10));U.col.scale.set(.05,3,.05);U.col.position.y=1.5;U.col.material.opacity=.25*lk});
   try{skill3d2(G,dt)}catch(e){console.error(e)}
+  try{skill3d3(G,dt)}catch(e){console.error(e)}
   S2.R.end();S2.SW.end();S2.LZ.end();S2.ORB.end();S2.MAG.end();S2.LK.end();intelHud(C)}
 /* ===================== KỸ NĂNG 3D (đợt 2) =====================
    Tiến Công · Giảm Hồi Chiêu Kỹ Năng · Liên Kết Tam Giác · Sửa Chữa Tàu · Drone Hồi Phục · Truyền Năng Lượng · Drone Gây Nhiễu
@@ -510,6 +511,60 @@ function tlb(G,dt){const C5=G.csk,X=C5&&C5.vf&&C5.vf.x2,list=X&&X.c5?X.c5.filter
       F.light.position.y=1.5;F.light.intensity=6*f*f;F.flash.position.y=.7;F.flash.scale.setScalar(4.5*(1-f*.2));F.flash.material.opacity=.95*f;F.halo.position.y=.7;F.halo.scale.setScalar(12*(1.1-f*.3));F.halo.material.opacity=.6*f;
       const k=(a-.3)/.7;F.wave.position.y=.06;F.wave.scale.setScalar(.4+5*Math.min(1,k*1.4));F.wave.material.opacity=Math.max(0,.9*(1-k*1.2))}});
   R3.fx.forEach((F,o)=>{if(seen.has(o))return;if(F.bolt){F.bolt.kill();F.br.forEach(b=>b.kill())}F.grp.traverse(m=>{if(m.material)m.material.dispose();if(m.geometry)m.geometry.dispose()});scene.remove(F.grp);R3.fx.delete(o)})}
+/* ===================== KỸ NĂNG 3D (đợt 3) =====================
+   Phóng Lao Xanh · Dịch Chuyển Tức Thời Cơ Bản · Cứu Trong Gang Tấc · Gọi Bóng · Ba Cấp Tốc · Lướt Tốc Thả Thiên Thạch · Tăng Tốc Phi Đội
+   · Phun Khói Lửa · Đánh Dấu Trụ Sở Kẻ Thù · Lướt Qua Nhau · Khiên Lục Giác Cơ Bản · Khiên Đón Đạn (+ khiên tròn / khiên đồng minh) */
+let SK3=null;
+function sk3Init(){if(SK3)return SK3;const AD=SK.AD;
+  const hex=cvTex(256,128,(x)=>{x.clearRect(0,0,256,128);x.strokeStyle='rgba(200,240,255,.95)';x.lineWidth=2.2;const r=10,h=r*Math.sqrt(3);for(let row=-1;row<8;row++)for(let col=-1;col<16;col++){const cx=col*r*1.5,cy=row*h+(col%2?h/2:0);x.beginPath();for(let i=0;i<6;i++){const a=i*Math.PI/3;x[i?'lineTo':'moveTo'](cx+Math.cos(a)*r,cy+Math.sin(a)*r)}x.closePath();x.stroke()}});
+  hex.wrapS=hex.wrapT=T.RepeatWrapping;
+  const streak=cvTex(16,128,(x)=>{const g=x.createLinearGradient(0,0,0,128);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.3,'rgba(160,220,255,.7)');g.addColorStop(1,'rgba(60,140,255,0)');x.fillStyle=g;x.fillRect(0,0,16,128)});
+  const sm=(m)=>new T.MeshBasicMaterial({map:m,color:0xffffff,transparent:true,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide,toneMapped:false,fog:false});
+  const strG=new T.PlaneGeometry(1,1);strG.translate(0,-.5,0);strG.rotateX(-Math.PI/2);/* dải phẳng kéo dài về +z */
+  const rock=rockGeo(1),rockM=new T.MeshStandardMaterial({color:lin(0x5a463a),roughness:.9,flatShading:true,emissive:lin(0x401000)});
+  const arcG=new T.CylinderGeometry(1,1,1,40,1,true,-Math.PI/2,Math.PI);/* nửa vòng phía trước (mặt -z) */
+  SK3={hex,
+    STR:Pool(()=>{const g=new T.Group();[0,1,2].forEach(i=>{const m=new T.Mesh(strG,sm(streak));m.frustumCulled=false;g.add(m)});const gl=new T.Sprite(ADDM(glowT()));gl.material.color.set(0x50beff);g.add(gl);g.userData={gl};scene.add(g);return g}),
+    BUB:Pool(()=>{const g=new T.Group(),s=new T.Mesh(SHG,AD(0x9fe3ff,.15)),h=new T.Mesh(SHG,new T.MeshBasicMaterial({map:hex,color:0x9fe3ff,transparent:true,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide,toneMapped:false,fog:false})),r=new T.Mesh(new T.TorusGeometry(1,.02,6,48).rotateX(Math.PI/2),AD(0xcfefff,.8));g.add(s,h,r);g.userData={s,h,r};scene.add(g);return g}),
+    MET:Pool(()=>{const g=new T.Group(),m=new T.Mesh(rock,rockM),f=new T.Sprite(ADDM(glowT()));m.scale.setScalar(.22);m.castShadow=true;f.material.color.set(0xff9a3c);f.scale.setScalar(.9);g.add(m,f);g.userData={m,f};scene.add(g);return g}),
+    FIRE:Pool(()=>{const m=new T.Mesh(strG,sm(SK.disc));m.material.color.set(0xff7a22);m.frustumCulled=false;scene.add(m);return m}),
+    PATH:Pool(()=>{const m=new T.Mesh(strG,AD(0xffd24a,.35));m.frustumCulled=false;scene.add(m);return m}),
+    CHV:Pool(()=>{const m=new T.Mesh(new T.ConeGeometry(.16,.34,3).rotateX(-Math.PI/2).rotateY(Math.PI),AD(0xffd24a,1));scene.add(m);return m}),
+    COL:Pool(()=>{const m=new T.Mesh(new T.CylinderGeometry(1,1,1,16,1,true),new T.MeshBasicMaterial({map:SK.wall,color:0xff4a4a,transparent:true,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide,toneMapped:false,fog:false}));scene.add(m);return m}),
+    ARC:Pool(()=>{const g=new T.Group(),a=new T.Mesh(arcG,new T.MeshBasicMaterial({map:hex,color:0x4aa8ff,transparent:true,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide,toneMapped:false,fog:false})),b=new T.Mesh(arcG,AD(0xbfe9ff,.25));g.add(a,b);g.userData={a,b};scene.add(g);return g})};
+  return SK3}
+/* vệt phản lực xanh phía sau tàu (Phóng Lao Xanh, lướt, tăng tốc) */
+function jet(u,dx,dz,big,c){const g=SK3.STR.get(),y=u.ang!=null?1:1;g.position.set(u.x,HOV,u.y);g.rotation.set(0,Math.atan2(-dx,-dz),0);const r=(u.size||2.2)*.5,L=r*(big?2.4:1.6)*(1+.15*Math.sin(t3*30));
+  g.children.forEach((m,i)=>{if(!m.isMesh)return;const k=i-1;m.position.set(k*r*.45,0,0);m.scale.set(r*(k?.28:.42),1,L*(k?.8:1));m.material.color.copy(col(c))});g.userData.gl.scale.setScalar(r*2.6);g.userData.gl.material.color.copy(col(c));g.userData.gl.material.opacity=big?.6:.35}
+function skill3d3(G,dt){const C=G.csk,P=G.pl;if(!C)return;sk3Init();const S3=SK3,units=[P].concat(G.al||[]).filter(u=>u&&!u.dead);
+  /* Phóng Lao Xanh / lướt (Lướt Tốc, Lướt Qua Nhau): 3 vệt phản lực dài; Ba Cấp Tốc và tăng tốc khác: vệt ngắn */
+  units.forEach(u=>{const c=u.cs||{};let dx=0,dz=0,big=false;
+    if(c.glT>0&&c.gld){dx=c.gld[0];dz=c.gld[1];big=true}else if(c.lao>0){const l=Math.hypot(u.vx||0,u.vy||0);if(l>.5){dx=u.vx/l;dz=u.vy/l}else{dx=-Math.cos(u.ang||0);dz=-Math.sin(u.ang||0);dx=-dx;dz=-dz}big=true}
+    else if((u.boostT>0)||(u.spb&&u.spb.t>0)||c.dash>0){const l=Math.hypot(u.vx||0,u.vy||0);if(l>.5){dx=u.vx/l;dz=u.vy/l}}
+    if(dx||dz)jet(u,dx,dz,big,big?'#50beff':'#9fe0ff');
+  /* khiên của tàu: khiên tròn (Dịch Chuyển Tức Thời...), khiên lục giác, khiên đồng minh xanh lá; vàng khi đang bất tử (Cứu Trong Gang Tấc) */
+    const ab=c.abs&&c.abs.t>0&&c.abs.v>0,sd=u.shd&&u.shd.t>0&&u.shd.v>0,inv=c.inv>0;
+    if(ab||sd||inv){const g=S3.BUB.get(),U=g.userData,rr=(u.size||2.2)*.62*1.2*(1+.03*Math.sin(t3*6)),f=ab?Math.min(1,c.abs.v/Math.max(1,c.abs.max)):sd?Math.min(1,u.shd.v/Math.max(1,u.shd.max)):1,cc=inv?'#ffd24a':ab?'#9fe3ff':'#8dffc0';
+      g.position.set(u.x,HOV,u.y);g.scale.set(rr,rr*.7,rr);U.s.material.color.copy(col(cc));U.s.material.opacity=.08+.12*f;U.h.visible=!!(ab&&c.hexc);U.h.material.opacity=.35+.4*f;U.h.material.map.offset.x=t3*.05;
+      U.r.material.color.copy(col(cc));U.r.rotation.y=t3*2;U.r.material.opacity=.5+.4*f}});
+  /* Khiên Đón Đạn: tấm khiên cong 180° phía trước mũi tàu */
+  units.forEach(u=>{const a=u.cs&&u.cs.arc;if(!a||!(a.t>0))return;const g=S3.ARC.get(),U=g.userData,R=(u.size||2.2)*.75,f=Math.min(1,a.v/a.max),fa=Math.min(1,a.t*3);g.position.set(u.x,HOV,u.y);g.rotation.set(0,Math.atan2(Math.cos(u.ang||0),Math.sin(u.ang||0)),0);g.scale.set(R,.9,R);
+    U.a.material.color.copy(col(a.hf>0?'#ffffff':'#4aa8ff'));U.a.material.opacity=fa*(.5+.4*f);U.b.material.opacity=fa*.25});
+  /* Lướt Tốc Thả Thiên Thạch: thiên thạch rực lửa rơi từ trên cao xuống mục tiêu */
+  (C.met||[]).forEach(m=>{const t=m.tg;if(!t||m.a<m.d)return;const p=Math.min(1,(m.a-m.d)/m.f),lx=t.x+m.ox,lz=t.y+m.oy,g=S3.MET.get(),U=g.userData;
+    g.position.set(lx-2.4*(1-p),HOV*.6+9*(1-p),lz-3.2*(1-p));U.m.rotation.set(t3*4,t3*3,0);U.f.scale.setScalar(.9+.3*Math.random());smoke(g.position.x,g.position.y,g.position.z,.6,.35);spark(g.position.x,g.position.y,g.position.z,rand(-.5,.5),1,rand(-.5,.5),'#ff9a3c',.3,.3)});
+  /* Tăng Tốc Phi Đội: vòng xanh lan ra kèm mũi tên chạy ra ngoài */
+  (C.sr||[]).forEach(w=>{const p=1-w.t/w.max,rr=w.R*Math.min(1,Math.sqrt(p*2.2)),fa=Math.min(1,w.t*2.2);if(rr<.1)return;const g=SK.R.get(),U=g.userData;g.position.set(w.P.x,HOV*.5,w.P.y);U.a.scale.set(rr,.7,rr);U.b.scale.setScalar(rr);U.a.material.color.set(0x5ad8ff);U.b.material.color.set(0xbff0ff);U.a.material.opacity=.6*fa;U.b.material.opacity=fa;
+    for(let i=0;i<8;i++){const a=i*Math.PI/4+p*.6,rad=rr*(.45+.4*((p*1.5+i/8)%1)),c=S3.CHV.get();c.position.set(w.P.x+Math.cos(a)*rad,HOV*.5,w.P.y+Math.sin(a)*rad);c.rotation.set(0,Math.atan2(Math.cos(a),Math.sin(a)),0);c.material.color.set(0xe6fbff);c.material.opacity=fa}});
+  /* Phun Khói Lửa: vệt lửa cháy trên đường bay, lửa bốc lên */
+  (C.fseg||[]).forEach(sg=>{const a=Math.max(0,Math.min(1,sg.t/.8,(sg.max-sg.t)*6+.25)),dx=sg.x2-sg.x1,dz=sg.y2-sg.y1,L=Math.hypot(dx,dz)||.01,m=S3.FIRE.get();m.position.set(sg.x1,.08,sg.y1);m.rotation.set(0,Math.atan2(dx,dz),0);m.scale.set(.9,1,L);m.material.opacity=a;
+    if(Math.random()<.5*a){const u=Math.random();spark(sg.x1+dx*u+rand(-.2,.2),.2,sg.y1+dz*u+rand(-.2,.2),0,rand(.8,1.6),0,Math.random()<.5?'#ffd060':'#ff7a22',.5,.3)}});
+  /* Đánh Dấu Trụ Sở Kẻ Thù: đường dẫn vàng trên sàn tới trụ sở địch, mũi tên chạy, cột sáng đỏ trên trụ sở địch */
+  if(C.mk&&G.eh){const mk=C.mk,pts=mk.path||[],fa=Math.min(1,mk.t*1.5,(mk.max-mk.t)*3+.2);let acc=0;
+    for(let i=1;i<pts.length;i++){const a=pts[i-1],b=pts[i],dx=b.x-a.x,dz=b.y-a.y,L=Math.hypot(dx,dz)||.01,m=S3.PATH.get();m.position.set(a.x,.06,a.y);m.rotation.set(0,Math.atan2(dx,dz),0);m.scale.set(.5,1,L);m.material.opacity=.3*fa;
+      for(let d=(2.2-((acc+t3*2.2)%2.2));d<L;d+=2.2){const c=S3.CHV.get();c.position.set(a.x+dx/L*d,.25,a.y+dz/L*d);c.rotation.set(0,Math.atan2(dx,dz),0);c.material.color.set(0xffd24a);c.material.opacity=fa*.9}acc+=L}
+    const h=G.eh,c=S3.COL.get();c.position.set(h.x,3,h.y);c.scale.set(.8,6,.8);c.material.opacity=.6*fa*(.8+.2*Math.sin(t3*6))}
+  S3.STR.end();S3.BUB.end();S3.MET.end();S3.FIRE.end();S3.PATH.end();S3.CHV.end();S3.COL.end();S3.ARC.end()}
 R3.tlbOn=()=>!!R3.live;
 
 /* ---------- nối vào vòng vẽ trận ---------- */
