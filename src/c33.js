@@ -289,8 +289,8 @@ const PH=new WeakMap();
 /* ---------- vẽ 3D ---------- */
 let t3=0,lastT=performance.now();
 function render(G,L){const now=performance.now(),dt=Math.min(.05,(now-lastT)/1000);lastT=now;t3+=dt;
-  applyQ();const w=dfc.clientWidth||dfV.w,h=dfc.clientHeight||dfV.h,pr=ren.getPixelRatio();if(cv3.width!==Math.round(w*pr)||cv3.height!==Math.round(h*pr))ren.setSize(w,h,false);
-  if(R3.gid!==G){setWorld(G);seenFx=new WeakSet();R3.yaw=0}pools();joyStep(G);camFollow(G,dt);gTex.needsUpdate=true;
+  applyQ();const PV=R3.pv,w=PV?PV.w:(dfc.clientWidth||dfV.w),h=PV?PV.h:(dfc.clientHeight||dfV.h),pr=ren.getPixelRatio();if(cv3.width!==Math.round(w*pr)||cv3.height!==Math.round(h*pr))ren.setSize(w,h,false);
+  if(R3.gid!==G){setWorld(G);seenFx=new WeakSet();R3.yaw=0}pools();baseZ.visible=!PV;if(shadowP)shadowP.visible=!PV;if(PV)pvCam(G,PV);else{joyStep(G);camFollow(G,dt)}gTex.needsUpdate=true;
   sky.rotation.y+=dt*.004;planet.rotation.y+=dt*.01;(R3.rocks||[]).forEach(r=>{r.m.rotation.x+=r.sp.x*dt;r.m.rotation.y+=r.sp.y*dt});
   {const P=dust.geometry.attributes.position;for(let i=0;i<P.count;i+=5)P.setY(i,P.getY(i)+Math.sin(t3*.6+i)*.002);P.needsUpdate=true}
   const used=new Set();BH=[];
@@ -337,10 +337,10 @@ function render(G,L){const now=performance.now(),dt=Math.min(.05,(now-lastT)/100
     const m=XB.get(),R=f.r*(1.1-k*.5)*(f.ex?.6:.8);m.position.set(f.x,y,f.y);m.scale.setScalar(Math.max(.05,R));m.material.color.copy(col(f.ex?'#ffb347':f.col));m.material.opacity=Math.min(1,k*.6)});
   BUL.end();BC.end();BG.end();XB.end();MS.end();
   XS.end();stepFx(dt);
-  const P=G.pl;marker.visible=!P.dead&&R3.joy.id===null&&Math.hypot(P.tx-P.x,P.ty-P.y)>.3;if(marker.visible){marker.position.x=P.tx;marker.position.z=P.ty;marker.rotation.z+=dt*2;marker.scale.setScalar(1+.15*Math.sin(t3*6))}
+  const P=G.pl;marker.visible=!PV&&!P.dead&&R3.joy.id===null&&Math.hypot(P.tx-P.x,P.ty-P.y)>.3;if(marker.visible){marker.position.x=P.tx;marker.position.z=P.ty;marker.rotation.z+=dt*2;marker.scale.setScalar(1+.15*Math.sin(t3*6))}
   try{skill3d(G,dt)}catch(e){console.error(e)}
-  tlb(G,dt);BAR.end();hud(G,true);
-  ren.render(scene,cam);radar(G)}
+  tlb(G,dt);BAR.end();if(!PV)hud(G,true);
+  ren.render(scene,cam);if(!PV)radar(G)}
 /* ---------- radar tròn (góc phải trên) ---------- */
 let rdc=null,rdq=null,rdn=0;
 function radar(G){if(!rdc){rdc=document.createElement('canvas');rdc.id='df3r';rdc.width=rdc.height=232;rdc.setAttribute('aria-label','Radar');rdc.style.cssText='position:absolute;right:max(16px,env(safe-area-inset-right,0px));top:calc(10px + env(safe-area-inset-top,0px));width:clamp(84px,16vh,116px);height:clamp(84px,16vh,116px);max-height:none;border:1px solid rgba(90,150,255,.28);border-radius:50%;background:rgba(6,14,32,.72);pointer-events:none;z-index:5';document.getElementById('def').appendChild(rdc);rdq=rdc.getContext('2d')}
@@ -1076,6 +1076,27 @@ function skill3d12(G,dt){const C=G.csk,X=C&&C.vf&&C.vf.x2;if(!X)return;sk12Init(
   (X.gl||[]).forEach(g=>{if(!g.fl)return;const u=g.u;if(!ok(u))return;const p=Math.max(0,g.t)/g.max,a=u.ang!=null?u.ang:-Math.PI/2,sz=(u.size||2.2)*.5,L=sz*(.5+1.5*p)*(.85+.15*Math.sin(t3*40)),fx=Math.cos(a),fz=Math.sin(a),sx=-fz,sz2=fx;
     [-1,1].forEach(sg=>{const bx=u.x-fx*sz*.42+sx*sg*sz*.17,bz=u.y-fz*sz*.42+sz2*sg*sz*.17,W=sz*.14*(.6+.6*p),m=S.FL.get();m.position.set(bx,Y,bz);m.rotation.set(0,Math.atan2(fx,fz),0);m.scale.set(W,W,L);m.material.opacity=.85;dot12(bx,Y,bz,W*4,'#bfe6ff',.8)})});
   S.B.end();S.DOT.end();S.TOR.end();S.DISK.end();S.DARK.end();S.BALL.end();S.BLD.end();S.WALL.end();S.BAR.end();S.FL.end();S.DRN.end()}
+/* ===================== MÔ PHỎNG KỸ NĂNG 3D (Shop kỹ năng) =====================
+   Dùng chung bộ dựng 3D của trận: tàu, công trình, đạn, nổ và hiệu ứng kỹ năng đã có bản 3D;
+   hiệu ứng chưa có bản 3D vẫn vẽ 2D lên một tấm trong suốt phủ đúng mặt sân mô phỏng. */
+function pvCam(G,PV){const WW=PV.WW,HH=PV.HH,cx=WW/2,asp=PV.w/PV.h;cam.aspect=asp;cam.fov=asp<1?62:50;cam.updateProjectionMatrix();
+  const D=Math.max(WW,HH)*(asp<1?.8:.62);cam.position.set(cx,D*.9,HH+D*.35);cam.lookAt(cx,0,HH*.5);
+  fxP.position.set(cx,FXY,HH/2);fxP.scale.set(WW,HH,1)}
+R3.pvDraw=function(o){if(!R3.on||R3.fail)return false;if(!window.THREE){loadThree();return false}if(!init())return false;if(R3.live&&DG&&!DG.pv)return false;
+  const G=o.G,prevDG=DG,prevLive=R3.live;
+  [G.pl].concat(G.en||[],G.al||[]).forEach(u=>{if(u&&u.sh&&!u.sc)u.sc=(u.size||2)/Math.max(u.sh.W||1,u.sh.H||1)});
+  let fx=R3.pvFx;if(!fx){fx=R3.pvFx=document.createElement('canvas')}const fw=Math.round(o.Wpx*o.dpr),fh=Math.round(o.Hpx*o.dpr);if(fx.width!==fw||fx.height!==fh){fx.width=fw;fx.height=fh}
+  const q2=fx.getContext('2d'),sc=o.sc,X=x=>x*sc,Y=y=>y*sc;
+  try{DG=G;let L=[];try{pump();L=collect(G)}catch(e){console.error(e)}
+    R3.hide=new Set(L.filter(i=>i.m).map(i=>i.src));R3.hiding=true;R3.live=true;
+    q2.setTransform(o.dpr,0,0,o.dpr,0,0);q2.clearRect(0,0,o.Wpx,o.Hpx);
+    try{CSK.under(q2,sc,X,Y)}catch(e){}try{if(G.csk)CSK.draw(q2,sc,X,Y)}catch(e){console.error(e)}
+    R3.hiding=false;R3.pv={w:o.Wpx,h:o.Hpx,WW:o.WW,HH:o.HH};gTex.image=fx;
+    render(G,L);
+    const q=o.q;q.setTransform(1,0,0,1,0,0);q.clearRect(0,0,q.canvas.width,q.canvas.height);q.drawImage(cv3,0,0,q.canvas.width,q.canvas.height);q.setTransform(o.dpr,0,0,o.dpr,0,0);
+    return true}
+  catch(e){console.error(e);return false}
+  finally{R3.pv=null;R3.hiding=false;R3.live=prevLive;DG=prevDG;gTex.image=dfc;gTex.needsUpdate=true}};
 R3.tlbOn=()=>!!R3.live;
 
 /* ---------- nối vào vòng vẽ trận ---------- */
