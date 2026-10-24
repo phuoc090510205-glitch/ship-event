@@ -14074,6 +14074,7 @@ function skill3d(G,dt){const C=G.csk;skInit();const S2=SK;
   try{skill3d5(G,dt)}catch(e){console.error(e)}
   try{skill3d6(G,dt)}catch(e){console.error(e)}
   try{skill3d7(G,dt)}catch(e){console.error(e)}
+  try{skill3d8(G,dt)}catch(e){console.error(e)}
   S2.R.end();S2.SW.end();S2.LZ.end();S2.ORB.end();S2.MAG.end();S2.LK.end();intelHud(C)}
 /* ===================== KỸ NĂNG 3D (đợt 2) =====================
    Tiến Công · Giảm Hồi Chiêu Kỹ Năng · Liên Kết Tam Giác · Sửa Chữa Tàu · Drone Hồi Phục · Truyền Năng Lượng · Drone Gây Nhiễu
@@ -14395,6 +14396,63 @@ function skill3d7(G,dt){const X=G.csk&&G.csk.vf&&G.csk.vf.x2;if(!X||!X.c5)return
     /* vệ tinh đá quay quanh tàu */
     else if(o.k==='orbit'){if(!P||P.dead)return;for(let i=0;i<3;i++){const aa=o.age*2.2+i*2.094,g=S7.PL.get(),U=g.userData;g.position.set(P.x+Math.cos(aa)*2.2,Y,P.y+Math.sin(aa)*2.2);U.m.material=MT.metal;U.ring.visible=false;U.gl.material.color.set(0x9fe0ff);U.gl.scale.setScalar(1.6);U.gl.material.opacity=.35*a}}});
   S7.FARC.end();S7.SPK.end();S7.VB.end();S7.AUR.end();S7.PL.end();S7.MT.end();S7.RING.end();S7.DOT.end()}
+/* ===================== KỸ NĂNG 3D (đợt 8) =====================
+   Né Xa Tôi Ra · Bom Từ Trường · Lưới Điện Tím · Vòng Lửa Quay · Pháo Hoa Chết Chóc · Bão Đạn Kim · Vòng Xoáy Tử Thần · Tia Laser Xanh
+   · Nhát Chém Kết Liễu · Xạ Thủ Đêm (+ băng phủ tàu địch) */
+Object.assign(R3.c5k,{nwave:1,mbomb:1,pbolt:1,fring:1,smis:1,needle:1,ice:1,vxtt:1,lzb:1,slash:1,aimr:1,snip:1});
+let SK8=null;
+function sk8Init(){if(SK8)return SK8;const AD=SK.AD,beamG=new T.CylinderGeometry(1,1,1,8,1,true),torus=new T.TorusGeometry(1,.022,8,64);torus.rotateX(Math.PI/2);
+  const band=new T.CylinderGeometry(1,1,1,64,1,true);
+  const mb=new T.CylinderGeometry(.04,.04,.3,6);mb.rotateX(Math.PI/2);const mc=new T.ConeGeometry(.04,.12,6);mc.rotateX(-Math.PI/2);mc.translate(0,0,-.21);
+  const nd=new T.BoxGeometry(.035,.035,1);nd.translate(0,0,.5);/* kim: từ gốc kéo dài về +z */
+  const blade=new T.TorusGeometry(1,.06,6,32,1.6);blade.rotateX(Math.PI/2);blade.rotateY(-.8);
+  SK8={B:Pool(()=>{const g=new T.Group(),a=new T.Mesh(beamG,AD(0xffffff,.5)),b=new T.Mesh(beamG,AD(0xffffff,1));a.frustumCulled=b.frustumCulled=false;g.add(a,b);g.userData={a,b};scene.add(g);return g}),
+    DOT:Pool(()=>{const s=new T.Sprite(ADDM(glowT()));scene.add(s);return s}),
+    TOR:Pool(()=>{const m=new T.Mesh(torus,AD(0xffffff,1));scene.add(m);return m}),
+    BAND:Pool(()=>{const m=new T.Mesh(band,new T.MeshBasicMaterial({map:SK.band,color:0xffffff,transparent:true,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide,toneMapped:false,fog:false}));m.frustumCulled=false;scene.add(m);return m}),
+    BALL:Pool(()=>{const m=new T.Mesh(new T.SphereGeometry(1,16,12),AD(0xffffff,1));scene.add(m);return m}),
+    MSL:Pool(()=>{const g=new T.Group(),a=new T.Mesh(mb,MT.gray),b=new T.Mesh(mc,MT.red);g.add(a,b);scene.add(g);return g}),
+    NDL:Pool(()=>{const m=new T.Mesh(nd,AD(0xcfeaff,.95));m.frustumCulled=false;scene.add(m);return m}),
+    ICE:Pool(()=>{const g=new T.Group(),a=new T.Mesh(new T.CylinderGeometry(1,1,1,6,1),new T.MeshStandardMaterial({color:lin(0xbfeeff),transparent:true,opacity:.35,metalness:.1,roughness:.05,emissive:lin(0x3aa8ff),emissiveIntensity:.4,depthWrite:false})),b=new T.Mesh(new T.CylinderGeometry(1,1,1,6,1,true),AD(0xe8ffff,.6));b.material.wireframe=true;g.add(a,b);g.userData={a,b};scene.add(g);return g}),
+    BLD:Pool(()=>{const m=new T.Mesh(blade,AD(0x8fd8ff,1));scene.add(m);return m})};
+  return SK8}
+function beam8(a,b,c,w,o){const g=SK8.B.get(),U=g.userData,d=b.clone().sub(a),L=d.length()||.01;g.position.copy(a).addScaledVector(d,.5);g.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),d.multiplyScalar(1/L));U.a.scale.set(w,L,w);U.b.scale.set(w*.32,L,w*.32);U.a.material.color.copy(col(c));U.b.material.color.copy(col(c)).lerp(WH3,.6);U.a.material.opacity=o*.6;U.b.material.opacity=o}
+function zap8(a,b,c,o,sd){const n=9,d=b.clone().sub(a),L=d.length()||.01,nx=-d.z/L,nz=d.x/L;let p0=a.clone();for(let i=1;i<=n;i++){const f=i/n,off=i<n?Math.sin(t3*70+i*4+sd)*.4:0,up=i<n?Math.cos(t3*61+i*7+sd)*.3:0,p1=a.clone().addScaledVector(d,f).add(new T.Vector3(nx*off,up,nz*off));beam8(p0,p1,c,.09,o);p0=p1}}
+function dot8(x,y,z,s,c,o){const d=SK8.DOT.get();d.position.set(x,y,z);d.scale.setScalar(s);d.material.color.copy(col(c));d.material.opacity=o;return d}
+function skill3d8(G,dt){const X=G.csk&&G.csk.vf&&G.csk.vf.x2;if(!X||!X.c5)return;sk8Init();const S8=SK8,Y=HOV,V3a=(x,z,y)=>new T.Vector3(x,y==null?Y:y,z);
+  const fa=o=>o.max?Math.max(0,Math.min(1,(o.max-o.age)/.4,o.age/.1+.2)):1;
+  X.c5.forEach(o=>{if(o.dl>0||!o.k)return;const k=o.k,a=fa(o),P=o.P;
+    /* Né Xa Tôi Ra: sóng xung kích xanh lan ra 6 ô, hất văng kẻ địch */
+    if(k==='nwave'){if(!P)return;const R=Math.max(.01,o.R),f=Math.max(0,1-o.age/.9),b=S8.BAND.get();b.position.set(P.x,Y*.6,P.y);b.scale.set(R,1.2*f+.2,R);b.material.color.set(0x3a9ad8);b.material.opacity=.6*f*a;
+      const t=S8.TOR.get();t.position.set(P.x,Y*.6,P.y);t.scale.setScalar(R);t.material.color.set(0xa8ecff);t.material.opacity=.75*f*a;if(o.age>.12){const t2=S8.TOR.get();t2.position.set(P.x,Y*.6,P.y);t2.scale.setScalar(R*.62);t2.material.color.set(0x8fe8ff);t2.material.opacity=.6*f*a}}
+    /* Bom Từ Trường: quả bom cam bay ra, hút địch bằng các vòng co dần */
+    else if(k==='mbomb'){const f=Math.min(1,o.age/.2,o.ph===2?Math.max(0,1-(o.t2||0)/.5):1),b=S8.BALL.get();b.position.set(o.x,Y,o.y);b.scale.setScalar(.35+.05*Math.sin(t3*10));b.material.color.set(0xffd27a);b.material.opacity=f*a;dot8(o.x,Y,o.y,3.2,'#ff8a20',.6*f*a);
+      if(o.ph===1)for(let i=0;i<3;i++){const ph=(t3*1.5+i/3)%1,t=S8.TOR.get();t.position.set(o.x,Y*.7,o.y);t.scale.setScalar(4*(1-ph*.85));t.material.color.set(0xff9a30);t.material.opacity=(1-ph)*.7*f*a}}
+    /* Lưới Điện Tím: sét tím nhảy dây chuyền qua tối đa 13 kẻ địch */
+    else if(k==='pbolt'){const f=1-o.age/o.max,A=V3a(o.x1,o.y1),B=V3a(o.x2,o.y2);zap8(A,B,'#9a4aff',f*a,o.x1*7);dot8(B.x,Y,B.z,1.8,'#b070ff',.75*f*a)}
+    /* Vòng Lửa Quay: vòng 14 cầu lửa xoay quanh tàu */
+    else if(k==='fring'){if(!P||P.dead)return;const R=Math.max(.01,o.R),f=Math.max(0,Math.min(1,o.age/.3,(o.max-o.age)/.5)),t=S8.TOR.get();t.position.set(P.x,Y,P.y);t.scale.setScalar(R);t.rotation.y=-o.rot;t.material.color.set(0xff6a1a);t.material.opacity=.5*f*a;
+      for(let i=0;i<14;i++){const an=o.rot+i/14*TAU,x=P.x+Math.cos(an)*R,z=P.y+Math.sin(an)*R;dot8(x,Y,z,.8+.15*Math.sin(t3*18+i*2),i%2?'#ff7a1a':'#ffc04a',.9*f*a);if(Math.random()<.05)spark(x,Y,z,0,1,0,'#ffd070',.4,.25)}}
+    /* Pháo Hoa Chết Chóc: 40 tên lửa nhỏ toả ra rồi lao vào mục tiêu */
+    else if(k==='smis'){const m=S8.MSL.get();m.position.set(o.x,Y,o.y);m.rotation.set(0,Math.atan2(-Math.cos(o.a),-Math.sin(o.a)),0);dot8(o.x-Math.cos(o.a)*.3,Y,o.y-Math.sin(o.a)*.3,.55,'#ffa040',.85*a);if(Math.random()<.25)smoke(o.x,Y,o.y,.45,.22)}
+    /* Bão Đạn Kim: hàng trăm kim băng xanh bay theo hình quạt */
+    else if(k==='needle'){const m=S8.NDL.get();m.position.set(o.x,Y,o.y);m.rotation.set(0,Math.atan2(-Math.cos(o.a),-Math.sin(o.a)),0);m.scale.set(1,1,1.1);m.material.opacity=.95*a}
+    /* băng phủ tàu địch: khối lục giác băng trong suốt */
+    else if(k==='ice'){const e=o.e;if(!e||e.dead)return;const g=S8.ICE.get(),U=g.userData,R=(e.size||2)*.55;g.position.set(e.x,Y,e.y);g.scale.set(R,.9,R);g.rotation.y=.3;U.a.material.opacity=.35*a;U.b.material.opacity=.5*a}
+    /* Vòng Xoáy Tử Thần: quả cầu tím bay ra, nở thành vòng xoáy hút và phóng sét tím */
+    else if(k==='vxtt'){const f=Math.min(1,o.age/.15,o.ph===2?Math.max(0,1-(o.t2||0)/.5):1);dot8(o.x,Y,o.y,2.2,'#b060ff',.8*f*a);const b=S8.BALL.get();b.position.set(o.x,Y,o.y);b.scale.setScalar(.3);b.material.color.set(0x2a0050);b.material.opacity=f*a;
+      if(o.ph===1){for(let i=0;i<3;i++){const an=Math.random()*TAU,r=3.4*Math.random()+.5;spark(o.x+Math.cos(an)*r,Y,o.y+Math.sin(an)*r,-Math.sin(an)*3-(Math.cos(an)*r)*.8,rand(-.2,.2),Math.cos(an)*3-(Math.sin(an)*r)*.8,i%2?'#d8a0ff':'#9a4aff',.5,.25)}
+        (o.ts||[]).forEach((e,i)=>{if(!e.dead)zap8(V3a(o.x,o.y),V3a(e.x,e.y),'#9a4aff',.8*f*a,i*3)})}}
+    /* Tia Laser Xanh: tia laser xanh liên tục bám mục tiêu */
+    else if(k==='lzb'){let A,B,f=1;if(P){if(P.dead||!o.tg||o.tg.dead)return;A=V3a(P.x,P.y);B=V3a(o.tg.x,o.tg.y);f=Math.max(0,Math.min(1,o.age/.2,(o.max-o.age)/.3))}else{A=V3a(o.x1,o.y1);B=V3a(o.x2,o.y2);f=Math.max(0,1-o.age/o.max)}
+      const pu=1+.1*Math.sin(t3*40);beam8(A,B,o.col1||'#3a90ff',.3*pu,f*a);dot8(B.x,Y,B.z,1.7,o.col1||'#3a90ff',.7*f*a);dot8(A.x,Y,A.z,.9,o.col1||'#3a90ff',.6*f*a)}
+    /* Nhát Chém Kết Liễu: lưỡi chém cong xanh xẹt qua mục tiêu */
+    else if(k==='slash'){const f=Math.max(0,1-o.age/.5),u=Math.min(1,o.age/.12),m=S8.BLD.get();m.position.set(o.x,Y,o.y);m.rotation.set(0,-(o.a+.9),0);m.scale.set(2.2*u+.05,1,2.2*u+.05);m.material.opacity=f*a;dot8(o.x,Y,o.y,2.2*f+.1,'#6ac8ff',.5*f*a)}
+    /* Xạ Thủ Đêm: tia ngắm nét đứt + vòng ngắm đỏ trên mục tiêu, rồi viên đạn bắn tỉa vụt qua */
+    else if(k==='aimr'){const t=o.aim&&o.aim.tg;if(o.ph!==0||!t||t.dead||!P||P.dead)return;const u=Math.min(1,(o.t1||0)/5),R=(t.size||2)*(1.6-.6*u);beam8(V3a(P.x,P.y),V3a(t.x,t.y),'#6ac8ff',.03,.5*a*(.6+.4*Math.sin(t3*20)));
+      const r=S8.TOR.get();r.position.set(t.x,Y,t.y);r.scale.setScalar(R*.5);r.material.color.set(0xff3a3a);r.material.opacity=.95*a;for(let i=0;i<4;i++){const an=i*Math.PI/2;beam8(V3a(t.x+Math.cos(an)*R*.3,t.y+Math.sin(an)*R*.3),V3a(t.x+Math.cos(an)*R*.7,t.y+Math.sin(an)*R*.7),'#ff3a3a',.04,.9*a)}}
+    else if(k==='snip'){const A=V3a(o.x,o.y),B=V3a(o.x-Math.cos(o.a)*6,o.y-Math.sin(o.a)*6);beam8(A,B,'#3a90ff',.1,a);dot8(o.x,Y,o.y,1.3,'#6ac8ff',.9*a)}});
+  S8.B.end();S8.DOT.end();S8.TOR.end();S8.BAND.end();S8.BALL.end();S8.MSL.end();S8.NDL.end();S8.ICE.end();S8.BLD.end()}
 R3.tlbOn=()=>!!R3.live;
 
 /* ---------- nối vào vòng vẽ trận ---------- */
@@ -14672,7 +14730,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL=(window.SE_CFG&&SE_CFG.fb)||'';
-  const VER='v184';
+  const VER='v185';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`
