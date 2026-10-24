@@ -4,33 +4,65 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Quảng cáo · Ship event</title>
-<style>
-html,body{margin:0;height:100%;background:radial-gradient(circle at 50% 40%,#173f96,#050d24 72%);color:#e8f0ff;font-family:system-ui,sans-serif;overflow:hidden}
-.bx{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:22px;padding:16px;text-align:center}
-.bx b{display:block;font-size:20px;text-shadow:0 0 12px #3fd8ff;margin-bottom:6px}.bx small{color:#bcd0ff}
-.sp{width:46px;height:46px;border-radius:50%;border:4px solid #1f3d7a;border-top-color:#ffd23a;animation:r 1s linear infinite}@keyframes r{to{transform:rotate(360deg)}}
-</style>
-<!-- ===== MÃ QUẢNG CÁO MONETAG =====
-     Dán các đoạn <script> lấy từ Monetag (nút "Get tag") vào ngay dưới dòng này:
-     - Vignette Banner (vùng 12104333)
-     - In-Page Push   (vùng 12104332)
-     - OnClick        (vùng 12104331) — chỉ bật khi người chơi bấm bên trong khung này
--->
-<!-- MONETAG-TAGS -->
 <script>
-/* chọn mã Monetag theo loại xem: giữa màn → 1 mã; 15 giây → 1 mã; 30 giây → 2 mã; 60 giây → cả 3 mã */
+/* ===== MÃ QUẢNG CÁO MONETAG =====
+   chọn mã theo loại xem: giữa màn → 1 mã; 15 giây → 1 mã; 30 giây → 2 mã; 60 giây → cả 3 mã */
 (function(){var Z={a:'300851',b:'300927',c:'300929'},q=new URLSearchParams(location.search),m=q.get('m'),s=+q.get('s')||0;
 var use=m!=='reward'?[Z.b]:s>=60?[Z.a,Z.b,Z.c]:s>=30?[Z.a,Z.b]:[Z.a];
 use.forEach(function(z){var e=document.createElement('script');e.src='https://quge5.com/88/tag.min.js';e.async=true;e.setAttribute('data-zone',z);e.setAttribute('data-cfasync','false');document.head.appendChild(e)});window.__adz=use})();
 </script>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;font-family:system-ui,-apple-system,sans-serif;color:#eaf2ff;background:#040a1f}
+#sky{position:fixed;inset:0;z-index:0}
+.wrap{position:relative;z-index:1;height:100%;display:flex;align-items:center;justify-content:center;gap:4vw;padding:14px 18px}
+.logo{width:min(34vh,190px);aspect-ratio:1;border-radius:22px;background:url(logo.png) center/cover,#0a1a48;box-shadow:0 0 0 2px rgba(120,200,255,.35),0 0 38px rgba(63,160,255,.55);flex:none;animation:fl 4s ease-in-out infinite}
+@keyframes fl{50%{transform:translateY(-6px)}}
+.info{max-width:430px;min-width:0}
+.tag{display:inline-block;background:#ffd23a;color:#3a2300;font:800 10.5px system-ui;padding:2px 8px;border-radius:5px;letter-spacing:.5px}
+h1{margin:8px 0 4px;font-size:clamp(18px,4.6vh,28px);line-height:1.15;text-shadow:0 0 16px rgba(63,216,255,.6)}
+.sl{position:relative;height:clamp(40px,11vh,64px)}
+.sl p{position:absolute;inset:0;margin:0;font-size:clamp(12px,3.3vh,15px);color:#bfd3ff;line-height:1.35;opacity:0;transform:translateY(8px);transition:.6s}
+.sl p.on{opacity:1;transform:none}
+.cards{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.cards a{flex:1;min-width:110px;text-decoration:none;color:#fff;background:linear-gradient(160deg,#1a3a8a,#0d1f52);border:1px solid #3b6fd8;border-radius:12px;padding:8px 10px;font-size:12.5px;font-weight:700;display:flex;align-items:center;gap:8px;transition:.2s}
+.cards a:hover,.cards a:active{transform:translateY(-2px);border-color:#ffd23a;box-shadow:0 0 14px rgba(255,210,58,.4)}
+.cards a i{font-style:normal;font-size:20px}
+.ft{margin-top:10px;font-size:11px;color:#7f97c9}
+@media (max-height:200px){.cards{display:none}}
+</style>
 </head>
 <body>
-<div class="bx" id="ld"><div class="sp"></div><div><b>Đang tải quảng cáo…</b><small>Cảm ơn bạn đã ủng hộ Ship event!</small></div></div>
+<canvas id="sky"></canvas>
+<div class="wrap">
+  <div class="logo" role="img" aria-label="Ship event"></div>
+  <div class="info">
+    <span class="tag">QUẢNG CÁO</span>
+    <h1>Ship event · Chỉ huy hạm đội</h1>
+    <div class="sl" id="sl">
+      <p class="on">🚀 Lắp ráp chiến hạm theo ý bạn: vũ khí, khiên, động cơ, lõi hạt nhân.</p>
+      <p>🌞 Hơn 400 kỹ năng thuyền trưởng: Mặt Trời Nhân Tạo, Ma Trận Số, Lưới Cầu Vàng…</p>
+      <p>🏰 Xây căn cứ với pháo cối, tháp laser, trụ điện hồ quang để chặn hạm đội địch.</p>
+      <p>🎁 Shop khuyến mãi: gói Đá ưu đãi, thuyền trưởng mới, vũ khí giới hạn.</p>
+    </div>
+    <div class="cards">
+      <a href="?m=reward&s=0&p=1"><i>💎</i>Ưu đãi Đá</a>
+      <a href="?m=reward&s=0&p=2"><i>⭐</i>Quà Sao</a>
+      <a href="?m=reward&s=0&p=3"><i>🛸</i>Tàu mới</a>
+    </div>
+    <div class="ft">Cảm ơn bạn đã xem quảng cáo ủng hộ game · phần thưởng tự mở khi hết giờ</div>
+  </div>
+</div>
 <script>
-/* chưa dán mã Monetag (hoặc quảng cáo không tải được sau 6 giây) thì hiện quảng cáo của chính game thay vì quay vòng mãi */
-(function(){var has=!!(window.__adz&&window.__adz.length);
-function house(){var b=document.getElementById('ld');if(!b)return;b.innerHTML='<div style="font-size:64px">🚀</div><div><b>Shop khuyến mãi Ship event</b><small>Gói Đá ưu đãi · Thuyền trưởng mới · Vũ khí giới hạn</small><div style="margin-top:8px;font-size:11.5px;color:#ffd23a">'+(has?'Bạn vẫn nhận thưởng khi hết giờ':'Quảng cáo của các hãng sẽ hiện ở đây khi game được gắn mã Monetag')+'</div></div>'}
-if(!has)house();else setTimeout(house,6000)})();
+/* giữ nguyên thông số khi bấm thẻ (thẻ là liên kết thật nên quảng cáo toàn màn hình của Monetag có thể hiện ra) */
+(function(){var q=new URLSearchParams(location.search);[].forEach.call(document.querySelectorAll('.cards a'),function(a){var u=new URLSearchParams(a.getAttribute('href').slice(1));u.set('m',q.get('m')||'reward');u.set('s',q.get('s')||'15');a.href='?'+u.toString()})})();
+/* chữ giới thiệu chạy vòng */
+(function(){var P=document.querySelectorAll('#sl p'),i=0;setInterval(function(){P[i].classList.remove('on');i=(i+1)%P.length;P[i].classList.add('on')},3200)})();
+/* nền sao bay */
+(function(){var c=document.getElementById('sky'),x=c.getContext('2d'),S=[],W,H;function rs(){W=c.width=innerWidth*devicePixelRatio;H=c.height=innerHeight*devicePixelRatio}rs();addEventListener('resize',rs);
+for(var i=0;i<140;i++)S.push({x:Math.random(),y:Math.random(),z:Math.random()*0.8+0.2});
+(function f(){var g=x.createRadialGradient(W*.5,H*.42,0,W*.5,H*.42,Math.max(W,H)*.7);g.addColorStop(0,'#13348a');g.addColorStop(1,'#040a1f');x.fillStyle=g;x.fillRect(0,0,W,H);
+S.forEach(function(s){s.x-=0.0009*s.z;if(s.x<0){s.x=1;s.y=Math.random()}x.fillStyle='rgba(220,235,255,'+(0.35+0.6*s.z)+')';x.fillRect(s.x*W,s.y*H,1.6*s.z*devicePixelRatio,1.6*s.z*devicePixelRatio)});requestAnimationFrame(f)})()})();
 </script>
 </body>
 </html>
