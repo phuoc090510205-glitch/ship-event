@@ -19,6 +19,12 @@ html,body{margin:0;height:100%;background:radial-gradient(circle at 50% 40%,#173
 <!-- MONETAG-TAGS -->
 </head>
 <body>
-<div class="bx"><div class="sp"></div><div><b>Đang tải quảng cáo…</b><small>Cảm ơn bạn đã ủng hộ Ship event!</small></div></div>
+<div class="bx" id="ld"><div class="sp"></div><div><b>Đang tải quảng cáo…</b><small>Cảm ơn bạn đã ủng hộ Ship event!</small></div></div>
+<script>
+/* chưa dán mã Monetag (hoặc quảng cáo không tải được sau 6 giây) thì hiện quảng cáo của chính game thay vì quay vòng mãi */
+(function(){var has=[].some.call(document.scripts,function(s){return s.src&&s.src.indexOf(location.host)<0});
+function house(){var b=document.getElementById('ld');if(!b)return;b.innerHTML='<div style="font-size:64px">🚀</div><div><b>Shop khuyến mãi Ship event</b><small>Gói Đá ưu đãi · Thuyền trưởng mới · Vũ khí giới hạn</small><div style="margin-top:8px;font-size:11.5px;color:#ffd23a">'+(has?'Hiện chưa có quảng cáo phù hợp — bạn vẫn nhận thưởng khi hết giờ':'Quảng cáo của các hãng sẽ hiện ở đây khi game được gắn mã Monetag')+'</div></div>'}
+if(!has)house();else setTimeout(house,6000)})();
+</script>
 </body>
 </html>
