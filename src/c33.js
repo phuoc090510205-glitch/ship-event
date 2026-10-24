@@ -30,7 +30,7 @@ function mats(){const M=o=>new T.MeshStandardMaterial(o);const L=o=>{['color','e
     orange:L({color:0xff9a3c,emissive:0xff7a1a,emissiveIntensity:.9}),green:L({color:0x5dffa1,emissive:0x2bd673,emissiveIntensity:1.1}),
     violet:L({color:0xb38cff,emissive:0x7a4dff,emissiveIntensity:1.2,flatShading:true}),blue:L({color:0x3f7cff,emissive:0x12307a,metalness:.6,roughness:.3,flatShading:true}),
     yellow:L({color:0xffd04a,emissive:0x7a5a00,metalness:.5,roughness:.35}),gray:L({color:0x9aa3b0,metalness:.7,roughness:.4}),tank:L({color:0xb3502a,metalness:.6,roughness:.4}),
-    rubble:L({color:0x1c1f27,roughness:1,flatShading:true}),glass:L({color:0x9feaff,emissive:0x48c8ff,emissiveIntensity:.55,metalness:.2,roughness:.08}),pad:L({color:0x161d2c,metalness:.6,roughness:.6})}}
+    rubble:L({color:0x1c1f27,roughness:1,flatShading:true}),gold:L({color:0xe0a52a,metalness:.9,roughness:.28}),glass:L({color:0x9feaff,emissive:0x48c8ff,emissiveIntensity:.55,metalness:.2,roughness:.08}),pad:L({color:0x161d2c,metalness:.6,roughness:.6})}}
 function init(){if(ren)return true;if(R3.fail||!window.THREE)return false;T=window.THREE;
   try{cv3=document.createElement('canvas');cv3.id='df3d';cv3.setAttribute('aria-hidden','true');cv3.style.cssText='position:absolute;inset:0;width:100%;height:100%;max-height:none;max-width:none;margin:0;border:0;border-radius:0;box-shadow:none;background:none;display:none;pointer-events:none';dfc.after(cv3);
     ren=new T.WebGLRenderer({canvas:cv3,antialias:true,powerPreference:'high-performance'})}catch(e){R3.fail=true;if(cv3)cv3.remove();btn();return false}
@@ -51,8 +51,8 @@ function init(){if(ren)return true;if(R3.fail||!window.THREE)return false;T=wind
   const PLAN=cvTex(1024,512,(x,W,H)=>{const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#1c4d6b');g.addColorStop(.5,'#2f8f8a');g.addColorStop(1,'#163a5a');x.fillStyle=g;x.fillRect(0,0,W,H);
     for(let i=0;i<140;i++){x.fillStyle=`rgba(${Math.random()<.5?'210,240,255':'15,50,70'},${rand(.05,.2)})`;x.fillRect(0,Math.random()*H,W,rand(4,26))}
     for(let i=0;i<60;i++){const cx=Math.random()*W,cy=Math.random()*H,r=rand(20,90),gg=x.createRadialGradient(cx,cy,0,cx,cy,r);gg.addColorStop(0,'rgba(255,255,255,.32)');gg.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=gg;x.fillRect(cx-r,cy-r,r*2,r*2)}},true);
-  planet=new T.Mesh(new T.SphereGeometry(60,48,32),new T.MeshStandardMaterial({map:PLAN,roughness:1,metalness:0,fog:false}));scene.add(planet);
-  atm=new T.Sprite(new T.SpriteMaterial({map:GL,color:0x5fd0ff,transparent:true,opacity:.45,blending:T.AdditiveBlending,depthWrite:false,fog:false}));atm.scale.set(176,176,1);scene.add(atm);
+  planet=new T.Mesh(new T.SphereGeometry(40,48,32),new T.MeshStandardMaterial({map:PLAN,roughness:1,metalness:0,fog:false}));scene.add(planet);
+  atm=new T.Sprite(new T.SpriteMaterial({map:GL,color:0x5fd0ff,transparent:true,opacity:.45,blending:T.AdditiveBlending,depthWrite:false,fog:false}));atm.scale.set(118,118,1);scene.add(atm);
   /* bụi không gian gần sân */
   {const g=new T.BufferGeometry(),n=380,p=new Float32Array(n*3);for(let i=0;i<n;i++){p[i*3]=Math.random();p[i*3+1]=Math.random();p[i*3+2]=Math.random()}g.setAttribute('position',new T.BufferAttribute(p,3));
    dust=new T.Points(g,new T.PointsMaterial({map:GL,color:0x9fc4ff,size:.16,transparent:true,opacity:.45,depthWrite:false,blending:T.AdditiveBlending}));dust.frustumCulled=false;scene.add(dust);dust.userData.base=p.slice()}
@@ -128,87 +128,58 @@ function build(j,im){
 function model(src,kind){if(!src)return null;let m=R3.models.get(src);if(m)return m.ready?m:null;m={ready:false};R3.models.set(src,m);R3.queue.push({src,kind,m});return null}
 function pump(){const t0=performance.now();let spin=R3.queue.length;while(R3.queue.length&&performance.now()-t0<10&&spin-->0){const j=R3.queue.shift();const im=_dimg(j.src);if(!im){R3.queue.push(j);continue}try{build(j,im)}catch(e){console.error(e);j.m.bad=true}}}
 function bSrc(t,v){return t==='hq'?HQIMG:(t==='wall'&&v?BSPR.wallv:(BSPR[t]||SPR[t]))}
-/* các công trình có khối 3D dựng sẵn; công trình khác: bệ + khối ép từ ảnh gốc (+ đầu pháo xoay nếu là pháo) */
-const PB={hq:'hq',wall:'wall',cannon:'cannon',laser:'laser',bigcannon:'daiphao',crossbow:'nothan',flame:'phunlua',droneb:'nhadrone',crusher:'maytaoda',mine:'mine',pylon:'tesla'};
+/* công trình: dựng khối 3D theo đúng hình gốc của game (tường, đại bác, laser, đại pháo, trụ sở, mìn, trụ điện có khung khối riêng; công trình khác ép khối từ ảnh) */
+const SB={hq:1,wall:1,cannon:1,laser:1,bigcannon:1,mine:1,pylon:1};
+const STX=new Map();
+function sprTex(src){let o=STX.get(src);if(o)return o.ready?o:null;o={ready:false};STX.set(src,o);const im=_dimg(src);if(!im){STX.delete(src);return null}
+  const t=new T.Texture(im);t.needsUpdate=true;t.encoding=T.sRGBEncoding;t.anisotropy=8;
+  const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');x.drawImage(im,0,0,128,128);const id=x.getImageData(0,0,128,128),D=id.data;
+  for(let i=0;i<D.length;i+=4){const r=D[i],g=D[i+1],b=D[i+2],cy=b>170&&g>160&&r<150&&D[i+3]>60;if(!cy){D[i]=D[i+1]=D[i+2]=0}D[i+3]=255}x.putImageData(id,0,0);
+  const gl=new T.CanvasTexture(c);gl.encoding=T.sRGBEncoding;
+  o.mat=new T.MeshStandardMaterial({map:t,emissive:0xffffff,emissiveMap:gl,emissiveIntensity:1.2,vertexColors:true,metalness:.35,roughness:.48,alphaTest:.35,side:T.DoubleSide});o.ready=true;return o}
+/* chiếu ảnh từ trên xuống lên mọi mặt của khối: nhìn từ trên giống hệt ảnh gốc, mặt bên lấy màu viền và tối hơn */
+function proj(geo,W,D,ox,oz){const P=geo.attributes.position,N=geo.attributes.normal,uv=new Float32Array(P.count*2),cl=new Float32Array(P.count*3);
+  for(let i=0;i<P.count;i++){const x=P.getX(i)+ox,z=P.getZ(i)+oz;uv[i*2]=Math.max(.002,Math.min(.998,x/W+.5));uv[i*2+1]=Math.max(.002,Math.min(.998,.5-z/D));const ny=N.getY(i),k=ny>.6?1:ny<-.5?.3:.62+.1*ny;if(ny<=.6){uv[i*2]=.5+(uv[i*2]-.5)*.9;uv[i*2+1]=.5+(uv[i*2+1]-.5)*.9}cl[i*3]=cl[i*3+1]=cl[i*3+2]=k}
+  geo.setAttribute('uv',new T.BufferAttribute(uv,2));geo.setAttribute('color',new T.BufferAttribute(cl,3));return geo}
+function sbuild(tt,w,h,mat){const g=new T.Group(),W=w,D=h,mn=Math.min(w,h);let top=.5,ex={};
+  const add=(geo,y,x,z)=>{x=x||0;z=z||0;geo.translate(x,y,z);proj(geo,W,D,0,0);const m=new T.Mesh(geo,mat);m.castShadow=m.receiveShadow=true;g.add(m);return m};
+  const box=(a,b,c,y)=>add(new T.BoxGeometry(a,b,c),y+b/2),cyl=(r0,r1,hh,y,seg)=>add(new T.CylinderGeometry(r0,r1,hh,seg||40,1),y+hh/2);
+  switch(tt){
+    case 'wall':{box(W*.98,.62,D*.98,0);top=.62;break}
+    case 'cannon':{box(W*.98,.26,D*.98,0);cyl(mn*.33,mn*.36,.32,.26);top=.58;
+      const br=new T.Mesh(new T.CylinderGeometry(mn*.055,mn*.065,mn*.42,14),MT.gold);br.rotation.x=Math.PI/2;br.position.set(0,.62,-mn*.3);br.castShadow=true;g.add(br);
+      const tip=new T.Mesh(new T.CylinderGeometry(mn*.075,mn*.075,mn*.06,14),MT.cyan);tip.rotation.x=Math.PI/2;tip.position.set(0,.62,-mn*.52);g.add(tip);break}
+    case 'laser':{box(W*.98,.26,D*.98,0);cyl(mn*.36,mn*.39,.24,.26);cyl(mn*.2,mn*.24,.22,.5);const em=new T.Mesh(new T.CylinderGeometry(mn*.06,mn*.08,.42,14),MT.cyan);em.position.y=.93;g.add(em);
+      const s=new T.Sprite(ADDM(glowT()));s.material.color.set(0x7fe8ff);s.scale.setScalar(mn*.55);s.position.y=1.18;g.add(s);ex.glow=s;top=1.15;break}
+    case 'bigcannon':{box(W*.98,.26,D*.98,0);cyl(mn*.41,mn*.45,.6,.26,48);const s=new T.Sprite(ADDM(glowT()));s.material.color.set(0x4fd6ff);s.scale.setScalar(mn*.45);s.position.y=.8;g.add(s);ex.glow=s;top=.86;break}
+    case 'hq':{cyl(mn*.49,mn*.5,.26,0,64);cyl(mn*.36,mn*.39,.24,.26,64);cyl(mn*.17,mn*.2,.22,.5,6);const s=new T.Sprite(ADDM(glowT()));s.material.color.set(0x7fe8ff);s.scale.setScalar(mn*.4);s.position.y=.82;g.add(s);ex.glow=s;
+      ex.shield=new T.Mesh(new T.SphereGeometry(mn*.78,40,20,0,TAU,0,Math.PI/2),new T.MeshBasicMaterial({color:0x4fd6ff,transparent:true,opacity:.05,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide,toneMapped:false}));g.add(ex.shield);
+      const lamp=new T.PointLight(0x4fd6ff,1.2,10,2);lamp.position.y=1.4;g.add(lamp);top=.75;break}
+    case 'mine':{cyl(mn*.45,mn*.47,.14,0,40);ex.sink=.14;top=.14;break}
+    case 'pylon':{cyl(mn*.48,mn*.5,.14,0,48);cyl(mn*.3,mn*.33,.22,.14,40);cyl(mn*.15,mn*.18,.5,.36,32);const s=new T.Sprite(ADDM(glowT()));s.material.color.set(0x7fe8ff);s.scale.setScalar(mn*.4);s.position.y=.95;g.add(s);ex.glow=s;ex.sink=.86;top=.86;break}}
+  return {g,top,ex}}
 function collect(G){const L=[];
   const ships=G.en.filter(e=>e.spawn<=G.t&&!e.dead).concat(G.pl.dead?[]:[G.pl]).concat((G.al||[]).filter(a=>!a.dead));
   ships.forEach(e=>{if(!e.sh||!e.sh.img)return;L.push({o:e,k:'s',src:e.sh.img,m:model(e.sh.img,'s')})});
-  const addB=(o,t,v,k)=>{const src=bSrc(t,v);if(PB[t])L.push({o,k,t,src:src||('pb:'+t),m:{ready:true,pb:true}});else if(src)L.push({o,k,t,src,m:model(src,'b')})};
+  const addB=(o,t,v,k)=>{const src=bSrc(t,v);if(!src)return;if(SB[t]){const st=sprTex(src);L.push({o,k,t,src,m:st?{ready:true,sb:st}:null})}else L.push({o,k,t,src,m:model(src,'b')})};
   G.bl.forEach(b=>{if(b.hp<=0)return;addB(b,b.t,b.v,'b')});
   if(G.pvp&&G.eu)G.eu.forEach(u=>{if(u.dead||!u.bd)return;addB(u,u.bd.t,u.bd.v,'u')});
   return L.map(i=>{if(i.m&&!i.m.ready)i.m=null;return i})}
-
-/* ---------- công trình dựng khối (theo bản mô phỏng; kích thước theo đúng số ô) ---------- */
-function pbuild(tt,w,h){const g=new T.Group(),W=w*.9,D=h*.9;let head=null,muzzle=null,top=1.5*K;const ex={};
-  const B=(a,b,c,m)=>{const o=new T.Mesh(new T.BoxGeometry(a,b,c),m);o.castShadow=o.receiveShadow=true;return o},C=(a,b,hh,s,m)=>{const o=new T.Mesh(new T.CylinderGeometry(a,b,hh,s),m);o.castShadow=o.receiveShadow=true;return o};
-  if(!['mine','tesla','wall','hq'].includes(tt)){const sl=B(W,.8*K,D,MT.dark);sl.position.y=.4*K;g.add(sl);for(const cx of[-1,1])for(const cz of[-1,1]){const l=B(.25*K,.12*K,.25*K,MT.cyan);l.position.set(cx*(W/2-.25*K),.86*K,cz*(D/2-.25*K));g.add(l)}}
-  const ped=(r,hh)=>{const p=C(r*K,r*1.25*K,hh*K,10,MT.metal);p.position.y=(.8+hh/2)*K;g.add(p);return .8+hh};
-  const mkHead=y=>{head=new T.Group();head.position.y=y*K;head.rotation.order='YXZ';g.add(head);return head};
-  switch(tt){
-    case 'hq':{const f=Math.min(w,h)/4;const b=C(4.3*K*f,4.7*K*f,1.2*K,6,MT.dark);b.position.y=.6*K;g.add(b);const t2=C(3.2*K*f,3.7*K*f,1.1*K,6,MT.metal);t2.position.y=1.7*K;g.add(t2);
-      const tw=C(1.2*K*f,1.8*K*f,4.2*K,8,MT.metal);tw.position.y=4.2*K;g.add(tw);const cap=new T.Mesh(new T.SphereGeometry(1.35*K*f,20,14),MT.cyan);cap.position.y=6.8*K;g.add(cap);
-      ex.ring=new T.Mesh(new T.TorusGeometry(3*K*f,.14*K,8,64),MT.cyan);ex.ring.rotation.x=Math.PI/2;ex.ring.position.y=4.8*K;g.add(ex.ring);
-      for(let i=0;i<6;i++){const a=i/6*TAU+Math.PI/6,l=B(.9*K,.25*K,.25*K,MT.cyan);l.position.set(Math.cos(a)*4.4*K*f,1.25*K,Math.sin(a)*4.4*K*f);l.rotation.y=-a;g.add(l)}
-      const lamp=new T.PointLight(0x4fd6ff,1.6,12,2);lamp.position.y=7.5*K;g.add(lamp);
-      ex.shield=new T.Mesh(new T.SphereGeometry(7.4*K*f,40,20,0,TAU,0,Math.PI/2),new T.MeshBasicMaterial({color:0x4fd6ff,transparent:true,opacity:.07,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide,toneMapped:false}));g.add(ex.shield);
-      g.add(new T.Mesh(ex.shield.geometry,new T.MeshBasicMaterial({color:0x4fd6ff,wireframe:true,transparent:true,opacity:.06,blending:T.AdditiveBlending,depthWrite:false,toneMapped:false})));top=7.5*K;break}
-    case 'wall':{const ww=w*.92,dd=h*.92,o=B(ww,2.2*K,dd,MT.metal);o.position.y=1.1*K;g.add(o);const st=B(ww+.02,.14*K,dd-.12,MT.cyan);st.position.y=2.25*K;g.add(st);top=2.3*K;break}
-    case 'cannon':{const y=ped(1.1,.7);const hd=mkHead(y+.4);hd.add(B(1.4*K,.8*K,1.4*K,MT.metal));const b=C(.22*K,.22*K,2.2*K,10,MT.dark);b.rotation.x=Math.PI/2;b.position.z=-1.4*K;hd.add(b);const tp=B(.32*K,.32*K,.32*K,MT.orange);tp.position.z=-2.5*K;hd.add(tp);muzzle=-2.7*K;top=(y+.9)*K;break}
-    case 'laser':{const y=ped(1,.7);const hd=mkHead(y+.35);hd.add(B(1.1*K,.6*K,1.1*K,MT.metal));const cr=new T.Mesh(new T.OctahedronGeometry(.55*K),MT.cyan);cr.position.y=.75*K;hd.add(cr);ex.crystal=cr;const b=C(.1*K,.1*K,1.8*K,8,MT.dark);b.rotation.x=Math.PI/2;b.position.z=-1.1*K;hd.add(b);muzzle=-2.05*K;top=(y+1.4)*K;break}
-    case 'daiphao':{const y=ped(1.4,.9);const hd=mkHead(y+.55);hd.add(B(1.9*K,1.1*K,1.9*K,MT.metal));const b=C(.45*K,.52*K,2.4*K,12,MT.dark);b.rotation.x=Math.PI/2;b.position.z=-1.6*K;hd.add(b);const r=new T.Mesh(new T.TorusGeometry(.5*K,.1*K,6,20),MT.orange);r.position.z=-2.8*K;hd.add(r);muzzle=-3*K;top=(y+1.2)*K;break}
-    case 'nothan':{const y=ped(1.2,.8);const hd=mkHead(y+.35);hd.add(B(1*K,.5*K,2.6*K,MT.metal));const bow=B(3.6*K,.18*K,.3*K,MT.orange);bow.position.set(0,.3*K,-1*K);hd.add(bow);for(const sx of[-1,1]){const tip=B(.3*K,.5*K,.3*K,MT.metal);tip.position.set(sx*1.8*K,.3*K,-.8*K);hd.add(tip)}const rail=B(.2*K,.2*K,2.8*K,MT.dark);rail.position.y=.4*K;hd.add(rail);muzzle=-1.6*K;top=(y+1)*K;break}
-    case 'phunlua':{for(const sx of[-1.15,1.15]){const tk=C(.7*K,.7*K,2.2*K,12,MT.tank);tk.position.set(sx*K,1.9*K,1.2*K);g.add(tk);const cp=new T.Mesh(new T.SphereGeometry(.7*K,12,8,0,TAU,0,Math.PI/2),MT.tank);cp.position.set(sx*K,3*K,1.2*K);g.add(cp)}
-      const y=ped(.9,.5);const hd=mkHead(y+.3);hd.add(B(1.1*K,.7*K,1.1*K,MT.metal));const nz=C(.22*K,.45*K,1.6*K,10,MT.dark);nz.rotation.x=-Math.PI/2;nz.position.z=-1.2*K;hd.add(nz);muzzle=-2.1*K;top=3.4*K;break}
-    case 'nhadrone':{const d=new T.Mesh(new T.SphereGeometry(2*K,20,12,0,TAU,0,Math.PI/2),MT.metal);d.position.y=.8*K;d.castShadow=true;g.add(d);const r=new T.Mesh(new T.TorusGeometry(2.7*K,.12*K,6,48),MT.green);r.rotation.x=Math.PI/2;r.position.y=.9*K;g.add(r);const l=new T.Mesh(new T.SphereGeometry(.4*K,12,8),MT.green);l.position.y=2.9*K;g.add(l);
-      ex.drones=[0,1].map(i=>{const dg=new T.Group();dg.add(new T.Mesh(new T.SphereGeometry(.35*K,12,8),MT.metal));const rr=new T.Mesh(new T.TorusGeometry(.5*K,.05*K,6,20),MT.green);rr.rotation.x=Math.PI/2;dg.add(rr);const gl=new T.Sprite(new T.SpriteMaterial({map:glowT(),color:0x5dffa1,blending:T.AdditiveBlending,transparent:true,depthWrite:false}));gl.scale.set(1.6*K,1.6*K,1);dg.add(gl);g.add(dg);return dg});top=3*K;break}
-    case 'maytaoda':{ex.crystals=new T.Group();ex.crystals.position.y=.8*K;g.add(ex.crystals);for(let i=0;i<5;i++){const c=new T.Mesh(new T.ConeGeometry(.45*K,rand(1.4,2.4)*K,5),MT.violet);const a=i/5*TAU;c.position.set(Math.cos(a)*.7*K*(i?1:0),.9*K,Math.sin(a)*.7*K*(i?1:0));c.rotation.set(rand(-.3,.3),0,rand(-.3,.3));c.castShadow=true;ex.crystals.add(c)}top=2.8*K;break}
-    case 'mine':{g.add(C(.9*K,1*K,.4*K,12,MT.dark));g.add(C(.35*K,.35*K,.46*K,12,MT.red));top=.5*K;ex.sink=.7*K;break}
-    case 'tesla':{const b=C(.7*K,.9*K,.6*K,10,MT.dark);b.position.y=.3*K;g.add(b);const c=C(.35*K,.35*K,2.6*K,10,MT.metal);c.position.y=1.9*K;g.add(c);for(const y of[1.2,2,2.8]){const r=new T.Mesh(new T.TorusGeometry(.55*K,.08*K,6,20),MT.cyan);r.rotation.x=Math.PI/2;r.position.y=y*K;g.add(r)}const ball=new T.Mesh(new T.SphereGeometry(.45*K,14,10),MT.cyan);ball.position.y=3.4*K;g.add(ball);top=3.7*K;ex.sink=3.7*K;break}}
-  return {g,head,muzzle,top,ex}}
-
-/* ---------- tàu: thân ép từ ảnh gốc + mô-đun nổi theo màu ô ---------- */
-function modsFor(e){if(e.__m3)return e.__m3;const sh=e.sh,L=[];
-  const add=(def,ax,ay,rot,k)=>{if(!def||ax==null)return;const rw=rot?def.h:def.w,rh=rot?def.w:def.h;L.push({cx:(sh.x0+56*(ax+rw/2))/sh.W,cy:(sh.y0+56*(ay+rh/2))/sh.H,w:rw*56/sh.W,h:rh*56/sh.H,k})};
-  if(e.team==='p'&&!e.ghost&&typeof khWpMap==='function'&&KSH.some(x=>x.id===sh.id)){try{const wm=khWpMap(sh);Object.keys(wm).forEach(i=>wm[i].forEach(it=>add(wpGet(it.id),it.ax,it.ay,it.rot,'w')));
-    const F={a:typeof khArmor==='function'&&khArmor,e:typeof khEngines==='function'&&khEngines,n:typeof khReactors==='function'&&khReactors,t:typeof khTanks==='function'&&khTanks,m:typeof khMassMods==='function'&&khMassMods,k:typeof khSkills==='function'&&khSkills};
-    Object.keys(F).forEach(k=>{if(F[k])(F[k](sh)||[]).forEach(it=>add(wpGet(it.id),it.ax,it.ay,it.rot,k))})}catch(er){}}
-  if(!L.some(m=>m.k==='w')&&e.ws&&e.sc)e.ws.forEach(x=>{const w=x.w;if(!w||x.mx==null)return;L.push({cx:(x.mx/e.sc+sh.W/2)/sh.W,cy:(x.my/e.sc+sh.H/2)/sh.H,w:(w.w||1)*56/sh.W,h:(w.h||1)*56/sh.H,k:'w'})});
-  return e.__m3=L}
-function coreUV(sh){if(sh.__core!==undefined)return sh.__core;let n=0,x=0,y=0;(sh.g||[]).forEach((row,j)=>[...row].forEach((c,i)=>{if(c==='g'){n++;x+=sh.x0+56*(i+.5);y+=sh.y0+56*(j+.5)}}));return sh.__core=n?{u:x/n/sh.W,v:y/n/sh.H}:null}
 const hAt=(m,u,v)=>m.hs?m.hs[Math.max(0,Math.min(m.NY-1,Math.round(v*(m.NY-1))))*m.NX+Math.max(0,Math.min(m.NX-1,Math.round(u*(m.NX-1))))]||0:.5;
-function engine(U,x,y,z,r,yellow){const b=U.body;if(yellow){const eg=new T.CylinderGeometry(r*.75,r,r*2.4,10);eg.rotateX(Math.PI/2);const e=new T.Mesh(eg,MT.yellow);e.position.set(x,y,z);e.castShadow=true;b.add(e);z+=r*1.2}
-  const fa=new T.Mesh(FLG,FLM1),fb=new T.Mesh(FLG,FLM2),gl=new T.Sprite(new T.SpriteMaterial({map:glowT(),color:0x48c8ff,blending:T.AdditiveBlending,transparent:true,depthWrite:false}));fa.position.set(x,y,z);fb.position.copy(fa.position);gl.position.set(x,y,z+r*.4);b.add(fa,fb,gl);U.fl.push({a:fa,b:fb,g:gl,r})}
+/* tàu: chỉ thân ép từ ảnh gốc + lửa động cơ ở đầu phun có sẵn (ô mô-đun màu chỉ hiện trong Kho tàu) */
+function engine(U,x,y,z,r){const b=U.body,fa=new T.Mesh(FLG,FLM1),fb=new T.Mesh(FLG,FLM2),gl=new T.Sprite(new T.SpriteMaterial({map:glowT(),color:0x48c8ff,blending:T.AdditiveBlending,transparent:true,depthWrite:false}));fa.position.set(x,y,z);fb.position.copy(fa.position);gl.position.set(x,y,z+r*.4);b.add(fa,fb,gl);U.fl.push({a:fa,b:fb,g:gl,r})}
 function mkShip(it,g,U){const o=it.o,m=it.m,ww=o.sh.W*o.sc,hh=o.sh.H*o.sc,hy=.26*Math.sqrt(ww*hh),body=U.body;U.ww=ww;U.hh=hh;U.hy=hy;
-  const hull=U.hull;hull.scale.set(ww,hy,hh);const bot=new T.Mesh(m.geo,m.matB);bot.customDepthMaterial=m.depth;bot.castShadow=true;bot.scale.set(ww,-hy*.65,hh);body.add(bot);
-  const top=(u,v)=>hAt(m,u,v)*hy,P=(u,v)=>[(u-.5)*ww,(v-.5)*hh],mods=modsFor(o),mn=Math.min(ww,hh);
-  /* buồng lái kính */
-  {const cu=coreUV(o.sh),u=.5,v=cu?Math.max(.18,cu.v-.22):.32,[x,z]=P(u,v);const cg=new T.SphereGeometry(mn*.09,16,12);cg.scale(1,.62,1.7);const c=new T.Mesh(cg,MT.glass);c.position.set(x,top(u,v)+mn*.03,z);body.add(c)}
-  let eng=0;
-  mods.forEach(x=>{const mw=x.w*ww,md=x.h*hh,s=Math.min(mw,md),[px,pz]=P(x.cx,x.cy),y=top(x.cx,x.cy);
-    if(x.k==='w'){const n=mw>md*.9?2:1;const pod=new T.Mesh(new T.BoxGeometry(mw*.55,s*.28,md*.75),MT.red);pod.position.set(px,y+s*.14,pz);pod.castShadow=true;body.add(pod);
-      for(let i=0;i<n;i++){const ox=n>1?(i?1:-1)*mw*.18:0,br=new T.Mesh(new T.CylinderGeometry(s*.07,s*.07,md*.8,8),MT.dark);br.rotation.x=Math.PI/2;br.position.set(px+ox,y+s*.16,pz-md*.55);body.add(br)}}
-    else if(x.k==='a'){const pl=new T.Mesh(new T.BoxGeometry(mw*.9,s*.12,md*.85),MT.blue);pl.position.set(px,y+s*.06,pz);pl.castShadow=true;body.add(pl)}
-    else if(x.k==='e'){eng++;engine(U,px,y+s*.18,pz,s*.32,true)}
-    else if(x.k==='t'){const tk=new T.Mesh(new T.CylinderGeometry(s*.28,s*.28,md*.85,10),MT.gray);tk.rotation.x=Math.PI/2;tk.position.set(px,y+s*.28,pz);tk.castShadow=true;body.add(tk)}
-    else{const c=new T.Mesh(new T.SphereGeometry(s*.34,16,12),MT.green.clone());c.position.set(px,y+s*.2,pz);body.add(c);(U.cores=U.cores||[]).push(c.material)}});
-  if(!eng)(m.noz||[]).forEach(n=>{const [x,z]=P(n.u,n.v);engine(U,x,top(n.u,Math.max(0,n.v-.06))*.6,z,Math.max(.05,n.r*ww),false)});
-  if(!eng&&!(m.noz||[]).length)[-.18,.18].forEach(dx=>engine(U,dx*ww,hy*.3,hh*.47,mn*.07,false));
-  if(!U.cores){const cu=coreUV(o.sh);if(cu){const [x,z]=P(cu.u,cu.v);const c=new T.Mesh(new T.SphereGeometry(mn*.07,14,10),MT.green.clone());c.position.set(x,top(cu.u,cu.v)+mn*.02,z);body.add(c);U.cores=[c.material]}}
+  U.hull.scale.set(ww,hy,hh);const bot=new T.Mesh(m.geo,m.matB);bot.customDepthMaterial=m.depth;bot.castShadow=true;bot.scale.set(ww,-hy*.65,hh);body.add(bot);
+  const P=(u,v)=>[(u-.5)*ww,(v-.5)*hh],mn=Math.min(ww,hh);
+  (m.noz||[]).forEach(n=>{const [x,z]=P(n.u,n.v);engine(U,x,hAt(m,n.u,Math.max(0,n.v-.06))*hy*.6,z,Math.max(.05,n.r*ww))});
+  if(!(m.noz||[]).length)[-.18,.18].forEach(dx=>engine(U,dx*ww,hy*.3,hh*.47,mn*.07));
   const sh=new T.Mesh(SHG,new T.MeshBasicMaterial({color:0x5fa8ff,transparent:true,opacity:.08,blending:T.AdditiveBlending,depthWrite:false,toneMapped:false}));sh.scale.set(ww*.66,hy*2.6+.3,hh*.66);sh.visible=false;g.add(sh);U.shield=sh}
 function mkInst(it){const g=new T.Group(),body=new T.Group();g.add(body);const U=g.userData={src:it.src,ph:Math.random()*6,body,fl:[],born:t3,k:it.k,o:it.o};
   if(it.k==='s'){const m=it.m;U.model=m;const hull=new T.Mesh(m.geo,m.mat.clone());hull.customDepthMaterial=m.depth;hull.castShadow=true;hull.receiveShadow=true;body.add(hull);U.hull=hull;mkShip(it,g,U)}
-  else if(it.m.pb){const tt=PB[it.t],P=pbuild(tt,it.o.w,it.o.h);body.add(P.g);U.pb=P;U.tt=tt;U.top=P.top}
-  else{const m=it.m,o=it.o;U.model=m;const sl=new T.Mesh(new T.BoxGeometry(o.w*.92,.33,o.h*.92),MT.dark);sl.position.y=.165;sl.castShadow=sl.receiveShadow=true;body.add(sl);
-    for(const cx of[-1,1])for(const cz of[-1,1]){const l=new T.Mesh(new T.BoxGeometry(.1,.05,.1),MT.cyan);l.position.set(cx*(o.w*.46-.1),.35,cz*(o.h*.46-.1));body.add(l)}
-    const hull=new T.Mesh(m.geo,m.mat.clone());hull.customDepthMaterial=m.depth;hull.castShadow=true;hull.receiveShadow=true;const hy=.2*Math.sqrt(o.w*o.h);hull.scale.set(o.w*.88,hy,o.h*.88);hull.position.y=.33;body.add(hull);U.hull=hull;U.top=.33+hy*1.1;
-    const sp=o.spec||(o.u&&o.u.ws&&o.u.ws.length);if(sp&&Math.abs(o.w-o.h)<.01){const hd=new T.Group();hd.position.y=U.top;const s=Math.min(o.w,o.h)*.5;const bx=new T.Mesh(new T.BoxGeometry(s*.55,s*.3,s*.55),MT.metal);bx.castShadow=true;hd.add(bx);const br=new T.Mesh(new T.CylinderGeometry(s*.07,s*.07,s*.8,8),MT.dark);br.rotation.x=Math.PI/2;br.position.z=-s*.5;hd.add(br);body.add(hd);U.head=hd;U.muz=-s*.9;U.top+=s*.2}}
+  else if(it.m.sb){const P=sbuild(it.t,it.o.w,it.o.h,it.m.sb.mat);body.add(P.g);U.sb=P;U.tt=it.t;U.top=P.top;U.mat=it.m.sb.mat}
+  else{const m=it.m,o=it.o;U.model=m;const hull=new T.Mesh(m.geo,m.mat.clone());hull.customDepthMaterial=m.depth;hull.castShadow=true;hull.receiveShadow=true;const hy=.3*Math.sqrt(o.w*o.h);hull.scale.set(o.w*.98,hy,o.h*.98);body.add(hull);U.hull=hull;U.top=hy*1.1}
   scene.add(g);return g}
-function drop(g){scene.remove(g);const U=g.userData;if(U.hull)U.hull.material.dispose();if(U.shield)U.shield.material.dispose();if(U.pb)U.pb.g.traverse(o=>{if(o.geometry)o.geometry.dispose()})}
-/* đầu pháo tự xoay về phía địch gần nhất */
-function aimHead(U,b,G,dt,isU){const L=isU?[G.pl].concat(G.al||[]):G.en;let bd=(b.spec&&b.spec.rng)||(isU&&b.ws&&b.ws[0]&&b.ws[0].rng)||10,tg=null;bd+=1;
-  L.forEach(e=>{if(!e||e.dead||(e.spawn!=null&&e.spawn>G.t))return;const d=Math.hypot(e.x-b.x,e.y-b.y);if(d<bd){bd=d;tg=e}});
-  const hd=U.pb?U.pb.head:U.head;if(!hd)return null;if(tg){const want=Math.atan2(-(tg.x-b.x),-(tg.y-b.y));hd.rotation.y+=angDiff(hd.rotation.y,want)*Math.min(1,dt*6)}return tg}
-
+function drop(g){scene.remove(g);const U=g.userData;if(U.hull)U.hull.material.dispose();if(U.shield)U.shield.material.dispose();if(U.sb)U.sb.g.traverse(o=>{if(o.geometry&&o.isMesh)o.geometry.dispose()})}
 /* ---------- camera bám sát phía sau tàu chính ---------- */
 function camFollow(G,dt){const P=G.pl,dead=P.dead,f=dead?{x:G.hq.x,y:G.hq.y}:P;
   const mv=Math.hypot(P.vx||0,P.vy||0);if(!dead&&(mv>.6||R3.joy.id!==null)){const want=Math.atan2(-(P.vx||0),-(P.vy||0));if(mv>.3)R3.yaw+=angDiff(R3.yaw,want)*Math.min(1,dt*1.5)}
@@ -292,10 +263,10 @@ const PAL=[['#4fadff','#ff8c26','#fff2d9'],['#4df2ff','#ffffff','#4db3ff']];
 function boom(x,y,z,s,blue){s=Math.min(1.6,s);const n=Math.round([16,26,40][R3.q]*Math.min(1.6,.5+s)),cs=PAL[blue?1:0];
   for(let i=0;i<n;i++){const v=new T.Vector3(rand(-1,1),rand(-.5,1),rand(-1,1)).normalize().multiplyScalar(rand(1.7,8.3)*s);spark(x,y,z,v.x,v.y,v.z,cs[i%5===0?2:i%2],.75+.35*s*rand(.6,1),.62*s*rand(.7,1.2))}
   rings.push({x,y,z,r:3.2*s,t:0,max:.6+.3*s,c:blue?'#4fd6ff':'#ff9a3c'});
-  const X=freeC.pop()||(()=>{const s=new T.Sprite(ADDM(glowT()));scene.add(s);return s})();X.visible=true;X.position.set(x,y,z);X.material.color.copy(col(blue?'#4fd6ff':'#ffc070'));bcores.push({s:X,t:0,max:.6,sz:s});
+  const X=XS.get();X.position.set(x,y,z);X.userData.boom={t:0,max:.6,s};
   flash(x,y,z,blue?'#4fd6ff':'#ffa855',5*s);if(s>.5)R3.shake+=s*.33/(1+cam.position.distanceTo(new T.Vector3(x,y,z))/12.5);
   for(let i=0;i<Math.min(6,s*4);i++)smoke(x+rand(-.4,.4)*s,y,z+rand(-.4,.4)*s,rand(.7,1.1),.6*s)}
-const booms=[],bcores=[],freeC=[];
+const booms=[];
 function debris(g,b){const m=g.userData.model,ww=b.w,hh=b.h,n=Math.min(18,Math.round(5+Math.max(ww,hh)*3));
   for(let i=0;i<n;i++){const s=rand(.1,.29)*(.6+Math.max(ww,hh)*.3),c=new T.Mesh(new T.BoxGeometry(s,s*rand(.5,1),s),m?m.mat:(Math.random()<.5?MT.rubble:MT.metal));c.castShadow=true;c.position.set(b.x+rand(-1,1)*ww*.4,rand(.2,.8),b.y+rand(-1,1)*hh*.4);scene.add(c);
     chunks.push({m:c,vx:rand(-3.3,3.3),vy:rand(2.5,5.8),vz:rand(-3.3,3.3),rx:rand(-6,6),rz:rand(-6,6),t:0})}
@@ -310,7 +281,6 @@ function stepFx(dt){
     if(m.position.y<.06){m.position.y=.06;c.vy*=-.3;c.vx*=.6;c.vz*=.6;c.rx*=.5;c.rz*=.5}
     if(c.t>3){m.scale.multiplyScalar(.97);if(c.t>3.8){scene.remove(m);m.geometry.dispose();chunks.splice(i,1)}}}
   if(flashL)flashL.intensity*=Math.pow(.02,dt);
-  for(let i=bcores.length-1;i>=0;i--){const c=bcores[i];c.t+=dt;const k=c.t/c.max;if(k>=1){c.s.visible=false;freeC.push(c.s);bcores.splice(i,1);continue}c.s.scale.setScalar(Math.max(.01,c.sz*3.75*(1-k*1.4)));c.s.material.opacity=Math.max(0,1-k*1.6)}
   RG.end();for(let i=rings.length-1;i>=0;i--){const r=rings[i];r.t+=dt;if(r.t>=r.max){rings.splice(i,1);continue}const k=r.t/r.max,m=RG.get();m.position.set(r.x,r.y,r.z);m.scale.setScalar(.2+r.r*k);m.material.color.copy(col(r.c));m.material.opacity=.85*(1-k)}}
 /* độ cao theo vị trí: trên công trình thì ở đầu pháo, ngoài ra ở độ cao bay của tàu */
 let BH=[];function hAtW(x,z,def){for(const b of BH){if(Math.abs(x-b.x)<=b.w/2&&Math.abs(z-b.y)<=b.h/2)return b.top}return def}
@@ -343,15 +313,12 @@ function render(G,L){const now=performance.now(),dt=Math.min(.05,(now-lastT)/100
       if(show){bar(o.x,by,bz,bw+.04,1,'#0a1020',.75,big?.22:.14);bar(o.x,by,bz,bw,Math.max(0,o.hp/o.max),big?'#ff4d5e':o.team==='p'?(o===G.pl?'#5dffa1':'#5dffa1'):'#ff6a3c',1,big?.14:.085);if(sf>0)bar(o.x,by,bz,bw,sf,'#ffffff',.9,big?.14:.085)}
       if(o.epM!=null&&(o.ep<o.epM||o.exh>0)){bar(o.x,by-.12,bz,bw,1,'#0a1020',.7,.07);bar(o.x,by-.12,bz,bw,Math.max(0,o.ep/o.epM),o.exh>0?'#ffffff':'#35c8ff',1,.05)}}
     else{const b=o,isU=it.k==='u',tt=isU?b.bd.t:b.t;g.position.set(b.x,0,b.y);
-      const fl=isU?(b.hit>0):(b.flash>0);
-      if(U.pb){const P=U.pb,ex=P.ex;
-        if(ex.ring)ex.ring.rotation.z+=dt*.8;if(ex.shield){const want=fl?.32:.07;ex.shield.material.opacity+=(want-ex.shield.material.opacity)*Math.min(1,dt*(fl?20:4))}
-        if(ex.crystal)ex.crystal.rotation.y+=dt*2;if(ex.crystals)ex.crystals.rotation.y+=dt*.6;
-        if(ex.drones)ex.drones.forEach((d,i)=>{const a=t3*1.6+i*Math.PI;d.position.set(Math.cos(a)*1.45,1.75,Math.sin(a)*1.45);d.rotation.y+=dt*4});
-        if(ex.sink!=null){const near=(isU?[G.pl].concat(G.al||[]):G.en).some(e=>e&&!e.dead&&(e.spawn==null||e.spawn<=G.t)&&Math.hypot(e.x-b.x,e.y-b.y)<(tt==='pylon'?6:2.5));U.rise=clamp((U.rise||0)+(near?2:-.5)*dt,0,1);P.g.position.y=-ex.sink*(1-U.rise)}
-        if(fl)P.g.scale.setScalar(1.03);else P.g.scale.setScalar(1)}
-      else{U.hull.material.color.setScalar(fl?2.1:1)}
-      aimHead(U,b,G,dt,isU);
+      const fl=isU?(b.hit>0):(b.flash>0),H=b.u||b;let ry=0;if(tt!=='hq'&&tt!=='wall'&&tt!=='mine'&&tt!=='pylon'&&H.da!=null&&Math.abs(b.w-b.h)<.01)ry=-(H.da+Math.PI/2);g.rotation.set(0,ry,0);
+      if(U.sb){const ex=U.sb.ex;if(ex.shield){const want=fl?.3:.05;ex.shield.material.opacity+=(want-ex.shield.material.opacity)*Math.min(1,dt*(fl?20:4))}
+        if(ex.glow)ex.glow.material.opacity=.65+.3*Math.sin(t3*3+b.x);
+        if(ex.sink!=null){const near=(isU?[G.pl].concat(G.al||[]):G.en).some(e=>e&&!e.dead&&(e.spawn==null||e.spawn<=G.t)&&Math.hypot(e.x-b.x,e.y-b.y)<(tt==='pylon'?6:2.5));U.rise=clamp((U.rise||0)+(near?2:-.5)*dt,0,1);U.sb.g.position.y=-ex.sink*(1-U.rise)+.001}
+        U.sb.g.scale.setScalar(fl?1.03:1)}
+      else U.hull.material.color.setScalar(fl?2.1:1);
       BH.push({x:b.x,y:b.y,w:b.w,h:b.h,top:Math.max(.4,(U.top||1)*.8)});
       const mx=b.max||1,hq=tt==='hq'||b.hq,show=b.hp<mx||hq||(b.shd&&b.shd.t>0&&b.shd.v>0);
       if(show&&tt!=='mine'){const bw=hq?2.1:.95,by=(U.top||1)+.5,bz=b.y;bar(b.x,by,bz,bw+.04,1,'#0a1020',.75,.15);bar(b.x,by,bz,bw,Math.max(0,b.hp/mx),hq?'#4fd6ff':'#5dffa1',1,.09);if(b.shd&&b.shd.t>0&&b.shd.v>0)bar(b.x,by,bz,bw,Math.min(1,b.shd.v/Math.max(1e-9,b.shd.max)),'#ffffff',.9,.09)}}});
@@ -371,6 +338,7 @@ function render(G,L){const now=performance.now(),dt=Math.min(.05,(now-lastT)/100
   BUL.end();BC.end();BG.end();XB.end();MS.end();
   XS.end();stepFx(dt);
   const P=G.pl;marker.visible=!P.dead&&R3.joy.id===null&&Math.hypot(P.tx-P.x,P.ty-P.y)>.3;if(marker.visible){marker.position.x=P.tx;marker.position.z=P.ty;marker.rotation.z+=dt*2;marker.scale.setScalar(1+.15*Math.sin(t3*6))}
+  try{skill3d(G,dt)}catch(e){console.error(e)}
   tlb(G,dt);BAR.end();hud(G,true);
   ren.render(scene,cam);radar(G)}
 /* ---------- radar tròn (góc phải trên) ---------- */
@@ -387,6 +355,68 @@ function radar(G){if(!rdc){rdc=document.createElement('canvas');rdc.id='df3r';rd
   if(G.pvp&&G.eu)G.eu.forEach(u=>{if(u.dead)return;dot(u.x,u.y,u.bd&&u.bd.t==='hq'?'#ffb35a':'rgba(255,120,90,.75)',u.bd&&u.bd.t==='hq'?6:2.6,true)});
   G.en.forEach(e=>{if(e.dead||e.spawn>G.t)return;dot(e.x,e.y,e.boss?'#ff3048':'#ff6a3c',e.boss?9:4.5)});(G.al||[]).forEach(s=>{if(!s.dead)dot(s.x,s.y,'#8affd0',3)});
   if(!P.dead){x.fillStyle='#4fd6ff';x.beginPath();x.moveTo(c,c-9);x.lineTo(c+6,c+6);x.lineTo(c-6,c+6);x.closePath();x.fill()}}
+/* ===================== HIỆU ỨNG KỸ NĂNG 3D (đợt 1) =====================
+   Khóa Mục Tiêu Đỏ · Radar Quét Rộng · Phân Tích Chiến Hạm · Từ Trường Xanh · Sốc Điện Hạm · Laser Đỏ Nhẹ · Nhiễu Sóng Xanh
+   + vòng sóng chung (ring) của mọi kỹ năng. Bản 2D của các hiệu ứng này tự tắt khi đang xem 3D. */
+let SK=null;
+function skInit(){if(SK)return SK;const AD=(c,o)=>new T.MeshBasicMaterial({color:c,transparent:true,opacity:o,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide,toneMapped:false,fog:false});
+  const band=cvTex(8,64,(x)=>{const g=x.createLinearGradient(0,64,0,0);g.addColorStop(0,'rgba(255,255,255,0)');g.addColorStop(.35,'rgba(255,255,255,.9)');g.addColorStop(.5,'rgba(255,255,255,1)');g.addColorStop(.65,'rgba(255,255,255,.9)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,8,64)});
+  const wall=cvTex(8,64,(x)=>{const g=x.createLinearGradient(0,64,0,0);g.addColorStop(0,'rgba(255,255,255,.85)');g.addColorStop(.3,'rgba(255,255,255,.3)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,8,64)});
+  const fan=cvTex(64,64,(x)=>{const g=x.createRadialGradient(0,64,0,0,64,64);g.addColorStop(0,'rgba(255,255,255,0)');g.addColorStop(.8,'rgba(255,255,255,.35)');g.addColorStop(1,'rgba(255,255,255,.9)');x.fillStyle=g;x.fillRect(0,0,64,64)});
+  const disc=cvTex(64,64,(x)=>{const g=x.createRadialGradient(32,32,0,32,32,32);g.addColorStop(0,'rgba(255,255,255,.05)');g.addColorStop(.7,'rgba(255,255,255,.18)');g.addColorStop(.97,'rgba(255,255,255,.75)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,64,64)});
+  const mk=(geo,map,o)=>{const m=new T.Mesh(geo,new T.MeshBasicMaterial({map,color:0xffffff,transparent:true,opacity:o||1,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide,toneMapped:false,fog:false}));m.frustumCulled=false;scene.add(m);return m};
+  const ringBand=new T.CylinderGeometry(1,1,1,64,1,true),flat=new T.RingGeometry(.9,1,64);flat.rotateX(-Math.PI/2);
+  const sector=new T.CircleGeometry(1,32,-Math.PI/2,Math.PI);sector.rotateX(-Math.PI/2);
+  const fanG=new T.PlaneGeometry(1,1);fanG.translate(.5,.5,0);
+  const torus=new T.TorusGeometry(1,.035,6,64);torus.rotateX(Math.PI/2);
+  const tick=new T.BoxGeometry(.06,.06,.5);
+  const beamG=new T.CylinderGeometry(1,1,1,10,1,true);
+  SK={band,wall,fan,disc,AD,
+    R:Pool(()=>{const g=new T.Group(),a=mk(ringBand,band,.9),b=new T.Mesh(flat,AD(0xffffff,.9));b.frustumCulled=false;g.add(a,b);g.userData={a,b};scene.add(g);return g}),
+    SW:Pool(()=>{const g=new T.Group(),s=mk(sector,fan,.6),f=mk(fanG,wall,.8),l=new T.Mesh(new T.BoxGeometry(1,.05,.05),AD(0xffffff,1));l.geometry.translate(.5,0,0);g.add(s,f,l);g.userData={s,f,l};scene.add(g);return g}),
+    LZ:Pool(()=>{const g=new T.Group(),a=new T.Mesh(beamG,AD(0xff2d3a,.9)),b=new T.Mesh(beamG,AD(0xffd6d6,1)),h=new T.Sprite(ADDM(glowT()));h.material.color.set(0xff3b3b);a.frustumCulled=b.frustumCulled=false;g.add(a,b,h);g.userData={a,b,h};scene.add(g);return g}),
+    ORB:Pool(()=>{const g=new T.Group(),c=new T.Mesh(new T.SphereGeometry(.22,16,12),AD(0xffffff,1)),gl=new T.Sprite(ADDM(glowT())),rg=new T.Mesh(torus,AD(0x8fd0ff,.9));rg.scale.setScalar(.38);g.add(c,gl,rg);g.userData={c,gl,rg};scene.add(g);return g}),
+    MAG:Pool(()=>{const g=new T.Group(),w=mk(ringBand,wall,.6),d=new T.Mesh(new T.CircleGeometry(1,48).rotateX(-Math.PI/2),new T.MeshBasicMaterial({map:disc,color:0x4da6ff,transparent:true,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide,toneMapped:false,fog:false})),core=new T.Mesh(torus,AD(0x6cc0ff,.9));
+      const arcs=[0,1,2].map(i=>{const a=new T.Mesh(new T.TorusGeometry(1,.03,6,40,Math.PI*.9),AD(0xbfe6ff,.8));g.add(a);return a});g.add(w,d,core);g.userData={w,d,core,arcs};scene.add(g);return g}),
+    LK:Pool(()=>{const g=new T.Group(),r1=new T.Mesh(torus,AD(0xff2d44,.9)),r2=new T.Mesh(torus,AD(0xff2d44,.6)),tk=[0,1,2,3].map(()=>{const t=new T.Mesh(tick,AD(0xff2d44,.95));g.add(t);return t}),dot=new T.Sprite(ADDM(glowT())),col=new T.Mesh(beamG,AD(0xff2d44,.25));dot.material.color.set(0xff2d44);g.add(r1,r2,dot,col);g.userData={r1,r2,tk,dot,col};scene.add(g);return g})};
+  return SK}
+/* vòng cung tiến trình (đếm ngược thời gian khóa) */
+const ARCG=new Map();function arcGeo(n){let g=ARCG.get(n);if(!g){g=new T.TorusGeometry(1,.03,6,48,Math.max(.01,n/32*TAU));g.rotateX(Math.PI/2);ARCG.set(n,g)}return g}
+let intelEl=null;
+function intelHud(C){if(!intelEl){intelEl=document.createElement('div');intelEl.id='df3intel';intelEl.style.cssText="position:absolute;right:max(16px,env(safe-area-inset-right,0px));top:calc(140px + env(safe-area-inset-top,0px));width:min(260px,40vw);background:rgba(8,20,48,.86);border:1px solid #ffd24a;border-radius:8px;padding:8px 10px;font:500 12px/1.45 'Be Vietnam Pro',system-ui,sans-serif;color:#e8f0ff;pointer-events:none;z-index:6;box-shadow:0 0 18px rgba(255,210,74,.25)";document.getElementById('def').appendChild(intelEl)}
+  const it=C&&C.intel;if(!it||!(it.t>0)){intelEl.style.display='none';return}intelEl.style.display='block';intelEl.style.opacity=Math.min(1,it.t*3,(it.max-it.t)*6+.2);
+  const h='<b style="font:700 12px Chakra Petch,system-ui;color:#ffd24a;letter-spacing:.06em">THÔNG TIN ĐỐI THỦ · '+Math.ceil(it.t)+'s</b><br>'+it.lines.map(l=>String(l).replace(/[<>&]/g,'')).join('<br>')+'<div style="height:3px;margin-top:6px;background:#ffd24a;width:'+Math.max(0,it.t/it.max*100)+'%"></div>';if(intelEl._h!==h){intelEl.innerHTML=h;intelEl._h=h}}
+function skill3d(G,dt){const C=G.csk;skInit();const S2=SK;
+  /* vòng sóng chung của kỹ năng: dải sáng đứng + vòng phẳng, nở ra và mờ dần */
+  if(C&&C.fx)C.fx.forEach(f=>{if(f.mot)return;const p=1-f.t/f.max,r=f.r0+(f.r1-f.r0)*Math.sqrt(p),g=S2.R.get(),U=g.userData,y=hAtW(f.x,f.y,HOV)*.75,o=Math.max(0,1-p)*.9;
+    g.position.set(f.x,y,f.y);U.a.scale.set(r,.25+.35*(1-p),r);U.b.scale.setScalar(r);U.a.material.color.copy(col(f.col));U.b.material.color.copy(col(f.col));U.a.material.opacity=o*.75;U.b.material.opacity=o});
+  /* Radar Quét Rộng: quạt quét hình bán nguyệt + vách sáng quay theo tia quét */
+  ((C&&C.sw)||[]).forEach(w=>{const p=1-w.t/w.max,u=Math.min(1,p*1.5),r=w.R*Math.sqrt(Math.min(1,p*2.2)),g=S2.SW.get(),U=g.userData,A0=w.a0,a=A0-Math.PI/2+u*Math.PI;
+    g.position.set(w.P.x,HOV*.6,w.P.y);g.rotation.set(0,-A0,0);U.s.scale.set(r,1,r);U.s.material.color.copy(col(w.col));U.s.material.opacity=(1-p)*.55;
+    U.f.rotation.set(0,-(a-A0),0);U.f.scale.set(r,.9,1);U.f.material.color.copy(col(w.col));U.f.material.opacity=(1-p)*.85;
+    U.l.rotation.set(0,-(a-A0),0);U.l.scale.set(r,1,1);U.l.material.color.copy(col(w.col));U.l.material.opacity=1-p});
+  /* Laser Đỏ Nhẹ: tia đỏ 3D từ tàu tới từng mục tiêu, nhấp nháy */
+  ((C&&C.lz)||[]).forEach(l=>{if(l.tg.dead)return;const p=1-l.t/l.max,g=S2.LZ.get(),U=g.userData,a=new T.Vector3(l.P.x,HOV,l.P.y),b=new T.Vector3(l.tg.x,HOV,l.tg.y),d=b.clone().sub(a),L=d.length()||.01,fl=(1-p)*(.7+.3*Math.sin(t3*60));
+    g.position.copy(a).addScaledVector(d,.5);g.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),d.multiplyScalar(1/L));U.a.scale.set(.09*(1-p*.5),L,.09*(1-p*.5));U.b.scale.set(.03,L,.03);U.a.material.opacity=fl*.8;U.b.material.opacity=fl;
+    U.h.position.set(0,L/2,0);U.h.scale.setScalar(.9+.3*Math.sin(t3*40));U.h.material.opacity=fl});
+  /* Sốc Điện Hạm (xanh) / Nhiễu Sóng Xanh (tím): quả cầu năng lượng bay, vòng điện xoay quanh */
+  ((C&&C.sh)||[]).forEach(b=>{const g=S2.ORB.get(),U=g.userData,c=b.jam?'#c9a6ff':'#7df4ff';g.position.set(b.x,HOV,b.y);U.gl.material.color.copy(col(c));U.gl.scale.setScalar(1.3+.2*Math.sin(t3*30));U.c.scale.setScalar(.9);U.rg.material.color.copy(col(b.jam?'#e6d6ff':'#bff'));U.rg.rotation.set(t3*9,t3*13,0);
+    if(Math.random()<.5)spark(b.x,HOV,b.y,rand(-.6,.6),rand(-.3,.6),rand(-.6,.6),c,.3,.22)});
+  /* Từ Trường Xanh: quả cầu bay vòng cung tới mục tiêu */
+  ((C&&C.orbs)||[]).forEach(b=>{const g=S2.ORB.get(),U=g.userData,pr=1-b.t/b.max;g.position.set(b.x,HOV+Math.sin(Math.PI*Math.min(1,pr))*1.6,b.y);U.gl.material.color.set(0x6cc0ff);U.gl.scale.setScalar(1.5);U.c.scale.setScalar(1.1);U.rg.material.color.set(0x8fd0ff);U.rg.rotation.set(t3*6,t3*8,0);
+    if(Math.random()<.8)spark(g.position.x,g.position.y,g.position.z,0,0,0,'#6cc0ff',.4,.4)});
+  /* Từ Trường Xanh: vùng từ trường – vách sáng tròn, đĩa nền, các đường sức xoay và hạt bị hút vào tâm */
+  ((C&&C.mags)||[]).forEach(m=>{const a=Math.min(1,m.t*2,(m.max-m.t)*5+.2),g=S2.MAG.get(),U=g.userData,R=m.R;g.position.set(m.x,0,m.y);
+    U.w.scale.set(R,1.6,R);U.w.position.y=.8;U.w.material.color.set(0x3a8cff);U.w.material.opacity=.55*a;U.d.scale.setScalar(R);U.d.position.y=.05;U.d.material.opacity=a;
+    U.core.scale.setScalar(R*.22);U.core.position.y=HOV*.7;U.core.material.opacity=.8*a;
+    U.arcs.forEach((s,i)=>{s.scale.setScalar(R*(.45+.18*i));s.position.y=HOV*.7;s.rotation.set(Math.PI/2+.25*Math.sin(t3+i),0,-t3*2.2*(i%2?-1:1)+i*2.094);s.material.opacity=.75*a});
+    if(Math.random()<.7){const an=Math.random()*TAU,rr=R*rand(.7,1);const x=m.x+Math.cos(an)*rr,z=m.y+Math.sin(an)*rr;spark(x,rand(.3,HOV*1.3),z,(m.x-x)*1.6,0,(m.y-z)*1.6,'#8fd0ff',.55,.2)}});
+  /* Khóa Mục Tiêu Đỏ: vòng khóa đỏ 3D quanh tàu địch, 4 vạch ngắm xoay, vòng đếm ngược, cột sáng đỏ */
+  G.en.forEach(e=>{if(e.dead||e.spawn>G.t||!(e.lockT>0&&e.cVulT>0))return;const g=S2.LK.get(),U=g.userData,r=(e.size||2)*.55,lk=Math.min(1,(e.lockMax-e.lockT)/.25),R2=r*(1.25+.9*(1-lk)),a0=t3*2.2;
+    g.position.set(e.x,HOV,e.y);U.r1.scale.setScalar(R2);U.r1.material.opacity=.35+.55*lk;U.r2.geometry=arcGeo(Math.max(1,Math.round(32*Math.max(0,e.lockT/e.lockMax))));U.r2.scale.setScalar(R2*1.18);U.r2.rotation.y=-a0;
+    U.tk.forEach((t,i)=>{const a=a0*-1.3+i*Math.PI/2;t.position.set(Math.cos(a)*R2*1.07,0,Math.sin(a)*R2*1.07);t.scale.set(1,1,R2*.6);t.rotation.y=Math.atan2(Math.cos(a),Math.sin(a))});
+    U.dot.scale.setScalar(.5+.15*Math.sin(t3*10));U.col.scale.set(.05,3,.05);U.col.position.y=1.5;U.col.material.opacity=.25*lk});
+  S2.R.end();S2.SW.end();S2.LZ.end();S2.ORB.end();S2.MAG.end();S2.LK.end();intelHud(C)}
 /* ---------- Thiên Lôi 3D: mây giông, khóa mục tiêu 0,3 giây, tia sét 3 lớp + 4 nhánh, lóe sáng ---------- */
 const ADD=(c,o)=>new T.MeshBasicMaterial({color:c,transparent:true,opacity:o,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide,toneMapped:false});
 const sprite=(c,o)=>{const s=new T.Sprite(new T.SpriteMaterial({map:glowT(),color:c,transparent:true,opacity:o,blending:T.AdditiveBlending,depthWrite:false,toneMapped:false}));return s};
@@ -422,7 +452,7 @@ R3.tlbOn=()=>!!R3.live;
 function btn(){const b=document.getElementById('df3b');if(!b)return;b.textContent=R3.fail?'2D':(R3.on?'3D':'2D');b.setAttribute('aria-pressed',String(R3.on&&!R3.fail));b.title=R3.fail?'Máy không hỗ trợ đồ họa 3D':(R3.on?'Đang xem 3D · chạm để về 2D':'Đang xem 2D · chạm để xem 3D')}
 {const z=document.getElementById('dfzo');if(z){const b=document.createElement('button');b.className='dfb';b.id='df3b';b.style.cssText='font-weight:900;font-size:12px';z.parentNode.insertBefore(b,z);
   b.onclick=()=>{if(R3.fail){toast('Máy không hỗ trợ đồ họa 3D, đang dùng 2D');return}R3.on=!R3.on;try{localStorage.setItem('se3d',R3.on?'1':'0')}catch(e){}btn()};btn()}}
-function off(){R3.live=false;if(cv3)cv3.style.display='none';const r=document.getElementById('df3r');if(r)r.style.display='none';try{hud(null,false)}catch(e){}if(stick)stick.style.display='none';R3.joy.id=null}
+function off(){R3.live=false;if(cv3)cv3.style.display='none';const r=document.getElementById('df3r');if(r)r.style.display='none';try{hud(null,false)}catch(e){}if(stick)stick.style.display='none';R3.joy.id=null;if(intelEl)intelEl.style.display='none'}
 setTimeout(()=>{
   const _D=dfDraw;dfDraw=function(){const G=DG;
     if(!G||!R3.on||R3.fail){off();return _D.apply(this,arguments)}
