@@ -424,6 +424,7 @@ function skill3d(G,dt){const C=G.csk;skInit();const S2=SK;
   try{skill3d7(G,dt)}catch(e){console.error(e)}
   try{skill3d8(G,dt)}catch(e){console.error(e)}
   try{skill3d9(G,dt)}catch(e){console.error(e)}
+  try{skill3d10(G,dt)}catch(e){console.error(e)}
   S2.R.end();S2.SW.end();S2.LZ.end();S2.ORB.end();S2.MAG.end();S2.LK.end();intelHud(C)}
 /* ===================== KỸ NĂNG 3D (đợt 2) =====================
    Tiến Công · Giảm Hồi Chiêu Kỹ Năng · Liên Kết Tam Giác · Sửa Chữa Tàu · Drone Hồi Phục · Truyền Năng Lượng · Drone Gây Nhiễu
@@ -857,6 +858,59 @@ function skill3d9(G,dt){const X=G.csk&&G.csk.vf&&G.csk.vf.x2;if(!X||!X.c5)return
     /* Tiếng Hú Câm Lặng: biển cấm đỏ lơ lửng trên tàu địch bị cấm kỹ năng */
     else if(k==='sil'){const e=o.e;if(!ok(e))return;const s=S9.SIL.get();s.position.set(e.x,Y+1.3+.08*Math.sin(t3*4),e.y);s.scale.setScalar(.9);s.material.opacity=.95*a}});
   S9.B.end();S9.DOT.end();S9.TOR.end();S9.LNK.end();S9.DOME.end();S9.SIL.end()}
+/* ===================== KỸ NĂNG 3D (đợt 10) =====================
+   Lực Đẩy Cực Đại (sóng nwave đã có) · Bầy Ong Lửa · Hộ Vệ Song Sinh · Bóng Chiến Binh · Vệ Tinh Pháo · Mồi Nhử Khổng Lồ · Kéo Bạn Về (xích hkch đã có) */
+Object.assign(R3.c5k,{bee:1,gdrn:1,shad:1,satl:1,bdec:1});
+let SK10=null;const DEC=new Map();
+function sk10Init(){if(SK10)return SK10;const AD=SK.AD,beamG=new T.CylinderGeometry(1,1,1,8,1,true),torus=new T.TorusGeometry(1,.03,8,64);torus.rotateX(Math.PI/2);
+  const beeB=new T.SphereGeometry(.13,10,8);beeB.scale(1,.75,1.5);const wing=new T.PlaneGeometry(.22,.1);wing.rotateX(-Math.PI/2);
+  const beeM=new T.MeshStandardMaterial({color:lin(0xffb040),emissive:lin(0xff7a10),emissiveIntensity:.7,metalness:.3,roughness:.4}),stripe=new T.MeshBasicMaterial({color:0x4a2a10}),wingM=new T.MeshBasicMaterial({color:0xfff2c8,transparent:true,opacity:.6,side:T.DoubleSide,depthWrite:false});
+  const stG=new T.CylinderGeometry(.135,.135,.05,10);stG.rotateX(Math.PI/2);
+  const hex=new T.CylinderGeometry(.36,.36,.16,6),arm=new T.BoxGeometry(.06,.04,.6),rot=new T.CylinderGeometry(.22,.22,.02,16),rotB=new T.CylinderGeometry(.24,.24,.01,16,1,true);
+  const dMat=new T.MeshStandardMaterial({color:lin(0x2a9a64),metalness:.6,roughness:.35,emissive:lin(0x1a6a40),emissiveIntensity:.5}),aMat=new T.MeshStandardMaterial({color:lin(0xcffff0),metalness:.7,roughness:.3}),rMat=new T.MeshBasicMaterial({color:0xbeffe1,transparent:true,opacity:.35,depthWrite:false});
+  const sB=new T.BoxGeometry(.7,.55,.7),pan=new T.BoxGeometry(1.1,.04,.55),dish=new T.SphereGeometry(.3,16,8,0,TAU,0,Math.PI/2.4),mast=new T.CylinderGeometry(.03,.03,.5,6);
+  const pMat=new T.MeshStandardMaterial({color:lin(0x2a4aa8),metalness:.5,roughness:.3,emissive:lin(0x16306a),emissiveIntensity:.6});
+  SK10={B:Pool(()=>{const g=new T.Group(),a=new T.Mesh(beamG,AD(0xffffff,.5)),b=new T.Mesh(beamG,AD(0xffffff,1));a.frustumCulled=b.frustumCulled=false;g.add(a,b);g.userData={a,b};scene.add(g);return g}),
+    DOT:Pool(()=>{const s=new T.Sprite(ADDM(glowT()));scene.add(s);return s}),
+    TOR:Pool(()=>{const m=new T.Mesh(torus,AD(0xffffff,1));scene.add(m);return m}),
+    BAR:Pool(()=>{const s=new T.Sprite(new T.SpriteMaterial({map:WHITE,transparent:true,depthTest:false,depthWrite:false,toneMapped:false,fog:false}));s.center.set(0,.5);s.renderOrder=20;scene.add(s);return s}),
+    BEE:Pool(()=>{const g=new T.Group(),b=new T.Mesh(beeB,beeM),s1=new T.Mesh(stG,stripe),s2=new T.Mesh(stG,stripe),w1=new T.Mesh(wing,wingM),w2=new T.Mesh(wing,wingM);s1.position.z=-.03;s2.position.z=.07;s1.scale.set(1.01,.76,1);s2.scale.set(.9,.7,1);w1.position.set(.13,.08,0);w2.position.set(-.13,.08,0);g.add(b,s1,s2,w1,w2);g.userData={w1,w2};scene.add(g);return g}),
+    DRN:Pool(()=>{const g=new T.Group(),c=new T.Mesh(hex,dMat.clone());g.add(c);const R=[];for(let i=0;i<4;i++){const an=i*Math.PI/2+Math.PI/4,a=new T.Mesh(arm,aMat);a.position.set(Math.cos(an)*.3,0,Math.sin(an)*.3);a.rotation.y=-an+Math.PI/2;const r=new T.Mesh(rot,rMat),rb=new T.Mesh(rotB,aMat);r.position.set(Math.cos(an)*.58,.06,Math.sin(an)*.58);rb.position.copy(r.position);g.add(a,r,rb);R.push(r)}g.userData={c,R};scene.add(g);return g}),
+    SAT:Pool(()=>{const g=new T.Group(),b=new T.Mesh(sB,new T.MeshStandardMaterial({color:lin(0xe0b040),metalness:.85,roughness:.3,emissive:lin(0x6a4a00),emissiveIntensity:.4})),p1=new T.Mesh(pan,pMat),p2=new T.Mesh(pan,pMat),d=new T.Mesh(dish,aMat),m=new T.Mesh(mast,aMat);
+      p1.position.x=.95;p2.position.x=-.95;d.rotation.x=Math.PI/2;d.position.set(0,0,.42);m.position.y=.5;g.add(b,p1,p2,d,m);g.userData={b,d};scene.add(g);return g})};
+  return SK10}
+function beam10(a,b,c,w,o){const g=SK10.B.get(),U=g.userData,d=b.clone().sub(a),L=d.length()||.01;g.position.copy(a).addScaledVector(d,.5);g.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),d.multiplyScalar(1/L));U.a.scale.set(w,L,w);U.b.scale.set(w*.32,L,w*.32);U.a.material.color.copy(col(c));U.b.material.color.copy(col(c)).lerp(WH3,.6);U.a.material.opacity=o*.6;U.b.material.opacity=o}
+function dot10(x,y,z,s,c,o){const d=SK10.DOT.get();d.position.set(x,y,z);d.scale.setScalar(s);d.material.color.copy(col(c));d.material.opacity=o;return d}
+function tor10(x,y,z,r,c,o){const t=SK10.TOR.get();t.position.set(x,y,z);t.scale.setScalar(r);t.material.color.copy(col(c));t.material.opacity=o;return t}
+function bar10(x,y,z,w,f,c){const bg=SK10.BAR.get();bg.position.set(x-w/2,y,z);bg.scale.set(w,.12,1);bg.material.color.set(0x101820);bg.material.opacity=.8;if(f<=0)return;const s=SK10.BAR.get();s.position.set(x-w/2,y,z);s.scale.set(Math.max(.001,w*Math.min(1,f)),.12,1);s.material.color.copy(col(c));s.material.opacity=1}
+/* Mồi Nhử Khổng Lồ: dựng lại tàu mồi khổng lồ bằng chính mô hình 3D của tàu được sao chép, phủ ánh vàng */
+function decoy10(o,a){const D=o.D,sh=o.sh;if(!sh||!sh.img)return;const m=model(sh.img,'s');if(!m)return;let g=DEC.get(o);
+  if(!g){const k=D.size/Math.max(sh.W||1,sh.H||1),ww=(sh.W||1)*k,hh=(sh.H||1)*k,hy=.26*Math.sqrt(ww*hh),mat=m.mat.clone();mat.transparent=true;mat.color=new T.Color(1.6,1.25,.5);mat.emissive=new T.Color(.35,.22,0);
+    g=new T.Group();const top=new T.Mesh(m.geo,mat),bot=new T.Mesh(m.geo,mat);top.scale.set(ww,hy,hh);bot.scale.set(ww,-hy*.65,hh);top.castShadow=bot.castShadow=true;g.add(top,bot);g.userData={mat,hh,ww};scene.add(g);DEC.set(o,g)}
+  const U=g.userData,f=Math.min(1,o.age/.25);g.visible=true;g.position.set(D.x,HOV+Math.sin(t3*1.4)*.12,D.y);g.rotation.set(0,-((D.ang||0)+Math.PI/2),0);U.mat.opacity=.92*f;U.mat.emissiveIntensity=D.hit>0?2.4:1.4;U.seen=t3;
+  const rr=D.size*.55;tor10(D.x,.15,D.y,rr,'#ffd24a',.7*f*a);dot10(D.x,HOV,D.y,D.size*1.4,'#ffd24a',.2*f*a);
+  const ay=HOV+1.2+D.size*.35+.15*Math.sin(t3*4);beam10(new T.Vector3(D.x,ay+.5,D.y),new T.Vector3(D.x,ay,D.y),'#ffe58a',.12,.9*f*a);dot10(D.x,ay,D.y,.8,'#ffe58a',.8*f*a);
+  bar10(D.x,HOV+1+D.size*.35,D.y,Math.max(1.6,D.size*.6),D.hp/D.max,'#ffd24a')}
+function skill3d10(G,dt){const X=G.csk&&G.csk.vf&&G.csk.vf.x2;sk10Init();const S10=SK10,Y=HOV,V3a=(x,z,y)=>new T.Vector3(x,y==null?Y:y,z),ok=e=>e&&!e.dead;
+  const fa=o=>o.max?Math.max(0,Math.min(1,(o.max-o.age)/.4,o.age/.1+.2)):1;
+  if(X&&X.c5)X.c5.forEach(o=>{if(o.dl>0||!o.k)return;const k=o.k,a=fa(o);
+    /* Bầy Ong Lửa: 80 con ong lửa vỗ cánh, kéo vệt lửa, lao vào mục tiêu */
+    if(k==='bee'){const g=S10.BEE.get(),U=g.userData,an=o.a||0,w=Math.sin(t3*70+o.x*9)*.7;g.position.set(o.x,Y+.15*Math.sin(t3*9+o.y*3),o.y);g.rotation.set(0,Math.atan2(Math.cos(an),Math.sin(an)),0);U.w1.rotation.z=.4+w;U.w2.rotation.z=-.4-w;
+      dot10(o.x,Y,o.y,.7,'#ff9a2a',.55*a);beam10(V3a(o.x,o.y),V3a(o.x-Math.cos(an)*.9,o.y-Math.sin(an)*.9),'#ff6a1a',.06,.6*a)}
+    /* Hộ Vệ Song Sinh: 2 drone hộ vệ bốn cánh quạt màu xanh lục bay quanh tàu */
+    else if(k==='gdrn'){const D=o.D;if(!ok(D))return;const f=Math.max(0,Math.min(1,o.age/.2,(o.max-o.age)/.4)),g=S10.DRN.get(),U=g.userData;g.position.set(D.x,Y+.25+.1*Math.sin(t3*3+D.x),D.y);g.rotation.y=t3*.5;g.scale.setScalar(f);U.R.forEach((r,i)=>r.rotation.y=t3*40+i);
+      U.c.material.emissive.copy(D.hit>0?WH3:lin(0x1a6a40));dot10(D.x,Y+.25,D.y,1.6,'#66ffaa',.35*f*a);bar10(D.x,Y+1,D.y,1,D.hp/D.max,'#66ffaa')}
+    /* Bóng Chiến Binh: vòng nét đứt xanh + vòng đếm thời gian quanh bóng ma (tàu bóng ma đã là mô hình 3D trong suốt) */
+    else if(k==='shad'){const g=o.g;if(!ok(g))return;const R=(g.size||2.2)*.6,f=Math.max(0,Math.min(1,o.age/.3,(o.max-o.age)/.5)),rem=Math.max(0,1-o.age/o.max),n=24;
+      for(let i=0;i<n;i++){const an=i/n*TAU+t3*.8;if(i%2)continue;beam10(V3a(g.x+Math.cos(an)*R,g.y+Math.sin(an)*R,.6),V3a(g.x+Math.cos(an+TAU/n)*R,g.y+Math.sin(an+TAU/n)*R,.6),'#8fd8ff',.04,.7*f*a)}
+      const m=Math.max(1,Math.round(32*rem));for(let i=0;i<m;i++){const an=-Math.PI/2+i/32*TAU;dot10(g.x+Math.cos(an)*R*1.15,.6,g.y+Math.sin(an)*R*1.15,.35,'#cfeeff',.8*f*a)}dot10(g.x,Y,g.y,R*2.6,'#58b8ff',.18*f*a)}
+    /* Vệ Tinh Pháo: vệ tinh vàng có tấm pin mặt trời, chĩa đĩa và bắn tia vàng liên tục */
+    else if(k==='satl'){const D=o.D;if(!ok(D))return;const f=Math.max(0,Math.min(1,o.age/.3,(o.max-o.age)/.5)),g=S10.SAT.get(),U=g.userData,y=Y+1.2+Math.sin(t3*1.6)*.15,t=o.tg;g.position.set(D.x,y,D.y);g.scale.setScalar(1.3*f);
+      U.b.material.emissive.copy(D.hit>0?WH3:lin(0x6a4a00));if(ok(t)){g.rotation.set(0,Math.atan2(t.x-D.x,t.y-D.y),0);const A=V3a(D.x,D.y,y),B=V3a(t.x,t.y),pu=1+.12*Math.sin(t3*38);beam10(A,B,'#ffc21a',.22*pu,f*a);dot10(B.x,Y,B.z,1.6,'#ffd24a',.7*f*a);dot10(A.x,y,A.z,1.1,'#ffe27a',.6*f*a)}else g.rotation.set(0,Math.sin(t3*.6)*.4,0);
+      bar10(D.x,y+1.2,D.y,1.8,D.hp/D.max,'#ffd24a')}
+    else if(k==='bdec'){if(ok(o.D))decoy10(o,a)}});
+  DEC.forEach((g,o)=>{if(g.userData.seen!==t3||!o.D||o.D.dead||o.done){g.visible=false;if(!o.D||o.D.dead||o.done||t3-(g.userData.seen||0)>2){scene.remove(g);g.userData.mat.dispose();DEC.delete(o)}}});
+  S10.B.end();S10.DOT.end();S10.TOR.end();S10.BAR.end();S10.BEE.end();S10.DRN.end();S10.SAT.end()}
 R3.tlbOn=()=>!!R3.live;
 
 /* ---------- nối vào vòng vẽ trận ---------- */
