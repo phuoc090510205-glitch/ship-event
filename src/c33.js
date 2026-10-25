@@ -1084,19 +1084,23 @@ function pvCam(G,PV){const WW=PV.WW,HH=PV.HH,cx=WW/2,asp=PV.w/PV.h;cam.aspect=as
   fxP.position.set(cx,FXY,HH/2);fxP.scale.set(WW,HH,1)}
 R3.pvDraw=function(o){if(!R3.on||R3.fail)return false;if(!window.THREE){loadThree();return false}if(!init())return false;if(R3.live&&DG&&!DG.pv)return false;
   const G=o.G,prevDG=DG,prevLive=R3.live;
-  [G.pl].concat(G.en||[],G.al||[]).forEach(u=>{if(u&&u.sh&&!u.sc)u.sc=(u.size||2)/Math.max(u.sh.W||1,u.sh.H||1)});
+  const al0=G.al,extra=(o.AL||[]).filter(a=>a&&!(al0||[]).includes(a));if(extra.length)G.al=(al0||[]).concat(extra);
+  [G.pl].concat(G.en||[],G.al||[]).forEach(u=>{if(!u)return;if(u.sh&&!u.sc)u.sc=(u.size||2)/Math.max(u.sh.W||1,u.sh.H||1);if(u.ang==null||isNaN(u.ang))u.ang=u.team==='e'?Math.PI/2:-Math.PI/2});
   let fx=R3.pvFx;if(!fx){fx=R3.pvFx=document.createElement('canvas')}const fw=Math.round(o.Wpx*o.dpr),fh=Math.round(o.Hpx*o.dpr);if(fx.width!==fw||fx.height!==fh){fx.width=fw;fx.height=fh}
   const q2=fx.getContext('2d'),sc=o.sc,X=x=>x*sc,Y=y=>y*sc;
   try{DG=G;let L=[];try{pump();L=collect(G)}catch(e){console.error(e)}
     R3.hide=new Set(L.filter(i=>i.m).map(i=>i.src));R3.hiding=true;R3.live=true;
     q2.setTransform(o.dpr,0,0,o.dpr,0,0);q2.clearRect(0,0,o.Wpx,o.Hpx);
-    try{CSK.under(q2,sc,X,Y)}catch(e){}try{if(G.csk)CSK.draw(q2,sc,X,Y)}catch(e){console.error(e)}
+    try{CSK.under(q2,sc,X,Y)}catch(e){}
+    /* tàu nào chưa dựng xong mô hình 3D thì tạm vẽ hình gốc để không bị mất tàu */
+    L.forEach(i=>{if(i.m||i.k!=='s')return;const u=i.o,im=_dimg(i.src);if(!im||!im.naturalWidth)return;const h=(u.size||2)*sc,w=h*im.naturalWidth/im.naturalHeight;q2.save();q2.translate(X(u.x),Y(u.y));q2.rotate((u.ang!=null?u.ang:-Math.PI/2)+Math.PI/2);if(u.ghost){q2.globalAlpha=.65}q2.drawImage(im,-w/2,-h/2,w,h);q2.restore()});
+    try{if(G.csk)CSK.draw(q2,sc,X,Y)}catch(e){console.error(e)}
     R3.hiding=false;R3.pv={w:o.Wpx,h:o.Hpx,WW:o.WW,HH:o.HH};gTex.image=fx;
     render(G,L);
     const q=o.q;q.setTransform(1,0,0,1,0,0);q.clearRect(0,0,q.canvas.width,q.canvas.height);q.drawImage(cv3,0,0,q.canvas.width,q.canvas.height);q.setTransform(o.dpr,0,0,o.dpr,0,0);
     return true}
   catch(e){console.error(e);return false}
-  finally{R3.pv=null;R3.hiding=false;R3.live=prevLive;DG=prevDG;gTex.image=dfc;gTex.needsUpdate=true}};
+  finally{G.al=al0;R3.pv=null;R3.hiding=false;R3.live=prevLive;DG=prevDG;gTex.image=dfc;gTex.needsUpdate=true}};
 R3.tlbOn=()=>!!R3.live;
 
 /* ---------- nối vào vòng vẽ trận ---------- */
