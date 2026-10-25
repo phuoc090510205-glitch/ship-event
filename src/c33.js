@@ -337,7 +337,7 @@ function render(G,L){const now=performance.now(),dt=Math.min(.05,(now-lastT)/100
   L.forEach(it=>{if(!it.m)return;const o=it.o;let g=R3.inst.get(o);
     if(!g||g.userData.src!==it.src){if(g)drop(g);g=mkInst(it);R3.inst.set(o,g)}
     used.add(o);const U=g.userData;
-    if(it.k==='s'){const M=U.hull.material,lf=o.lift||0;let sc=1+lf*.25;
+    if(it.k==='s'){const M=U.hull.material,lf=o.lift||0;let sc=1+Math.min(1,lf)*.25;
       if(o.boss){const a=t3-U.born;if(a<1.3){const k=Math.min(1,a/1.1);sc*=.25+.75*(1+2.7*Math.pow(k-1,3)+1.7*Math.pow(k-1,2));if(!U.bfx){U.bfx=1;boom(o.x,HOV,o.y,2.6,false);rings.push({x:o.x,y:.2,z:o.y,r:o.size*3,t:0,max:1.2,c:'#ff4d5e'})}}}
       g.scale.setScalar(sc);const y=HOV+lf*1.3+Math.sin(t3*2.2+o.x)*(o.boss?.2:.09);g.position.set(o.x,y,o.y);
       const ry=-(o.ang+Math.PI/2),turn=angDiff(U.ry==null?ry:U.ry,ry);U.ry=ry;U.bank=clamp((U.bank||0)+((-turn/Math.max(dt,.001)*.06)-(U.bank||0))*Math.min(1,dt*6),-.9,.9);
@@ -385,7 +385,7 @@ function render(G,L){const now=performance.now(),dt=Math.min(.05,(now-lastT)/100
   G.fx.forEach(f=>{const k=f.t/f.max;if(k<=0)return;const y=hAtW(f.x,f.y,HOV)*.9;if(!seenFx.has(f)){seenFx.add(f);if(f.ex||f.r>=1)boom(f.x,y,f.y,Math.max(.22,f.r*.42),!f.ex&&/^#?[0-9a-f]{0,2}[89a-f]/i.test(f.col||''));else boom(f.x,y,f.y,.22,false)}
     const m=XB.get(),R=f.r*(1.1-k*.5)*(f.ex?.6:.8);m.position.set(f.x,y,f.y);m.scale.setScalar(Math.max(.05,R));m.material.color.copy(col(f.ex?'#ffb347':f.col));m.material.opacity=Math.min(1,k*.6)});
   BUL.end();BC.end();BG.end();XB.end();MS.end();TRL.end();ARW.end();SHL.end();
-  try{imp3d(G)}catch(e){console.error(e)}try{skill3d16(G,dt)}catch(e){console.error(e)}try{shields3d(G)}catch(e){console.error(e)}XS.end();IMP.end();stepFx(dt);
+  try{imp3d(G)}catch(e){console.error(e)}try{skill3d16(G,dt)}catch(e){console.error(e)}try{skill3d17(G,dt)}catch(e){console.error(e)}try{shields3d(G)}catch(e){console.error(e)}XS.end();IMP.end();stepFx(dt);
   const P=G.pl;marker.visible=!PV&&!P.dead&&R3.joy.id===null&&Math.hypot(P.tx-P.x,P.ty-P.y)>.3;if(marker.visible){marker.position.x=P.tx;marker.position.z=P.ty;marker.rotation.z+=dt*2;marker.scale.setScalar(1+.15*Math.sin(t3*6))}
   try{skill3d(G,dt)}catch(e){console.error(e)}
   try{rocks3d(G)}catch(e){console.error(e)}tlb(G,dt);BAR.end();if(!PV)hud(G,true);
@@ -1458,6 +1458,186 @@ function skill3d15(G,dt){const C=G.csk,X=C&&C.vf&&C.vf.x2;sk15Init();const S=SK1
    · tàu địch xuất hiện qua cổng sáng · biểu tượng choáng 3D */
 Object.assign(R3.c5k,{rsh:1,cone:1,err:1,void:1});
 let SK16=null;const WARP=new WeakSet(),WFX=[];
+/* ===== đợt 17: 23 kỹ năng drone / khiên (c34) dựng 3D ===== */
+let SK17=null;
+function sk17Init(){if(SK17)return SK17;skInit();const AD=SK.AD,beamG=new T.CylinderGeometry(1,1,1,8,1,true),torus=new T.TorusGeometry(1,.035,8,72);torus.rotateX(Math.PI/2);
+  const MSd=(c,o)=>new T.MeshStandardMaterial(Object.assign({color:lin(c),metalness:.6,roughness:.35},o||{})),GLm=c=>new T.MeshBasicMaterial({color:c,toneMapped:false});
+  const white=MSd(0xe9eef5,{metalness:.5,roughness:.28}),dark=MSd(0x1b2332,{metalness:.8,roughness:.35}),gun=MSd(0x3a4352,{metalness:.9,roughness:.25}),
+    redH=MSd(0x5a1a1a,{metalness:.7,roughness:.3}),purH=MSd(0x3a1f5c,{metalness:.75,roughness:.3,emissive:lin(0x2a0a50),emissiveIntensity:.6}),goldH=MSd(0xd9a520,{metalness:.95,roughness:.2,emissive:lin(0x4a3000),emissiveIntensity:.4}),
+    orange=MSd(0xff8a20,{metalness:.4,roughness:.4,emissive:lin(0xff6a00),emissiveIntensity:.7});
+  const hexT=(()=>{const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d');x.strokeStyle='#ffffff';x.lineWidth=3;const r=22,h=r*Math.sqrt(3);
+    for(let j=-1;j<8;j++)for(let i=-1;i<9;i++){const cx=i*r*1.5,cy=j*h+(i%2?h/2:0);x.beginPath();for(let k=0;k<6;k++){const a=k*Math.PI/3;x.lineTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r)}x.closePath();x.stroke()}
+    const t=new T.CanvasTexture(c);t.wrapS=t.wrapT=T.RepeatWrapping;return t})();
+  const swT=(()=>{const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d');x.translate(128,128);for(let i=0;i<5;i++){x.rotate(TAU/5);const g=x.createLinearGradient(0,0,120,0);g.addColorStop(0,'rgba(255,255,220,1)');g.addColorStop(1,'rgba(255,190,40,0)');x.strokeStyle=g;x.lineWidth=10;x.beginPath();for(let k=0;k<60;k++){const a=k/60*3,r=k*2;x.lineTo(Math.cos(a)*r,Math.sin(a)*r)}x.stroke()}return new T.CanvasTexture(c)})();
+  const hexM=(c,o)=>new T.MeshBasicMaterial({map:hexT,color:c,transparent:true,opacity:o,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide,toneMapped:false,fog:false});
+  const glowS=(c,s,x,y,z)=>{const g=new T.Sprite(ADDM(glowT()));g.material.color.set(c);g.scale.setScalar(s);g.position.set(x||0,y||0,z||0);return g};
+  const add=(g,m,x,y,z)=>{m.position.set(x||0,y||0,z||0);m.castShadow=true;g.add(m);return m};
+  /* --- các khung drone theo ảnh kỹ năng, mặt trước hướng -z --- */
+  function orb(c,hull,o){o=o||{};const g=new T.Group(),b=new T.Group();g.add(b);const r=o.r||.32;
+    add(b,new T.Mesh(new T.SphereGeometry(r,20,14),hull||white));const band=new T.Mesh(new T.TorusGeometry(r*1.02,.045,8,32),dark);b.add(band);
+    const eye=add(b,new T.Mesh(new T.SphereGeometry(r*.32,14,10),GLm(c)),0,0,-r*.92);const lens=add(b,new T.Mesh(new T.TorusGeometry(r*.36,.03,6,20),dark),0,0,-r*.88);
+    const pods=[];[-1,1].forEach(s=>{const p=add(b,new T.Mesh(new T.CylinderGeometry(r*.28,r*.34,r*1.1,12),o.pod||dark),s*r*1.15,0,r*.15);p.rotation.x=Math.PI/2;const gl=glowS(c,r*1.4,s*r*1.15,0,r*.8);b.add(gl);pods.push(gl)});
+    if(o.fin)[-1,1].forEach(s=>{const f=add(b,new T.Mesh(new T.BoxGeometry(r*.9,.03,r*.5),o.fin),s*r*1.6,0,r*.2)});
+    const gl=glowS(c,r*2.2,0,0,-r*1.05);b.add(gl);g.userData={b,eye,gl,pods,c};return g}
+  function jet(c,hull,o){o=o||{};const g=new T.Group(),b=new T.Group();g.add(b);
+    const fu=add(b,new T.Mesh(new T.CylinderGeometry(.05,.15,1,12),hull||white));fu.rotation.x=-Math.PI/2;
+    const sh=new T.Shape();sh.moveTo(0,-.28);sh.lineTo(.6,.26);sh.lineTo(.46,.36);sh.lineTo(.12,.22);sh.lineTo(0,.3);sh.lineTo(-.12,.22);sh.lineTo(-.46,.36);sh.lineTo(-.6,.26);sh.closePath();
+    const wg=new T.ExtrudeGeometry(sh,{depth:.035,bevelEnabled:false});wg.rotateX(Math.PI/2);const w=add(b,new T.Mesh(wg,o.wing||dark),0,.02,.1);
+    [-1,1].forEach(s=>{add(b,new T.Mesh(new T.BoxGeometry(.04,.12,.22),o.tip||hull||white),s*.5,.06,.38)});
+    const can=add(b,new T.Mesh(new T.SphereGeometry(.09,12,8),MSd(0x0a1a3a,{metalness:.9,roughness:.1})),0,.08,-.12);can.scale.set(1,.7,2);
+    const eye=add(b,new T.Mesh(new T.SphereGeometry(.07,12,8),GLm(c)),0,.1,.08);const gl=glowS(c,.5,0,.1,.08);b.add(gl);
+    const pods=[glowS(c,.45,-.08,0,.55),glowS(c,.45,.08,0,.55)];pods.forEach(p=>b.add(p));g.userData={b,eye,gl,pods,c};return g}
+  function ship(){const g=new T.Group(),b=new T.Group();g.add(b);add(b,new T.Mesh(new T.BoxGeometry(.42,.16,1.3),purH));const n=add(b,new T.Mesh(new T.ConeGeometry(.3,.6,4),purH),0,0,-.9);n.rotation.x=-Math.PI/2;n.rotation.y=Math.PI/4;n.scale.set(1,1,.45);
+    const sh=new T.Shape();sh.moveTo(0,-.3);sh.lineTo(.8,.35);sh.lineTo(.7,.5);sh.lineTo(0,.3);sh.lineTo(-.7,.5);sh.lineTo(-.8,.35);sh.closePath();const wg=new T.ExtrudeGeometry(sh,{depth:.05,bevelEnabled:false});wg.rotateX(Math.PI/2);add(b,new T.Mesh(wg,dark),0,-.02,.1);
+    add(b,new T.Mesh(new T.BoxGeometry(.2,.14,.5),dark),0,.14,.05);[-1,1].forEach(s=>{const l=add(b,new T.Mesh(new T.BoxGeometry(.03,.03,1.2),GLm(0xc27dff)),s*.22,.05,0)});
+    const eye=add(b,new T.Mesh(new T.BoxGeometry(.16,.05,.1),GLm(0xe0b0ff)),0,.2,-.18);const pods=[-.14,0,.14].map(x=>{const p=glowS(0xb060ff,.5,x,0,.72);b.add(p);return p});const gl=glowS(0xb060ff,.9,0,.2,-.18);b.add(gl);g.userData={b,eye,gl,pods,c:0xb060ff};return g}
+  function giant(){const g=orb(0x4fd8ff,white,{r:.32,fin:dark}),U=g.userData,ring=new T.Group();U.b.add(ring);const rg=new T.Mesh(new T.TorusGeometry(.62,.025,6,64),GLm(0x6fe0ff));rg.rotation.x=Math.PI/2;ring.add(rg);
+    for(let i=0;i<6;i++){const a=i/6*TAU,n=new T.Mesh(new T.SphereGeometry(.07,10,8),white);n.position.set(Math.cos(a)*.62,0,Math.sin(a)*.62);ring.add(n);const e=new T.Mesh(new T.SphereGeometry(.03,8,6),GLm(0x6fe0ff));e.position.copy(n.position).multiplyScalar(1.13);ring.add(e)}
+    const crown=add(U.b,new T.Mesh(new T.ConeGeometry(.12,.25,6),dark),0,.36,0);const big=add(U.b,new T.Mesh(new T.TorusGeometry(.13,.025,8,24),GLm(0xff5a3a)),0,0,-.31);U.ring=ring;U.horn=[-1,1].map(s=>{const h=add(U.b,new T.Mesh(new T.ConeGeometry(.05,.3,6),redH),s*.2,.28,-.05);h.rotation.z=-s*.5;return h});U.eye.material=GLm(0xff5a3a);return g}
+  function turret(){const g=new T.Group(),b=new T.Group();g.add(b);for(let i=0;i<3;i++){const a=i/3*TAU,l=new T.Mesh(new T.CylinderGeometry(.04,.05,.9,8),gun);l.position.set(Math.cos(a)*.3,.35,Math.sin(a)*.3);l.rotation.set(Math.sin(a)*.6,0,-Math.cos(a)*.6);l.castShadow=true;b.add(l)}
+    add(b,new T.Mesh(new T.CylinderGeometry(.22,.26,.2,16),dark),0,.75,0);const hd=new T.Group();hd.position.y=.9;b.add(hd);add(hd,new T.Mesh(new T.BoxGeometry(.42,.28,.5),white),0,.08,0);add(hd,new T.Mesh(new T.BoxGeometry(.44,.08,.3),dark),0,.24,.05);
+    const brl=[-1,1].map(s=>{const m=add(hd,new T.Mesh(new T.CylinderGeometry(.045,.055,.7,10),gun),s*.12,.08,-.55);m.rotation.x=Math.PI/2;return m});const tip=[-1,1].map(s=>{const t=glowS(0xff4a2a,.35,s*.12,.08,-.92);hd.add(t);return t});
+    const eye=add(hd,new T.Mesh(new T.SphereGeometry(.05,10,8),GLm(0xff4a2a)),0,.12,-.26);g.userData={b,hd,tip,eye,c:0xff4a2a};return g}
+  function mine(){const g=new T.Group(),m=new T.Mesh(new T.IcosahedronGeometry(.2,0),redH);g.add(m);const sp=new T.ConeGeometry(.04,.18,5);const pos=new T.IcosahedronGeometry(1,0).attributes.position,seen=new Set();
+    for(let i=0;i<pos.count;i++){const v=new T.Vector3().fromBufferAttribute(pos,i),key=v.toArray().map(n=>n.toFixed(2)).join();if(seen.has(key))continue;seen.add(key);const c=new T.Mesh(sp,gun);c.position.copy(v).multiplyScalar(.24);c.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),v.clone().normalize());g.add(c)}
+    const core=new T.Mesh(new T.SphereGeometry(.09,10,8),GLm(0xff2020));core.position.z=-.17;g.add(core);const gl=glowS(0xff2a2a,.9);g.add(gl);g.userData={gl,core};return g}
+  function bomb(){const g=new T.Group();const m=new T.Mesh(new T.SphereGeometry(.15,12,10),redH);m.scale.y=1.3;g.add(m);const f=new T.Mesh(new T.BoxGeometry(.24,.12,.02),gun);f.position.y=.2;g.add(f);const f2=f.clone();f2.rotation.y=Math.PI/2;g.add(f2);g.add(glowS(0xff5a2a,.5,0,-.1,0));return g}
+  function panel(){const g=new T.Group(),sh=new T.Shape();sh.moveTo(-.7,1.1);sh.lineTo(.7,1.1);sh.lineTo(.7,-.6);sh.lineTo(0,-1.2);sh.lineTo(-.7,-.6);sh.closePath();
+    const ho=new T.Path();ho.moveTo(-.45,.85);ho.lineTo(.45,.85);ho.lineTo(.45,-.45);ho.lineTo(0,-.85);ho.lineTo(-.45,-.45);ho.closePath();
+    const fr=new T.Shape(sh.getPoints());fr.holes.push(ho);const fg=new T.ExtrudeGeometry(fr,{depth:.12,bevelEnabled:false});fg.translate(0,0,-.06);const fm=new T.Mesh(fg,new T.MeshStandardMaterial({color:lin(0x7fd0ff),emissive:lin(0x2a8aff),emissiveIntensity:1.2,metalness:.6,roughness:.3,transparent:true}));g.add(fm);
+    const pg=new T.ShapeGeometry(new T.Shape(ho.getPoints())),pm=new T.MeshBasicMaterial({map:hexT,color:0x6fc8ff,transparent:true,opacity:.55,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide,toneMapped:false});const p=new T.Mesh(pg,pm);g.add(p);
+    const fill=new T.Mesh(new T.ShapeGeometry(sh),new T.MeshBasicMaterial({color:0x2a7aff,transparent:true,opacity:.18,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide,toneMapped:false}));g.add(fill);g.userData={fm,pm,fill};return g}
+  const POOL=f=>Pool(()=>{const g=f();scene.add(g);return g});
+  const coneG=new T.ConeGeometry(1,1,16,1,true);coneG.translate(0,-.5,0);
+  const segG=new T.CylinderGeometry(1,1,1,16);segG.translate(0,.5,0);
+  SK17={hexT,
+    B:Pool(()=>{const g=new T.Group(),a=new T.Mesh(beamG,AD(0xffffff,.5)),b=new T.Mesh(beamG,AD(0xffffff,1));a.frustumCulled=b.frustumCulled=false;g.add(a,b);g.userData={a,b};scene.add(g);return g}),
+    DOT:Pool(()=>{const s=new T.Sprite(ADDM(glowT()));scene.add(s);return s}),
+    TOR:Pool(()=>{const m=new T.Mesh(torus,AD(0xffffff,1));scene.add(m);return m}),
+    CONE:Pool(()=>{const m=new T.Mesh(coneG,AD(0xffffff,.4));m.frustumCulled=false;scene.add(m);return m}),
+    BAR:Pool(()=>{const s=new T.Sprite(new T.SpriteMaterial({map:WHITE,transparent:true,depthTest:false,depthWrite:false,toneMapped:false,fog:false}));s.center.set(0,.5);s.renderOrder=20;scene.add(s);return s}),
+    HEXP:Pool(()=>{const m=new T.Mesh(new T.CylinderGeometry(1,1,1,16,1,true,-.62,1.24),hexM(0x5fc0ff,.5));m.frustumCulled=false;scene.add(m);return m}),
+    DOME:Pool(()=>{const m=new T.Mesh(new T.SphereGeometry(1,32,20),hexM(0x5fc0ff,.35));m.renderOrder=3;scene.add(m);return m}),
+    WALLC:Pool(()=>{const m=new T.Mesh(new T.CylinderGeometry(1,1,1,48,1,true),hexM(0x6fd0ff,.4));m.frustumCulled=false;scene.add(m);return m}),
+    DISC:Pool(()=>{const g=new T.Group(),d=new T.Mesh(new T.CircleGeometry(1,48),new T.MeshBasicMaterial({map:hexT,color:0xffd84a,transparent:true,opacity:.55,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide,toneMapped:false})),f=new T.Mesh(new T.CircleGeometry(1,48),new T.MeshBasicMaterial({color:0xffb020,transparent:true,opacity:.22,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide,toneMapped:false})),r=new T.Mesh(new T.TorusGeometry(1,.06,8,64),goldH);
+      g.add(d,f,r);g.userData={d,f,r};scene.add(g);return g}),
+    SWIRL:Pool(()=>{const m=new T.Mesh(new T.CircleGeometry(1,40),new T.MeshBasicMaterial({map:swT,color:0xffffff,transparent:true,opacity:.8,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide,toneMapped:false}));scene.add(m);return m}),
+    RINGG:Pool(()=>{const m=new T.Mesh(new T.TorusGeometry(1,.12,12,64),goldH);m.castShadow=true;scene.add(m);return m}),
+    ROCK:Pool(()=>{const m=new T.Mesh(rockGeo(.2),new T.MeshStandardMaterial({color:lin(0x8a7060),roughness:.85,metalness:.15,flatShading:true,emissive:lin(0x3a1a00),emissiveIntensity:.4}));m.castShadow=true;scene.add(m);return m}),
+    SEG:Pool(()=>{const m=new T.Mesh(segG,white);m.castShadow=true;m.frustumCulled=false;scene.add(m);return m}),
+    SEGD:Pool(()=>{const m=new T.Mesh(segG,dark);m.castShadow=true;m.frustumCulled=false;scene.add(m);return m}),
+    JOINT:Pool(()=>{const m=new T.Mesh(new T.SphereGeometry(1,20,14),dark);m.castShadow=true;scene.add(m);return m}),
+    ABASE:Pool(()=>{const g=new T.Group();add(g,new T.Mesh(new T.CylinderGeometry(1.5,1.6,.5,32),dark),0,.25,0);add(g,new T.Mesh(new T.CylinderGeometry(1.2,1.35,.6,32),white),0,.8,0);const ring=add(g,new T.Mesh(new T.TorusGeometry(1.25,.06,8,48),GLm(0x4fd8ff)),0,.55,0);ring.rotation.x=Math.PI/2;
+      const sh=add(g,new T.Mesh(new T.BoxGeometry(1.4,1.2,1.4),white),0,1.6,0);[-1,1].forEach(s=>add(g,new T.Mesh(new T.BoxGeometry(.2,1,1.1),dark),s*.8,1.6,0));const lt=add(g,new T.Mesh(new T.SphereGeometry(.12,10,8),GLm(0xff9a2a)),0,1.6,-.72);
+      g.userData={sh,ring};scene.add(g);return g}),
+    CLAW:Pool(()=>{const g=new T.Group(),hub=add(g,new T.Mesh(new T.CylinderGeometry(.45,.55,.5,16),dark),0,0,0);hub.rotation.x=Math.PI/2;const F=[];
+      for(let i=0;i<3;i++){const f=new T.Group(),a=i/3*TAU;f.rotation.z=a;const p1=add(f,new T.Mesh(new T.BoxGeometry(.16,.7,.2),white),0,.35,0),j=new T.Group();j.position.set(0,.7,0);f.add(j);const p2=add(j,new T.Mesh(new T.BoxGeometry(.13,.55,.17),gun),0,.27,0);
+        const tip=add(j,new T.Mesh(new T.ConeGeometry(.08,.25,6),dark),0,.62,0);const fg=new T.Group();fg.add(f);fg.position.z=-.3;g.add(fg);f.userData={j};F.push(f)}
+      const gl=glowS(0xff9a2a,.8,0,0,-.4);g.add(gl);g.userData={F,gl};scene.add(g);return g}),
+    FTR:POOL(()=>jet(0x4fd8ff,white,{wing:dark})),MN:POOL(()=>jet(0xff3a3a,dark,{wing:redH,tip:redH})),
+    SKY:POOL(()=>{const g=orb(0xffa040,white,{pod:orange,fin:dark});const em=new T.Mesh(new T.CylinderGeometry(.06,.1,.18,10),dark);em.position.y=-.32;g.userData.b.add(em);return g}),
+    SHD:POOL(()=>orb(0x4fd8ff,white,{fin:dark})),BMB:POOL(()=>orb(0xff2a2a,redH,{pod:dark,fin:redH})),COL:POOL(()=>{const g=orb(0x6fe8ff,white,{fin:dark});const em=new T.Mesh(new T.CylinderGeometry(.12,.08,.12,12),dark);em.position.y=-.33;g.userData.b.add(em);return g}),
+    MK:POOL(()=>orb(0xff3a3a,white,{fin:dark})),GOLD:POOL(()=>{const g=orb(0xffb020,white,{pod:goldH,fin:goldH});const n=new T.Mesh(new T.ConeGeometry(.1,.3,10),goldH);n.rotation.x=-Math.PI/2;n.position.z=-.4;g.userData.b.add(n);return g}),
+    RES:POOL(()=>jet(0x5fd0ff,white,{wing:MSd(0x1a5aa8)})),HEAL:POOL(()=>orb(0x3dff7a,white,{fin:dark})),CAGE:POOL(()=>{const g=orb(0x6fd0ff,white,{});const r=new T.Mesh(new T.TorusGeometry(.42,.025,6,32),GLm(0x6fd0ff));r.rotation.x=Math.PI/2;g.userData.b.add(r);return g}),
+    PUR:POOL(ship),DEM:POOL(giant),TUR:POOL(turret),MINE:POOL(mine),BOMB:POOL(bomb),PANEL:POOL(panel)};
+  return SK17}
+function beam17(a,b,c,w,o){const g=SK17.B.get(),U=g.userData,d=b.clone().sub(a),L=d.length()||.01;g.position.copy(a).addScaledVector(d,.5);g.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),d.multiplyScalar(1/L));U.a.scale.set(w,L,w);U.b.scale.set(w*.32,L,w*.32);U.a.material.color.copy(col(c));U.b.material.color.copy(col(c)).lerp(WH3,.6);U.a.material.opacity=o*.6;U.b.material.opacity=o}
+function zap17(a,b,c,o,sd,amp,w){amp=amp||.3;const n=9,d=b.clone().sub(a),L=d.length()||.01,nx=-d.z/L,nz=d.x/L;let p0=a.clone();for(let i=1;i<=n;i++){const f=i/n,off=i<n?Math.sin(t3*55+i*3+sd)*amp:0,up=i<n?Math.cos(t3*47+i*5+sd)*amp:0,p1=a.clone().addScaledVector(d,f).add(new T.Vector3(nx*off,up,nz*off));beam17(p0,p1,c,w||.06,o);p0=p1}}
+function dot17(x,y,z,s,c,o){const d=SK17.DOT.get();d.position.set(x,y,z);d.scale.setScalar(s);d.material.color.copy(col(c));d.material.opacity=o;return d}
+function tor17(x,y,z,r,c,o,rx,rz){const t=SK17.TOR.get();t.position.set(x,y,z);t.scale.setScalar(Math.max(.01,r));t.rotation.set(rx||0,0,rz||0);t.material.color.copy(col(c));t.material.opacity=o;return t}
+function cone17(a,b,r,c,o){const m=SK17.CONE.get(),d=b.clone().sub(a),L=d.length()||.01;m.position.copy(a);m.quaternion.setFromUnitVectors(new T.Vector3(0,-1,0),d.multiplyScalar(1/L));m.scale.set(r,L,r);m.material.color.copy(col(c));m.material.opacity=o;return m}
+function bar17(x,y,z,w,f,c){const bg=SK17.BAR.get();bg.position.set(x-w/2,y,z);bg.scale.set(w,.11,1);bg.material.color.set(0x101820);bg.material.opacity=.8;if(f<=0)return;const s=SK17.BAR.get();s.position.set(x-w/2,y,z);s.scale.set(Math.max(.001,w*Math.min(1,f)),.11,1);s.material.color.copy(col(c));s.material.opacity=1}
+function seg17(pool,a,b,r){const m=pool.get(),d=b.clone().sub(a),L=d.length()||.01;m.position.copy(a);m.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),d.multiplyScalar(1/L));m.scale.set(r,L,r);return m}
+const K17={ftr:'FTR',sky:'SKY',shd:'SHD',bmb:'BMB',col:'COL',mk:'MK',dem:'DEM',gold:'GOLD',res:'RES',heal:'HEAL',mn:'MN',pur:'PUR',cage:'CAGE'};
+const SC17={ftr:.85,sky:.9,shd:.95,bmb:.95,col:.9,mk:.9,dem:6.6,gold:.95,res:.85,heal:.95,mn:.8,pur:1.5,cage:.9};
+function skill3d17(G,dt){const Z=G.c34;if(!Z)return;sk17Init();const S=SK17,Y=HOV,V=(x,z,y)=>new T.Vector3(x,y,z),ok=e=>e&&!e.dead;
+  /* đơn vị */
+  Z.u.forEach(u=>{const dead=u.dead,age=G.t-u.born,dk=dead?Math.max(0,1-(G.t-(u.dt0||G.t))/.5):1;if(dead&&dk<=0)return;
+    if(dead&&!u.fx3){u.fx3=1;if(u.exp||u.k==='arm'||u.k==='tur'||u.k==='s4w'||u.k==='pur'||u.k==='dem')boom(u.x,(u.h||0)+.6,u.y,u.k==='dem'?2:u.k==='arm'?1.6:.7,u.k!=='dem');else if(!u.pull)boom(u.x,(u.h||0)+.6,u.y,.45,true)}
+    const pk=K17[u.k];
+    if(pk){if(dead)return;const g=S[pk].get(),U=g.userData,sc=SC17[u.k]*(u.k==='res'&&u.h>2?1.1:1),hy=(u.h||1)+.55+(u.k==='dem'?0:.06*Math.sin(t3*4+u.x*3)),bk=u.k==='dem'?.05:.25;
+      g.position.set(u.x,hy,u.y);g.rotation.set(0,-(u.ang||0)-Math.PI/2,0);U.b.rotation.z=Math.sin(t3*2+u.x)*bk;g.scale.setScalar(sc*Math.min(1,age*3+.05));
+      const hf=u.hit>0;if(U.eye)U.eye.material.color.set(hf?0xffffff:U.c);if(U.pods)U.pods.forEach(p=>p.scale.setScalar((u.k==='dem'?.5:.45)*(.8+.4*Math.random())));if(U.ring)U.ring.rotation.y=t3*1.5;
+      const bw=u.k==='dem'?4:u.k==='pur'?1.3:.8;if(u.k!=='sky')bar17(u.x,hy+sc*(u.k==='dem'?.75:.55),u.y,bw,u.hp/u.max,u.es?'#ff6a3c':'#5fe08a');
+      /* hiệu ứng riêng */
+      if(u.k==='res'&&u.h>1.6){beam17(V(u.x,u.y,u.h+12),V(u.x,u.y,0),'#5fd0ff',.5,.35);dot17(u.x,.15,u.y,1.6,'#5fd0ff',.5);tor17(u.x,.1,u.y,1+.2*Math.sin(t3*8),'#8fe0ff',.6)}
+      if(u.k==='sky'){const tg=u.tg;if(tg&&ok(tg)&&u.las){const E=V(tg.x,tg.y,Y+(tg.lift||0)*1.3),A=V(u.x,u.y,hy-.3);beam17(A,E,'#ff8a20',.32+.05*Math.sin(t3*30+u.slot),.85);beam17(A,E,'#ffe0a0',.08,1);dot17(E.x,E.y,E.z,1.4+.3*Math.sin(t3*25),'#ff9a2a',.85);
+          if(Math.random()<.4)spark(E.x,E.y,E.z,rand(-2,2),rand(1,3),rand(-2,2),'#ffb060',.4,.3)}}
+      if(u.k==='col'&&u.suck&&u.w){const A=V(u.x,u.y,hy-.25),E=V(u.w.x,u.w.y,.1);cone17(A,E,1.1,'#5fd8ff',.22);beam17(A,E,'#9fe8ff',.05,.6);for(let i=0;i<3;i++){const k=((t3*1.4+i/3+u.slot*.13)%1);dot17(E.x+(A.x-E.x)*k,E.y+(A.y-E.y)*k,E.z+(A.z-E.z)*k,.35,'#bff4ff',.9)}}
+      if(u.k==='gold'&&u.flame&&ok(u.tg)){const tg=u.tg,A=V(u.x,u.y,hy),E=V(tg.x,tg.y,Y+(tg.lift||0)*1.3),f=1+.15*Math.sin(t3*40+u.x);cone17(A,E,.55*f,'#ff6a10',.45);cone17(A,E,.28*f,'#ffd060',.6);if(Math.random()<.7)spark(E.x,E.y,E.z,rand(-1.5,1.5),rand(.5,2.5),rand(-1.5,1.5),'#ff9a2a',.35,.35)}
+      if(u.k==='heal'&&u.beam&&ok(u.tg)){const tg=u.tg,A=V(u.x,u.y,hy),E=V(tg.x,tg.y,Y+(tg.lift||0)*1.3);beam17(A,E,'#3dff7a',.14,.8);dot17(E.x,E.y+.4,E.z,1.1,'#5dff9a',.45);if(Math.random()<.3)spark(E.x+rand(-.5,.5),E.y,E.z+rand(-.5,.5),0,1.5,0,'#8fffb0',.6,.25)}
+      if(u.k==='mk'&&ok(u.tg)&&Math.random()<.02)0;
+      if(u.pull)beam17(V(u.x,u.y,hy),V(u.own.x,u.own.y,Y),'#ffe0a0',.04,.5);
+      if(u.merge&&!u.pull)dot17(u.x,hy,u.y,.9,'#ff9a5a',.7);
+      return}
+    if(u.k==='shd'){if(dead)return;const g=S.SHD.get();g.position.set(u.x,u.h+.5,u.y);g.rotation.set(0,-(u.ang||0)-Math.PI/2,0);g.scale.setScalar(.9*Math.min(1,age*3+.05));bar17(u.x,u.h+1.1,u.y,.7,u.hp/u.max,'#5fe08a');
+      if(u.sv>0){const p=S.HEXP.get(),fl=u.shh&&G.t-u.shh<.15;p.position.set(u.x-Math.cos(u.ang)*.9,u.h-.1,u.y-Math.sin(u.ang)*.9);p.rotation.set(0,-u.ang+Math.PI/2,0);p.scale.set(1.75,2.4,1.75);p.material.opacity=(fl?.9:.4+.15*Math.sin(t3*4+u.slot))*(.4+.6*u.sv/u.svm)*Math.min(1,age*2);
+        p.material.map.offset.y=t3*.05;bar17(u.x,u.h+1.25,u.y,.7,u.sv/u.svm,'#8fd8ff')}return}
+    if(u.k==='tur'){if(dead)return;const g=S.TUR.get(),U=g.userData,r=u.rise||0;g.position.set(u.x,-1.2*(1-r),u.y);g.rotation.set(0,0,0);g.scale.setScalar(1.4);U.hd.rotation.y=-(u.yaw||0)-Math.PI/2;const fl=u.tg&&Math.random()<.6;U.tip.forEach((t,i)=>t.scale.setScalar(fl&&(i===(u.alt?1:0))?.7:.25));
+      bar17(u.x,2,u.y,.9,u.hp/u.max,'#5fe08a');if(age<.6)dot17(u.x,.2,u.y,2*(1-age/.6)+.5,'#ffb060',.6);return}
+    if(u.k==='s4w'){const g=S.PANEL.get(),U=g.userData;g.position.set(u.x,1.25,u.y);g.rotation.set(0,-u.ang+Math.PI/2,0);g.scale.setScalar(1);const f=u.hp/u.max;U.pm.opacity=(.35+.3*f)*dk;U.fill.material.opacity=.15*dk;U.fm.material.opacity=dk;U.fm.material.emissiveIntensity=u.hit>0?3:1.2;
+      if(!dead)bar17(u.x,2.7,u.y,.9,f,'#8fd8ff');return}
+    if(u.k==='arm'){if(dead)return;const r=u.rise||0,bx=u.x,bz=u.y,base=S.ABASE.get(),yw=Math.atan2(u.cy-bz,u.cx-bx);base.position.set(bx,-2.4*(1-r),bz);base.rotation.set(0,-yw-Math.PI/2,0);base.userData.ring.material.color.set(u.hit>0?0xffffff:0x4fd8ff);
+      const sy=2.2-2.4*(1-r),Sx=V(bx,bz,sy),cx=bx+(u.cx-bx)*r,cz=bz+(u.cy-bz)*r,ch=sy+(u.ch-2.2)*r,dx=cx-bx,dz=cz-bz,dh=ch-sy,dH=Math.hypot(dx,dz)||.001,L1=3.6,L2=3.4,D=Math.min(L1+L2-.05,Math.max(.6,Math.hypot(dH,dh))),al=Math.atan2(dh,dH);
+      const c1=Math.max(-1,Math.min(1,(L1*L1+D*D-L2*L2)/(2*L1*D))),p1=al+Math.acos(c1),ux=dx/dH,uz=dz/dH,E=V(bx+ux*Math.cos(p1)*L1,bz+uz*Math.cos(p1)*L1,sy+Math.sin(p1)*L1),W=V(bx+ux*Math.cos(al)*D,bz+uz*Math.cos(al)*D,sy+Math.sin(al)*D);
+      seg17(S.SEG,Sx,E,.85);seg17(S.SEGD,Sx.clone().add(V(0,0,.3)),E.clone().add(V(0,0,.3)),.22);seg17(S.SEG,E,W,.68);seg17(S.SEGD,E.clone().add(V(0,0,-.25)),W.clone().add(V(0,0,-.25)),.18);
+      const j1=S.JOINT.get();j1.position.copy(Sx);j1.scale.setScalar(1.1);const j2=S.JOINT.get();j2.position.copy(E);j2.scale.setScalar(.85);dot17(E.x,E.y,E.z,.7,'#4fd8ff',.6);
+      const cl=S.CLAW.get(),CU=cl.userData,dir=W.clone().sub(E).normalize();cl.position.copy(W);cl.quaternion.setFromUnitVectors(new T.Vector3(0,0,-1),dir);cl.scale.setScalar(1.25);const open=u.grab?.15:(u.st==='reach'?.9:.5);
+      CU.F.forEach(f=>{f.rotation.x=-open*.8;f.userData.j.rotation.x=open*.9-.6});bar17(bx,4.6,bz,1.6,u.hp/u.max,'#5fe08a');
+      for(let i=0;i<2;i++)dot17(bx+rand(-1,1),.3,bz+rand(-1,1),.5,'#4fd8ff',.3);if(u.grab)tor17(W.x,W.y-.6,W.z,1.1+.1*Math.sin(t3*12),'#ff9a2a',.6);return}
+    if(u.k==='cage'||u.k==='mn'){}});
+  /* hiệu ứng / vật thể */
+  Z.o.forEach(o=>{const k=o.k;
+    if(k==='mine'){const g=S.MINE.get(),U=g.userData,a=Math.min(1,o.t*3,(o.max-o.t)*2+.2),bl=o.max-o.t<2?(Math.sin(t3*20)>0?1:.3):1;g.position.set(o.x,.9+.15*Math.sin(t3*2.5+o.ph),o.y);g.rotation.set(t3*.6+o.ph,t3*.8,0);g.scale.setScalar(1.3*a);U.gl.material.opacity=.7*bl;U.gl.scale.setScalar(.9+.2*Math.sin(t3*6+o.ph));return}
+    if(k==='bomb'){const g=S.BOMB.get(),p=Math.min(1,o.t/o.max);g.position.set(o.x,(o.h0+.4)*(1-p*p),o.y);g.rotation.set(0,0,0);g.scale.setScalar(1.3);if(Math.random()<.5)smoke(o.x,(o.h0+.4)*(1-p*p)+.3,o.y,.4,.25);return}
+    if(k==='thrown'){const e=o.e;if(!ok(e))return;for(let i=0;i<2;i++)smoke(e.x,Y+(e.lift||0)*1.3,e.y,.5,.4);return}
+    if(k==='merge'){const p=Math.min(1,o.t/o.max);tor17(o.x,3.6,o.y,4*(1-p)+.4,'#ff7a4a',.7);dot17(o.x,3.6,o.y,1+5*p,'#ff9a5a',.5*p);o.M.forEach((m,i)=>{if(m.u)return;const x=m.x0+(o.x-m.x0)*p*p,z=m.y0+(o.y-m.y0)*p*p,h=m.h0+(3-m.h0)*p+.6;const g=S.FTR.get();g.position.set(x,h,z);g.rotation.set(0,-Math.atan2(o.y-m.y0,o.x-m.x0)-Math.PI/2,0);g.scale.setScalar(.85);beam17(V(x,z,h),V(o.x,o.y,3.6),'#6fe0ff',.03,.5)});return}
+    if(k==='door'){const P=o.P;if(!ok(P))return;const a=Math.min(1,o.t*3,(o.max-o.t)*3),an=(P.ang||0)+Math.PI/2,dx=P.x+Math.cos(an)*.8,dz=P.y+Math.sin(an)*.8;dot17(dx,Y+.2,dz,2.2+.4*Math.sin(t3*10),'#ffe0a0',.8*a);tor17(dx,Y+.2,dz,1+.4*Math.sin(t3*6),'#ffd27a',.7*a,Math.PI/2,an);for(let i=0;i<4;i++){const kk=(t3*1.5+i/4)%1;tor17(dx+Math.cos(an)*kk*6,Y+.2,dz+Math.sin(an)*kk*6,1.4*(1-kk)+.2,'#ffe0a0',.5*a*(1-kk),Math.PI/2,an)}return}
+    if(k==='zap'){if(o.t<o.dl){dot17(o.P.x,Y,o.P.y,2+o.t*4,'#9fd0ff',.6);return}const p=(o.t-o.dl)/o.max,R=CF34().zap.R*Math.min(1,p*4),a=1-p;const d=S.DOME.get();d.position.set(o.x,0,o.y);d.scale.set(R,R*.5,R);d.material.color.set(0x8fd0ff);d.material.opacity=.45*a;d.material.map.offset.x=t3*.3;
+      tor17(o.x,.2,o.y,R,'#cfe6ff',.9*a);tor17(o.x,.2,o.y,R*.6,'#8fd0ff',.6*a);for(let i=0;i<10;i++){const an=i/10*TAU+t3*2,rr=R*(.5+.5*Math.sin(i*7.1+t3*9));zap17(V(o.x,o.y,Y),V(o.x+Math.cos(an)*rr,o.y+Math.sin(an)*rr,.3+Math.random()*R*.4),'#bfe0ff',a,i*3.7,.6,.07)}return}
+    if(k==='cage'){const e=o.e,C=CF34().cage;if(o.st==='fly'){if(ok(e))tor17(e.x,.15,e.y,C.rad,'#6fd0ff',.4);return}const a=o.st==='done'?Math.max(0,1-(G.t-o.t1)/.6):Math.min(1,(G.t-o.t0)*3),f=Math.max(0,o.v/o.vm),w=S.WALLC.get();
+      w.position.set(o.x,1.4,o.y);w.scale.set(C.rad,2.8,C.rad);w.material.opacity=(.18+.32*f)*a;w.material.map.offset.x=t3*.1;tor17(o.x,.15,o.y,C.rad,'#9fd8ff',.9*a);tor17(o.x,2.8,o.y,C.rad,'#9fd8ff',.7*a*f+.1);
+      o.D.forEach(d=>{if(ok(d))beam17(V(d.x,d.y,d.h+.55),V(o.x,o.y,1.4),'#6fd0ff',.04,.5*a)});if(ok(e))bar17(o.x,3.4,o.y,2,f,'#9fd8ff');return}
+    if(k==='s4'){if(o.st==='stay')return;const y0=o.st==='hover'?4.6+.3*Math.sin(t3*4):4.6*(1-(o.k2||0))+1.25*(o.k2||0);for(let i=0;i<4;i++){const a=i*Math.PI/2+Math.PI/4,r=o.st==='hover'?1.4:1.4-.5*(o.k2||0),g=S.PANEL.get(),U=g.userData;
+        g.position.set(o.x+Math.cos(a)*r,y0,o.y+Math.sin(a)*r);g.rotation.set(o.st==='hover'?.35:0,-a+Math.PI/2,0);g.scale.setScalar(1);U.pm.opacity=.6;U.fill.material.opacity=.2;U.fm.material.opacity=1;U.fm.material.emissiveIntensity=1.6}
+      tor17(o.x,.15,o.y,1.6+.2*Math.sin(t3*8),'#6fd0ff',.7);if(o.st==='hover')beam17(V(o.x,o.y,.2),V(o.x,o.y,6),'#6fd0ff',.06,.3);return}
+    if(k==='disc'){const P=o.P;if(!ok(P))return;const C=CF34().disc,a=Math.min(1,o.t*4,(o.max-o.t)*3),g=S.DISC.get(),U=g.userData;g.position.set(o.x,Y+.2,o.y);g.rotation.set(0,-o.a+Math.PI/2,0);g.scale.set(C.rad,C.rad*1.1,1);
+      U.d.material.opacity=.55*a;U.f.material.opacity=(.18+.08*Math.sin(t3*6))*a;U.d.rotation.z=t3*.4;dot17(o.x,Y+.2,o.y,2.2,'#ffd84a',.35*a);return}
+    if(k==='god'){const P=o.P;if(!ok(P))return;if(o.st==='beam'){const a=Math.min(1,o.t*2),p=o.t/CF34().god.beam;beam17(V(P.x,P.y,30),V(P.x,P.y,0),'#9a40ff',.95+.1*Math.sin(t3*10),.28*a);beam17(V(P.x,P.y,30),V(P.x,P.y,0),'#e0b8ff',.2,.55*a);
+        for(let i=0;i<3;i++){const kk=((t3*.6+i/3)%1);tor17(P.x,kk*6,P.y,1.6+.4*Math.sin(t3*3+i),'#d27dff',.7*(1-kk)*a)}if(Math.random()<.6)spark(P.x+rand(-1,1),rand(0,4),P.y+rand(-1,1),0,rand(1,3),0,'#e0b0ff',.8,.3);
+        tor17(P.x,.12,P.y,2.2,'#b060ff',.5*a);const n=Math.round(24*p);for(let i=0;i<n;i++){const an=-Math.PI/2+i/24*TAU;dot17(P.x+Math.cos(an)*2.5,.2,P.y+Math.sin(an)*2.5,.3,'#e0b0ff',.8)}}return}
+    if(k==='frag'){const e=o.e;if(!ok(e))return;const R=(e.size||2)*.45+.5,ey=Y+(e.lift||0)*1.3;o.F.forEach(f=>{const m=S.ROCK.get();let x,y,z;
+        if(f.st){const th=f.th+(o.st==='lock'?t3*.3:t3*1.2),ph=f.ph;x=e.x+Math.sin(ph)*Math.cos(th)*R;y=ey+Math.cos(ph)*R*.8;z=e.y+Math.sin(ph)*Math.sin(th)*R}else{x=f.x;y=f.h+.5;z=f.y;if(Math.random()<.15)spark(x,y,z,0,0,0,'#ffb060',.3,.25)}
+        if(o.st==='boom')return;m.position.set(x,y,z);m.rotation.set(t3*2+f.i,t3*1.5+f.i*2,0);m.scale.setScalar(f.s*4);m.material.emissiveIntensity=o.st==='lock'?1.2+.8*Math.sin(t3*16):.4});
+      if(o.st==='lock')dot17(e.x,ey,e.y,R*2.6,'#ff9a3a',.35+.15*Math.sin(t3*16));return}
+    if(k==='bsh'){return}
+    if(k==='ring'){const C=CF34().ring,a=Math.min(1,o.t*3,(o.max-o.t)*2);[o.A,o.B].forEach((p,j)=>{const r=S.RINGG.get();r.position.set(p.x,C.rad+.3,p.y);r.rotation.set(0,-o.a+Math.PI/2,0);r.scale.setScalar(C.rad*a+.01);
+        const s=S.SWIRL.get();s.position.copy(r.position);s.rotation.set(0,-o.a+Math.PI/2,(j?-1:1)*t3*3);s.scale.setScalar(C.rad*.95*a+.01);s.material.opacity=.75*a;dot17(p.x,C.rad+.3,p.y,C.rad*2.4,'#ffd24a',.35*a);
+        for(let i=0;i<3;i++){const an=t3*2+i*2.1+j;spark(p.x+Math.cos(an)*C.rad*.2,C.rad+.3+Math.sin(an)*C.rad,p.y,0,.2,0,'#ffe27a',.4,.25)}});
+      const n=10;for(let i=0;i<n;i++){const f=((i/n+t3*.25)%1);dot17(o.A.x+(o.B.x-o.A.x)*f,C.rad+.3,o.A.y+(o.B.y-o.A.y)*f,.35,'#ffe27a',.35*a)}return}});
+  /* tia, vệt đạn, nổ */
+  Z.fx.forEach(f=>{const a=f.t/f.max;
+    if(f.k==='trc'){beam17(V(f.x1,f.y1,(f.h1||0)+.6),V(f.x2,f.y2,f.h2?f.h2+.6:Y),f.c,f.w*1.6,.9*a);dot17(f.x2,Y,f.y2,.6,f.c,.7*a);return}
+    if(f.k==='big'){const A=V(f.x1,f.y1,f.h1+.6),E=V(f.x2,f.y2,Y);beam17(A,E,'#ff5a3a',.5*a+.1,.9*a);beam17(A,E,'#ffe0c0',.15,a);dot17(E.x,E.y,E.z,2.5*a+.5,'#ff7a4a',.8*a);if(!f.s3){f.s3=1;boom(E.x,E.y,E.z,.8,false)}return}
+    if(f.k==='boom'){if(!f.s3){f.s3=1;boom(f.x,.8,f.y,Math.max(.4,f.r*.5),/7fd0ff|ffe0a0/.test(f.c))}tor17(f.x,.15,f.y,f.r*(1.2-a*.6),f.c,a);return}
+    if(f.k==='land'){if(!f.s3){f.s3=1;boom(f.x,.6,f.y,1,false)}tor17(f.x,.12,f.y,2.6*(1-a)+.3,'#ffb060',a);return}
+    if(f.k==='spark'){dot17(f.x,Y+.2,f.y,1.2*a+.3,f.c,a);return}
+    if(f.k==='zz'){if(!f.s3){f.s3=1;boom(f.x,(f.h||1)+.6,f.y,.5,true)}for(let i=0;i<2;i++)zap17(V(f.x,f.y,(f.h||1)+.6),V(f.x+rand(-1,1),f.y+rand(-1,1),(f.h||1)+rand(0,1)),'#cfe6ff',a,i*5,.3,.05);return}
+    if(f.k==='dlz'){const A=V(f.x1,f.y1,Y+.2),E=V(f.x2,f.y2,Y+.2);beam17(A,E,'#ff4a4a',.18,a);beam17(A,E,'#ffe0a0',.05,a);return}
+    if(f.k==='warp'){dot17(f.x,1.8,f.y,2.5*a,'#ffd24a',a);dot17(f.x2,1.8,f.y2,2.5*a,'#ffe27a',a);return}});
+  /* trạng thái trên tàu: dấu đỏ, khiên, miễn thương, hóa thần, cháy, bị nhốt */
+  const mk=G.c34mk&&G.c34mk.e&&!G.c34mk.e.dead&&G.t<G.c34mk.until?G.c34mk.e:null;
+  if(mk){const r=(mk.size||2)*.55+.4,y=Y+(mk.lift||0)*1.3;tor17(mk.x,y,mk.y,r,'#ff2a2a',.9);tor17(mk.x,y,mk.y,r*1.35,'#ff4a4a',.5);for(let i=0;i<4;i++){const an=i*Math.PI/2+t3;beam17(V(mk.x+Math.cos(an)*r*.8,mk.y+Math.sin(an)*r*.8,y),V(mk.x+Math.cos(an)*r*1.6,mk.y+Math.sin(an)*r*1.6,y),'#ff3030',.05,.9)}
+    beam17(V(mk.x,mk.y,y+.4),V(mk.x,mk.y,y+3),'#ff3030',.03,.5);dot17(mk.x,y+3,mk.y,.6,'#ff3030',.9)}
+  [G.pl].concat(G.al||[],G.en||[]).forEach(u=>{if(!ok(u))return;const r=(u.size||2)*.5,y=Y+(u.lift||0)*1.3;
+    if(u.c34sh>0){const d=S.DOME.get(),f=Math.min(1,u.c34sh/Math.max(1,u.c34shm||u.c34sh)),R=r*1.6+.4;d.position.set(u.x,y,u.y);d.scale.setScalar(R);d.material.color.set(0x5fc0ff);d.material.opacity=.22+.25*f;d.material.map.offset.x=t3*.05;d.rotation.y=t3*.2}
+    if(u.c34inv>G.t)dot17(u.x,y,u.y,r*3,'#ffe27a',.5+.2*Math.sin(t3*30));
+    if(u.c34gb>G.t){tor17(u.x,.12,u.y,r*1.4+.2*Math.sin(t3*4),'#d27dff',.8);dot17(u.x,y,u.y,r*2.4,'#c070ff',.3);if(Math.random()<.3)spark(u.x+rand(-r,r),y,u.y+rand(-r,r),0,1.6,0,'#e0b0ff',.6,.25)}
+    if(u.c34burn&&Math.random()<.6){spark(u.x+rand(-r,r)*.6,y+.2,u.y+rand(-r,r)*.6,rand(-.3,.3),rand(1,2.4),rand(-.3,.3),Math.random()<.5?'#ff6a10':'#ffc040',.45,.3);if(Math.random()<.2)smoke(u.x,y+.4,u.y,.6,.35)}});
+  S.B.end();S.DOT.end();S.TOR.end();S.CONE.end();S.BAR.end();S.HEXP.end();S.DOME.end();S.WALLC.end();S.DISC.end();S.SWIRL.end();S.RINGG.end();S.ROCK.end();S.SEG.end();S.SEGD.end();S.JOINT.end();S.ABASE.end();S.CLAW.end();
+  ['FTR','MN','SKY','SHD','BMB','COL','MK','GOLD','RES','HEAL','CAGE','PUR','DEM','TUR','MINE','BOMB','PANEL'].forEach(k=>S[k].end())}
+function CF34(){return (window.C34&&C34.CF)||{}}
+
 function sk16Init(){if(SK16)return SK16;skInit();const AD=SK.AD,beamG=new T.CylinderGeometry(1,1,1,8,1,true),torus=new T.TorusGeometry(1,.02,8,72);torus.rotateX(Math.PI/2);
   const disk=new T.CircleGeometry(1,48);disk.rotateX(-Math.PI/2);const wallG=new T.CylinderGeometry(1,1,1,48,1,true);wallG.translate(0,.5,0);
   const steel=new T.MeshStandardMaterial({color:lin(0x2b4a86),metalness:.8,roughness:.35}),trim=new T.MeshStandardMaterial({color:lin(0x9fe8ff),emissive:lin(0x4fd6ff),emissiveIntensity:1.2}),gm=new T.MeshStandardMaterial({color:lin(0x3c4656),metalness:.92,roughness:.3});
