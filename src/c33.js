@@ -1516,6 +1516,10 @@ function sk17Init(){if(SK17)return SK17;skInit();const AD=SK.AD,beamG=new T.Cyli
     TOR:Pool(()=>{const m=new T.Mesh(torus,AD(0xffffff,1));scene.add(m);return m}),
     CONE:Pool(()=>{const m=new T.Mesh(coneG,AD(0xffffff,.4));m.frustumCulled=false;scene.add(m);return m}),
     BAR:Pool(()=>{const s=new T.Sprite(new T.SpriteMaterial({map:WHITE,transparent:true,depthTest:false,depthWrite:false,toneMapped:false,fog:false}));s.center.set(0,.5);s.renderOrder=20;scene.add(s);return s}),
+    SHC:Pool(()=>{const g=new T.Group(),hx=new T.Mesh(new T.CircleGeometry(1,48),new T.MeshBasicMaterial({map:hexT,color:0x6fd0ff,transparent:true,opacity:.7,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide,toneMapped:false})),
+      fl=new T.Mesh(new T.CircleGeometry(1,48),new T.MeshBasicMaterial({color:0x2a8aff,transparent:true,opacity:.28,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide,toneMapped:false})),
+      rim=new T.Mesh(new T.TorusGeometry(1,.05,8,64),new T.MeshBasicMaterial({color:0x9fe4ff,transparent:true,toneMapped:false})),gl=new T.Sprite(ADDM(glowT()));gl.material.color.set(0x4fb8ff);gl.scale.setScalar(2.6);
+      hx.material.map=hexT.clone();hx.material.map.needsUpdate=true;hx.material.map.repeat.set(.6,.6);g.add(fl,hx,rim,gl);g.userData={hx,fl,rim,gl};scene.add(g);return g}),
     HEXP:Pool(()=>{const m=new T.Mesh(new T.CylinderGeometry(1,1,1,16,1,true,-.62,1.24),hexM(0x5fc0ff,.5));m.frustumCulled=false;scene.add(m);return m}),
     DOME:Pool(()=>{const m=new T.Mesh(new T.SphereGeometry(1,32,20),hexM(0x5fc0ff,.35));m.renderOrder=3;scene.add(m);return m}),
     WALLC:Pool(()=>{const m=new T.Mesh(new T.CylinderGeometry(1,1,1,48,1,true),hexM(0x6fd0ff,.4));m.frustumCulled=false;scene.add(m);return m}),
@@ -1548,7 +1552,7 @@ function tor17(x,y,z,r,c,o,rx,rz){const t=SK17.TOR.get();t.position.set(x,y,z);t
 function cone17(a,b,r,c,o){const m=SK17.CONE.get(),d=b.clone().sub(a),L=d.length()||.01;m.position.copy(a);m.quaternion.setFromUnitVectors(new T.Vector3(0,-1,0),d.multiplyScalar(1/L));m.scale.set(r,L,r);m.material.color.copy(col(c));m.material.opacity=o;return m}
 function bar17(x,y,z,w,f,c){const bg=SK17.BAR.get();bg.position.set(x-w/2,y,z);bg.scale.set(w,.11,1);bg.material.color.set(0x101820);bg.material.opacity=.8;if(f<=0)return;const s=SK17.BAR.get();s.position.set(x-w/2,y,z);s.scale.set(Math.max(.001,w*Math.min(1,f)),.11,1);s.material.color.copy(col(c));s.material.opacity=1}
 function seg17(pool,a,b,r){const m=pool.get(),d=b.clone().sub(a),L=d.length()||.01;m.position.copy(a);m.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),d.multiplyScalar(1/L));m.scale.set(r,L,r);return m}
-const K17={ftr:'FTR',sky:'SKY',shd:'SHD',bmb:'BMB',col:'COL',mk:'MK',dem:'DEM',gold:'GOLD',res:'RES',heal:'HEAL',mn:'MN',pur:'PUR',cage:'CAGE'};
+const K17={ftr:'FTR',sky:'SKY',bmb:'BMB',col:'COL',mk:'MK',dem:'DEM',gold:'GOLD',res:'RES',heal:'HEAL',mn:'MN',pur:'PUR',cage:'CAGE'};
 const SC17={ftr:.85,sky:.9,shd:.95,bmb:.95,col:.9,mk:.9,dem:6.6,gold:.95,res:.85,heal:.95,mn:.8,pur:1.5,cage:.9};
 function skill3d17(G,dt){const Z=G.c34;if(!Z)return;sk17Init();const S=SK17,Y=HOV,V=(x,z,y)=>new T.Vector3(x,y,z),ok=e=>e&&!e.dead;
   /* đơn vị */
@@ -1571,8 +1575,10 @@ function skill3d17(G,dt){const Z=G.c34;if(!Z)return;sk17Init();const S=SK17,Y=HO
       if(u.merge&&!u.pull)dot17(u.x,hy,u.y,.9,'#ff9a5a',.7);
       return}
     if(u.k==='shd'){if(dead)return;const g=S.SHD.get();g.position.set(u.x,u.h+.5,u.y);g.rotation.set(0,-(u.ang||0)-Math.PI/2,0);g.scale.setScalar(.9*Math.min(1,age*3+.05));bar17(u.x,u.h+1.1,u.y,.7,u.hp/u.max,'#5fe08a');
-      if(u.sv>0){const p=S.HEXP.get(),fl=u.shh&&G.t-u.shh<.15;p.position.set(u.x-Math.cos(u.ang)*.9,u.h-.1,u.y-Math.sin(u.ang)*.9);p.rotation.set(0,-u.ang+Math.PI/2,0);p.scale.set(1.75,2.4,1.75);p.material.opacity=(fl?.9:.4+.15*Math.sin(t3*4+u.slot))*(.4+.6*u.sv/u.svm)*Math.min(1,age*2);
-        p.material.map.offset.y=t3*.05;bar17(u.x,u.h+1.25,u.y,.7,u.sv/u.svm,'#8fd8ff')}return}
+      if(u.sv>0){const g2=S.SHC.get(),U2=g2.userData,fl=u.shh&&G.t-u.shh<.15,k=(.45+.55*u.sv/u.svm)*Math.min(1,age*2.5),c=Math.cos(u.ang),sn=Math.sin(u.ang);
+        g2.position.set(u.x+c*.85,u.h+.5,u.y+sn*.85);g2.rotation.set(0,-u.ang+Math.PI/2,0);g2.scale.setScalar(Math.min(1,age*3+.1));U2.hx.material.opacity=(fl?1:.55+.15*Math.sin(t3*4+u.slot))*k;U2.fl.material.opacity=(fl?.5:.22)*k;
+        U2.rim.material.opacity=k;U2.gl.material.opacity=(fl?.8:.35)*k;U2.hx.rotation.z=t3*.3+u.slot;beam17(V(u.x,u.y,u.h+.5),V(u.x+c*.85,u.y+sn*.85,u.h+.5),'#6fd0ff',.06,.7*k);
+        bar17(u.x,u.h+1.25,u.y,.7,u.sv/u.svm,'#8fd8ff')}return}
     if(u.k==='tur'){if(dead)return;const g=S.TUR.get(),U=g.userData,r=u.rise||0;g.position.set(u.x,-1.2*(1-r),u.y);g.rotation.set(0,0,0);g.scale.setScalar(1.4);U.hd.rotation.y=-(u.yaw||0)-Math.PI/2;const fl=u.tg&&Math.random()<.6;U.tip.forEach((t,i)=>t.scale.setScalar(fl&&(i===(u.alt?1:0))?.7:.25));
       bar17(u.x,2,u.y,.9,u.hp/u.max,'#5fe08a');if(age<.6)dot17(u.x,.2,u.y,2*(1-age/.6)+.5,'#ffb060',.6);return}
     if(u.k==='s4w'){const g=S.PANEL.get(),U=g.userData;g.position.set(u.x,1.25,u.y);g.rotation.set(0,-u.ang+Math.PI/2,0);g.scale.setScalar(1);const f=u.hp/u.max;U.pm.opacity=(.35+.3*f)*dk;U.fill.material.opacity=.15*dk;U.fm.material.opacity=dk;U.fm.material.emissiveIntensity=u.hit>0?3:1.2;
@@ -1634,7 +1640,7 @@ function skill3d17(G,dt){const Z=G.c34;if(!Z)return;sk17Init();const S=SK17,Y=HO
     if(u.c34inv>G.t)dot17(u.x,y,u.y,r*3,'#ffe27a',.5+.2*Math.sin(t3*30));
     if(u.c34gb>G.t){tor17(u.x,.12,u.y,r*1.4+.2*Math.sin(t3*4),'#d27dff',.8);dot17(u.x,y,u.y,r*2.4,'#c070ff',.3);if(Math.random()<.3)spark(u.x+rand(-r,r),y,u.y+rand(-r,r),0,1.6,0,'#e0b0ff',.6,.25)}
     if(u.c34burn&&Math.random()<.6){spark(u.x+rand(-r,r)*.6,y+.2,u.y+rand(-r,r)*.6,rand(-.3,.3),rand(1,2.4),rand(-.3,.3),Math.random()<.5?'#ff6a10':'#ffc040',.45,.3);if(Math.random()<.2)smoke(u.x,y+.4,u.y,.6,.35)}});
-  S.B.end();S.DOT.end();S.TOR.end();S.CONE.end();S.BAR.end();S.HEXP.end();S.DOME.end();S.WALLC.end();S.DISC.end();S.SWIRL.end();S.RINGG.end();S.ROCK.end();S.SEG.end();S.SEGD.end();S.JOINT.end();S.ABASE.end();S.CLAW.end();
+  S.B.end();S.DOT.end();S.TOR.end();S.CONE.end();S.BAR.end();S.HEXP.end();S.SHC.end();S.DOME.end();S.WALLC.end();S.DISC.end();S.SWIRL.end();S.RINGG.end();S.ROCK.end();S.SEG.end();S.SEGD.end();S.JOINT.end();S.ABASE.end();S.CLAW.end();
   ['FTR','MN','SKY','SHD','BMB','COL','MK','GOLD','RES','HEAL','CAGE','PUR','DEM','TUR','MINE','BOMB','PANEL'].forEach(k=>S[k].end())}
 function CF34(){return (window.C34&&C34.CF)||{}}
 

@@ -9,7 +9,7 @@ const CF={
  arm:{hp:800,life:8,len:7,thick:3,R:8,thr:8,dmg:500,cyc:3.6,cd:250},
  ftr:{n:6,hp:500,dmg:100,rof:1,life:12,rng:6,R:10,sp:8,cd:240},
  sky:{n:6,life:5,dmg:500,R:10,h:9,cd:250},
- shd:{n:6,hp:500,life:8,abs:600,gap:1.6,ahead:3,cd:250},
+ shd:{n:6,hp:500,life:8,abs:600,gap:2,ahead:3,cd:250},
  bmb:{n:6,hp:500,R:12,dmg:120,rof:2,bombs:3,sp:7,blast:1.4,cd:280},
  col:{n:6,hp:400,life:8,rate:20,sp:8,cd:250},
  mk:{R:8,n:4,hp:400,dmg:80,rof:2,life:8,rng:5,sp:8,cd:250},
@@ -43,7 +43,7 @@ const TX={
  sky:['Gọi 6 drone từ trên cao chiếu tia laser cam xuống kẻ địch trong phạm vi, ưu tiên mục tiêu bị đánh dấu.',
   [['Số lượng','6 drone trên cao'],['Sát thương','Tối đa 500 mỗi tia trong 5 giây'],['Ưu tiên','Mục tiêu bị đánh dấu'],['Thời gian','5 giây'],['Hồi chiêu','250 giây'],['Hiệu ứng','Laser từ trên cao'],['Mục tiêu','Kẻ địch trong phạm vi']]],
  shd:['Tạo 6 drone dàn thành hàng ngang trước mũi tàu; mỗi drone dựng một tấm khiên xanh chắn đạn phía trước.',
-  [['Số lượng','6 drone'],['Khiên','Chắn 600 sát thương mỗi tấm (phía trước)'],['Máu drone','500'],['Thời gian','8 giây'],['Hồi chiêu','250 giây'],['Hiệu ứng','Khiên chắn hàng ngang'],['Mục tiêu','Bảo vệ tàu ta']]],
+  [['Số lượng','6 drone'],['Khiên','Hình tròn 2×2 ô, chắn 600 sát thương mỗi tấm (phía trước)'],['Máu drone','500'],['Thời gian','8 giây'],['Hồi chiêu','250 giây'],['Hiệu ứng','Khiên chắn hàng ngang'],['Mục tiêu','Bảo vệ tàu ta']]],
  bmb:['Tạo 6 drone đỏ ném bom bay tới kẻ địch trong 12 ô và thả bom xuống. Mỗi drone thả tối đa 3 quả rồi biến mất.',
   [['Số lượng','6 drone'],['Sát thương','120 mỗi quả bom (cộng dồn)'],['Số bom','3 quả mỗi drone'],['Tốc độ thả','1 quả mỗi 2 giây'],['Máu drone','500'],['Phạm vi','12 ô'],['Hồi chiêu','280 giây'],['Mục tiêu','Kẻ địch trong phạm vi']]],
  col:['Tạo 6 drone bay tới xác tàu, công trình đổ nát hoặc đá để hút năng lượng, chuyển thành Đá cho người chơi.',
@@ -326,7 +326,7 @@ function blockProj(G,p){if(!G||!G.c34||p.dead||p.c34df)return false;const Z=G.c3
         o.n++;fx(G,{k:'spark',x:o.x+(-s)*ly,y:o.y+c*ly,c:'#ffe27a',t:.3,max:.3});return true}}
     if(o.k==='cage'&&o.st==='hold'&&o.es===es&&o.v>0){const C=CF.cage,dx=p.x-o.x,dy=p.y-o.y,l=Math.hypot(dx,dy);if(Math.abs(l-C.rad)<=.45&&(dx*p.vx+dy*p.vy)>0){o.v-=p.dmg||0;p.dead=true;fx(G,{k:'spark',x:p.x,y:p.y,c:'#9fd8ff',t:.25,max:.25});if(o.v<=0)breakCage(G,o);return true}}}
   for(const u of Z.u){if(u.k!=='shd'||u.dead||u.es!==es||!(u.sv>0))continue;const dx=p.x-u.x,dy=p.y-u.y,c=Math.cos(u.ang),s=Math.sin(u.ang),lx=dx*c+dy*s,ly=-dx*s+dy*c;
-    if(lx>=-.2&&lx<=.9&&Math.abs(ly)<=CF.shd.gap*.55){u.sv-=p.dmg||0;u.shh=G.t;p.dead=true;fx(G,{k:'spark',x:p.x,y:p.y,c:'#7fd0ff',t:.25,max:.25});return true}}
+    if(lx>=.3&&lx<=1.5&&Math.abs(ly)<=1.05){u.sv-=p.dmg||0;u.shh=G.t;p.dead=true;fx(G,{k:'spark',x:p.x,y:p.y,c:'#7fd0ff',t:.25,max:.25});return true}}
   return false}
 function blockBeam(G,x,y,d){if(!G||!G.c34)return false;const Z=G.c34;
   for(const o of Z.o){if(o.k==='disc'&&!o.es){const C=CF.disc,dx=x-o.x,dy=y-o.y,c=Math.cos(o.a),s=Math.sin(o.a),lx=dx*c+dy*s,ly=-dx*s+dy*c;
@@ -335,7 +335,7 @@ function blockBeam(G,x,y,d){if(!G||!G.c34)return false;const Z=G.c34;
         if(best)hurt(G,best,d*C.k,false,o.P);fx(G,{k:'dlz',x1:o.x,y1:o.y,x2:o.x+Math.cos(na)*(best?bd:9),y2:o.y+Math.sin(na)*(best?bd:9),t:.15,max:.15});return true}}
     if(o.k==='cage'&&o.st==='hold'&&!o.es&&o.v>0){const l=Math.hypot(x-o.x,y-o.y);if(Math.abs(l-CF.cage.rad)<=.4&&dist(o.e,o)<CF.cage.rad){o.v-=d;if(o.v<=0)breakCage(G,o);return true}}}
   for(const u of Z.u){if(u.k!=='shd'||u.dead||u.es||!(u.sv>0))continue;const dx=x-u.x,dy=y-u.y,c=Math.cos(u.ang),s=Math.sin(u.ang),lx=dx*c+dy*s,ly=-dx*s+dy*c;
-    if(lx>=-.2&&lx<=.9&&Math.abs(ly)<=CF.shd.gap*.55){u.sv-=d;u.shh=G.t;return true}}
+    if(lx>=.3&&lx<=1.5&&Math.abs(ly)<=1.05){u.sv-=d;u.shh=G.t;return true}}
   return false}
 {const _h=window.c14Hit;window.c14Hit=function(p){const G=DG;try{if(blockProj(G,p))return true}catch(e){console.error(e)}return _h?_h.apply(this,arguments):false}}
 {const _b=window.c14BeamHit;window.c14BeamHit=function(x,y,d){const G=DG;try{if(blockBeam(G,x,y,d))return true}catch(e){console.error(e)}return _b?_b.apply(this,arguments):false}}
