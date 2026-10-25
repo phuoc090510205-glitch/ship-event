@@ -193,7 +193,7 @@ function mkShip(it,g,U){const o=it.o,m=it.m,ww=o.sh.W*o.sc,hh=o.sh.H*o.sc,hy=.26
   const P=(u,v)=>[(u-.5)*ww,(v-.5)*hh],mn=Math.min(ww,hh);
   (m.noz||[]).forEach(n=>{const [x,z]=P(n.u,n.v);engine(U,x,hAt(m,n.u,Math.max(0,n.v-.06))*hy*.6,z,Math.max(.05,n.r*ww))});
   if(!(m.noz||[]).length)[-.18,.18].forEach(dx=>engine(U,dx*ww,hy*.3,hh*.47,mn*.07));
-  const sh=new T.Mesh(SHG,new T.MeshBasicMaterial({color:0x5fa8ff,transparent:true,opacity:.08,blending:T.AdditiveBlending,depthWrite:false,toneMapped:false}));sh.scale.set(ww*.66,hy*2.6+.3,hh*.66);sh.visible=false;g.add(sh);U.shield=sh}
+  const sr=Math.max(ww,hh)*.62,sh=new T.Mesh(SHG,new T.MeshBasicMaterial({color:0x7fd8ff,transparent:true,opacity:.12,blending:T.AdditiveBlending,depthWrite:false,toneMapped:false,side:T.DoubleSide}));sh.scale.set(sr,Math.max(.75,sr*.62),sr);sh.visible=false;g.add(sh);U.shield=sh;const sw=new T.Mesh(SHW||(SHW=new T.IcosahedronGeometry(1.02,2)),new T.MeshBasicMaterial({color:0xbff0ff,wireframe:true,transparent:true,opacity:.28,blending:T.AdditiveBlending,depthWrite:false,toneMapped:false}));sh.add(sw);U.shw=sw}
 function mkInst(it){const g=new T.Group(),body=new T.Group();g.add(body);const U=g.userData={src:it.src,ph:Math.random()*6,body,fl:[],born:t3,k:it.k,o:it.o};
   if(it.k==='s'){const m=it.m;U.model=m;const hull=new T.Mesh(m.geo,m.mat.clone());hull.customDepthMaterial=m.depth;hull.castShadow=true;hull.receiveShadow=true;body.add(hull);U.hull=hull;mkShip(it,g,U)}
   else if(it.m.sb){const P=sbuild(it.t,it.o.w,it.o.h,it.m.sb.mat);body.add(P.g);U.sb=P;U.tt=it.t;U.top=P.top;U.mat=it.m.sb.mat}
@@ -270,7 +270,7 @@ function hud(G,on){const d=document.getElementById('def');if(!d)return;d.classLi
 let GLOWT=null;function glowT(){if(GLOWT)return GLOWT;return GLOWT=cvTex(64,64,(x)=>{const g=x.createRadialGradient(32,32,0,32,32,32);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.22,'rgba(255,255,255,.75)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,64,64)})}
 function Pool(mk){const a=[];let n=0;return{get(){let o=a[n];if(!o){o=mk();a.push(o)}n++;o.visible=true;return o},end(){for(let i=n;i<a.length;i++)a[i].visible=false;n=0}}}
 const ADDM=(map)=>new T.SpriteMaterial({map,transparent:true,blending:T.AdditiveBlending,depthWrite:false,toneMapped:false});
-let BUL,BC,BG,XS,XB,BAR,MS,RG,BMS={},TRL,ARW,SHL,IMP;
+let SHW=null,BUL,BC,BG,XS,XB,BAR,MS,RG,BMS={},TRL,ARW,SHL,IMP;
 function pools(){if(BUL)return;
   /* đạn vạch sáng: thanh dài + quầng sáng (như bản mô phỏng) */
   const bg=new T.BoxGeometry(.085,.085,.85);
@@ -348,7 +348,7 @@ function render(G,L){const now=performance.now(),dt=Math.min(.05,(now-lastT)/100
       const f=.85+Math.random()*.3,sp=.6+Math.min(1,spd/6)*.8;U.fl.forEach(F=>{F.a.scale.set(F.r,F.r,F.r*5*sp*f);F.b.scale.set(F.r*.45,F.r*.45,F.r*3*sp*f);F.g.scale.setScalar(F.r*4.2*f);F.a.visible=F.b.visible=F.g.visible=op>.3});
       if(U.cores){let e=.75+.2*Math.sin(t3*6+U.ph);if(o===G.pl&&o.nrgMax)e=.12+1.5*(o.nrg/o.nrgMax)*(.8+.2*Math.sin(t3*6));U.cores.forEach(m=>m.emissiveIntensity=e)}
       let sf=0;if(typeof c7ShF==='function')sf=c7ShF(o);
-      U.shield.visible=sf>0&&op>.3;if(U.shield.visible){U.sfl=o.hit>0?.22:Math.max(0,(U.sfl||0)-dt);U.shield.material.opacity=.035+.04*sf+U.sfl}
+      U.shield.visible=sf>0&&op>.3;if(U.shield.visible){U.sfl=o.hit>0?.3:Math.max(0,(U.sfl||0)-dt);U.shield.material.opacity=.08+.1*sf+U.sfl;if(U.shw){U.shw.material.opacity=.1+.16*sf+U.sfl*1.5;U.shw.rotation.y+=dt*.4}}
       const big=o.boss,bw=big?Math.max(2.9,o.size*1.2):Math.max(.9,o.size*.55),by=y+(big?3.7:1.1)*sc,bz=o.y,show=big||o.team!=='p'||o.hp<o.max||o===G.pl;
       if(show){bar(o.x,by,bz,bw+.04,1,'#0a1020',.75,big?.22:.14);bar(o.x,by,bz,bw,Math.max(0,o.hp/o.max),big?'#ff4d5e':o.team==='p'?(o===G.pl?'#5dffa1':'#5dffa1'):'#ff6a3c',1,big?.14:.085);if(sf>0)bar(o.x,by,bz,bw,sf,'#ffffff',.9,big?.14:.085)}
       if(o.epM!=null&&(o.ep<o.epM||o.exh>0)){bar(o.x,by-.12,bz,bw,1,'#0a1020',.7,.07);bar(o.x,by-.12,bz,bw,Math.max(0,o.ep/o.epM),o.exh>0?'#ffffff':'#35c8ff',1,.05)}}
@@ -381,7 +381,7 @@ function render(G,L){const now=performance.now(),dt=Math.min(.05,(now-lastT)/100
   G.fx.forEach(f=>{const k=f.t/f.max;if(k<=0)return;const y=hAtW(f.x,f.y,HOV)*.9;if(!seenFx.has(f)){seenFx.add(f);if(f.ex||f.r>=1)boom(f.x,y,f.y,Math.max(.22,f.r*.42),!f.ex&&/^#?[0-9a-f]{0,2}[89a-f]/i.test(f.col||''));else boom(f.x,y,f.y,.22,false)}
     const m=XB.get(),R=f.r*(1.1-k*.5)*(f.ex?.6:.8);m.position.set(f.x,y,f.y);m.scale.setScalar(Math.max(.05,R));m.material.color.copy(col(f.ex?'#ffb347':f.col));m.material.opacity=Math.min(1,k*.6)});
   BUL.end();BC.end();BG.end();XB.end();MS.end();TRL.end();ARW.end();SHL.end();
-  try{imp3d(G)}catch(e){console.error(e)}try{skill3d16(G,dt)}catch(e){console.error(e)}XS.end();IMP.end();stepFx(dt);
+  try{imp3d(G)}catch(e){console.error(e)}try{skill3d16(G,dt)}catch(e){console.error(e)}try{shields3d(G)}catch(e){console.error(e)}XS.end();IMP.end();stepFx(dt);
   const P=G.pl;marker.visible=!PV&&!P.dead&&R3.joy.id===null&&Math.hypot(P.tx-P.x,P.ty-P.y)>.3;if(marker.visible){marker.position.x=P.tx;marker.position.z=P.ty;marker.rotation.z+=dt*2;marker.scale.setScalar(1+.15*Math.sin(t3*6))}
   try{skill3d(G,dt)}catch(e){console.error(e)}
   tlb(G,dt);BAR.end();if(!PV)hud(G,true);
@@ -394,6 +394,34 @@ function imp3d(G){if(!G.vfi)return;G.vfi.forEach(f=>{const r=window.VFX&&VFX[f.i
   const m=IMP.get();m.position.set(f.x,r.imp==='shock'?.2:y*.7,f.y);m.scale.setScalar(Math.max(.05,R*p*1.15));m.material.color.copy(col(r.cb||r.ca));m.material.opacity=al;
   flashDot(f.x,y,f.y,R*(r.imp==='flash'?1.6:1)*(.6+.8*p),r.ca,al*.9)})}
 function flashDot(x,y,z,s,c,o){const d=XS.get();d.position.set(x,y,z);d.scale.setScalar(s);if(d.material){d.material.color&&d.material.color.copy(col(c));d.material.opacity=o}}
+/* ---------- khiên của công trình dạng 3D: vòm khiên bao trọn công trình, giáp gương cong dựng đứng, ma trận giáp phủ cả căn cứ, vòm giảm sát thương ---------- */
+let SKH=null;
+function skhInit(){if(SKH)return SKH;const AD=SK.AD,hemi=new T.SphereGeometry(1,32,14,0,TAU,0,Math.PI/2),hw=new T.IcosahedronGeometry(1.01,2);
+  const dm=()=>new T.MeshBasicMaterial({color:0x7fd8ff,transparent:true,opacity:.12,blending:T.AdditiveBlending,depthWrite:false,toneMapped:false,side:T.DoubleSide});
+  const wm=()=>new T.MeshBasicMaterial({color:0xbff0ff,wireframe:true,transparent:true,opacity:.25,blending:T.AdditiveBlending,depthWrite:false,toneMapped:false});
+  SKH={DOME:Pool(()=>{const g=new T.Group(),a=new T.Mesh(hemi,dm()),b=new T.Mesh(hw,wm());b.scale.y=1;g.add(a,b);g.userData={a,b};scene.add(g);return g}),
+    MIR:Pool(()=>{const N=13,geo=new T.BufferGeometry(),pos=new Float32Array(N*2*3),idx=[];for(let i=0;i<N-1;i++){const a=i*2,b=a+1,c=a+2,d=a+3;idx.push(a,c,b,b,c,d)}geo.setAttribute('position',new T.BufferAttribute(pos,3));geo.setIndex(idx);
+      const m=new T.Mesh(geo,new T.MeshStandardMaterial({color:lin(0x9fd0ff),emissive:lin(0x3a8aff),emissiveIntensity:.8,metalness:.6,roughness:.1,transparent:true,opacity:.55,side:T.DoubleSide,depthWrite:false}));m.frustumCulled=false;
+      const eg=new T.BufferGeometry();eg.setAttribute('position',new T.BufferAttribute(new Float32Array(N*3),3));const e=new T.Line(eg,new T.LineBasicMaterial({color:0xe8f6ff,transparent:true}));e.frustumCulled=false;const g=new T.Group();g.add(m,e);g.userData={m,e,N};scene.add(g);return g}),
+    BOX:Pool(()=>{const g=new T.Group(),b=new T.Mesh(new T.BoxGeometry(1,1,1),new T.MeshBasicMaterial({color:0xb48cff,transparent:true,opacity:.07,blending:T.AdditiveBlending,depthWrite:false,toneMapped:false,side:T.DoubleSide})),e=new T.LineSegments(new T.EdgesGeometry(new T.BoxGeometry(1,1,1)),new T.LineBasicMaterial({color:0xd8bfff,transparent:true,opacity:.7}));g.add(b,e);g.userData={b,e};scene.add(g);return g}),
+    DOT:Pool(()=>{const s=new T.Sprite(ADDM(glowT()));scene.add(s);return s})};return SKH}
+function shields3d(G){skhInit();const S=SKH;
+  const dome=(x,z,rx,ry,rz,c,o,wo)=>{const g=S.DOME.get(),U=g.userData;g.position.set(x,0,z);g.scale.set(rx,ry,rz);U.a.material.color.copy(col(c));U.a.material.opacity=o;U.b.material.color.copy(col(c)).lerp(WH3,.5);U.b.material.opacity=wo;U.b.rotation.y=t3*.2;return g};
+  (G.bl||[]).forEach(b=>{if(b.hp<=0)return;
+    /* giáp do công trình khác cấp cho công trình: vòm khiên bao trọn */
+    if(b.shd&&b.shd.t>0&&b.shd.v>0){const f=Math.min(1,b.shd.v/Math.max(1e-9,b.shd.max||b.shd.v)),fl=b.flash>0?.12:0;dome(b.x,b.y,Math.max(b.w,1)*.78,Math.max(1.4,Math.max(b.w,b.h)*.55),Math.max(b.h,1)*.78,'#9fe0ff',.08+.08*f+fl,.18+.2*f+fl*1.5)}
+    /* vòm giảm sát thương công trình lân cận */
+    if(b.nb&&b.nb.k==='dome'&&b.nb.r){const r=b.nb.r;dome(b.x,b.y,r,r*.55,r,'#78e6ff',.045,.09)}
+    /* Giáp Gương: tấm khiên cong dựng đứng ở mũi gương */
+    const m=b.c19m;if(b.nb&&b.nb.c19==='ne7'&&m&&m.hp>0&&window.c19Geo){const gg=window.c19Geo.mirGeo(b),up=Math.min(1,(G.t-(m.up||0))/.6),hit=m.hitT!=null?Math.max(0,1-(G.t-m.hitT)/.35):0,f=m.hp/m.max,g=S.MIR.get(),U=g.userData,pa=U.m.geometry.attributes.position,pe=U.e.geometry.attributes.position,H=2.2*up;
+      gg.P.forEach((p,i)=>{if(i>=U.N)return;pa.setXYZ(i*2,p[0],.05,p[1]);pa.setXYZ(i*2+1,p[0],H,p[1]);pe.setXYZ(i,p[0],H,p[1])});pa.needsUpdate=true;pe.needsUpdate=true;U.m.geometry.computeVertexNormals();U.m.geometry.computeBoundingSphere();
+      U.m.material.opacity=.3+.25*f+.3*hit;U.m.material.emissiveIntensity=.6+1.5*hit;U.e.material.opacity=.7+.3*f;const k=Math.floor(((t3*.6)%1)*(gg.P.length-1)),q=gg.P[k];const d=S.DOT.get();d.position.set(q[0],H,q[1]);d.scale.setScalar(.6);d.material.color.set(0xffffff);d.material.opacity=.8}
+    /* Ma Trận Giáp: lồng giáp tím phủ trọn căn cứ, 4 cột góc phát sáng */
+    const x=b.c19x;if(b.nb&&b.nb.c19==='ne9'&&x&&x.hp>0&&x.bb&&window.c19Geo){const C4=window.c19Geo.matCorners(x.bb),x0=C4[0][0],z0=C4[0][1],x1=C4[2][0],z1=C4[2][1],up=Math.min(1,(G.t-(x.up||0))/.7),hit=x.hitT!=null?Math.max(0,1-(G.t-x.hitT)/.35):0,f=x.hp/x.max,H=2.6*up,g=S.BOX.get(),U=g.userData;
+      g.position.set((x0+x1)/2,H/2,(z0+z1)/2);g.scale.set(x1-x0,Math.max(.05,H),z1-z0);U.b.material.opacity=.04+.04*f+.08*hit;U.e.material.opacity=.35+.3*f+.3*hit;C4.forEach((p,i)=>{const d=S.DOT.get();d.position.set(p[0],H,p[1]);d.scale.setScalar(1+.2*Math.sin(t3*5+i));d.material.color.set(0xbe82ff);d.material.opacity=.9})}});
+  /* Mảng khiên: tăng sáng vòm khiên trụ sở khi còn đứng */
+  if((G.bl||[]).some(p=>p.t==='shield'&&p.hp>0)){const hq=(G.bl||[]).find(b=>b.hq&&b.hp>0);if(hq){const r=Math.max(hq.w,hq.h)*.8;dome(hq.x,hq.y,r,r*.62,r,'#4fd6ff',.07,.16)}}
+  S.DOME.end();S.MIR.end();S.BOX.end();S.DOT.end()}
 /* ---------- radar tròn (góc phải trên) ---------- */
 let rdc=null,rdq=null,rdn=0;
 function radar(G){if(!rdc){rdc=document.createElement('canvas');rdc.id='df3r';rdc.width=rdc.height=232;rdc.setAttribute('aria-label','Radar');rdc.style.cssText='position:absolute;right:max(16px,env(safe-area-inset-right,0px));top:calc(10px + env(safe-area-inset-top,0px));width:clamp(84px,16vh,116px);height:clamp(84px,16vh,116px);max-height:none;border:1px solid rgba(90,150,255,.28);border-radius:50%;background:rgba(6,14,32,.72);pointer-events:none;z-index:5';document.getElementById('def').appendChild(rdc);rdq=rdc.getContext('2d')}
