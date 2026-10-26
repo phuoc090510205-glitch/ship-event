@@ -84,8 +84,8 @@ if(typeof STT!=='undefined'&&!STT.some(t=>t[0]==='m'))STT.push(['m','Thảm chi�
 let CF='all';
 function renderCarpets(keep){const o=document.getElementById('storeov');if(!o)return;const sc=o.scrollTop,F=NF,C=cur();
   const L=CP.filter(c=>CF==='all'||(CF==='own'?own(c):String(c.tier)===CF));
-  o.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><b style="font-size:20px">CỬA HÀNG</b><span style="flex:1"></span><span class="chip d">Đá: ${F(S.da)}</span><span class="chip s">Sao: ${F(S.sao)}</span><button id="stx" aria-label="Đóng" style="font-size:22px;background:none;border:0;color:#fff">×</button></div>
-  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">`+STT.map(t=>`<button data-t="${t[0]}" style="padding:6px 12px;border-radius:8px;border:1px solid #1c4fc9;background:${ST.tab===t[0]?'#1c4fc9':'#0c2358'};color:#fff;font-weight:700">${t[1]}</button>`).join('')+`</div>
+  o.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><b style="font-size:20px">${ST.only==='m'?'THẢM CHIẾN TRƯỜNG':'CỬA HÀNG'}</b><span style="flex:1"></span><span class="chip d">Đá: ${F(S.da)}</span><span class="chip s">Sao: ${F(S.sao)}</span><button id="stx" aria-label="Đóng" style="font-size:22px;background:none;border:0;color:#fff">×</button></div>`+
+  (ST.only==='m'?'':`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">`+STT.map(t=>`<button data-t="${t[0]}" style="padding:6px 12px;border-radius:8px;border:1px solid #1c4fc9;background:${ST.tab===t[0]?'#1c4fc9':'#0c2358'};color:#fff;font-weight:700">${t[1]}</button>`).join('')+`</div>`)+`
   <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">`+[['all','Tất cả'],['own','Đã sở hữu']].concat(TIERS.map((t,i)=>[String(i),t.n])).map(f=>`<button data-cf="${f[0]}" style="padding:4px 10px;border-radius:14px;border:1px solid #2b6bff;background:${CF===f[0]?'#2b6bff':'#0a1a3d'};color:#fff;font-size:12px;font-weight:700">${f[1]}</button>`).join('')+`</div>
   <div style="opacity:.8;margin-bottom:8px">Thảm trải dưới căn cứ, buff cho <b>toàn bộ công trình</b> khi vào trận Level và PvP. Đang dùng: <b style="color:#7dffb0">${C.n}</b></div>
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px">`+L.map(c=>{const t=c.tier>=0?TIERS[c.tier]:null,ok=S.da>=c.da&&S.sao>=c.sao,on=C.id===c.id,mine=own(c),col=['#9fb4d0','#7dd3ff','#c58bff','#ffc53d','#fff3b0','#ff6ad5'][c.tier]||'#7dffb0';
@@ -100,7 +100,8 @@ function renderCarpets(keep){const o=document.getElementById('storeov');if(!o)re
       S.da-=c.da;S.sao-=c.sao;S.own=S.own||{};S.own[c.id]=1;S.carpet=c.id;try{save()}catch(x){}try{refresh()}catch(x){}paintBase();renderCarpets(true);toast('Đã mua và trải '+c.n)}})}
   if(keep)o.scrollTop=sc}
 {const _r=stRender;stRender=function(keep,focus){if(ST.tab==='m')return renderCarpets(keep);return _r.apply(this,arguments)}}
-function openCarpets(){try{ST.tab='m';stOpen()}catch(e){console.error(e)}}
+function openCarpets(){try{ST.tab='m';ST.only='m';C39.inOpen=1;stOpen()}catch(e){console.error(e)}finally{C39.inOpen=0}}
+{const _o=stOpen;stOpen=function(){if(!C39.inOpen){ST.only=null;if(ST.tab==='m')ST.tab='w'}return _o.apply(this,arguments)}}
 C39.open=openCarpets;
 
 /* ---------- nút "Thảm chiến trường" ở sảnh (cạnh Trụ sở) ---------- */
