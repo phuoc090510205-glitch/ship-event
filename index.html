@@ -2604,7 +2604,7 @@ function dfStep(dt){
     // chọn mục tiêu: tàu người chơi nếu gần, ngược lại công trình gần nhất
     let tg=null,bd=1e9;
     G.bl.forEach(b=>{if(b.hp<=0||b.t==='mine'||b.smk>0)return;const q=dd(e,b)-Math.max(b.w,b.h)*.4;if(q<bd){bd=q;tg=b}});
-    if(!P.dead&&!(P.smk>0)){const q=dd(e,P);if(q<9&&q<bd+3){bd=q;tg=P}}
+    {let sb=null,sd=1e9;[P].concat(G.al||[]).forEach(u=>{if(!u||u.dead||u.smk>0||u.stl>0)return;const q=dd(e,u);if(q<12&&q<sd){sd=q;sb=u}});if(sb){bd=sd;tg=sb}}
     {const ct=window.c14Taunt&&window.c14Taunt(e,null);if(ct)tg=ct}
     e._tg=tg;
     if(window.c28Tg){const z=window.c28Tg(e,tg);if(z)tg=z}
@@ -2621,7 +2621,7 @@ function dfStep(dt){
       // mục tiêu trong tầm của vũ khí
       let t2=null,b2=1e9;
       G.bl.forEach(b=>{if(b.hp<=0||b.t==='mine'||b.smk>0)return;const q=dd(e,b);if(q<w.rng+Math.max(b.w,b.h)*.4&&q<b2){b2=q;t2=b}});
-      if(!P.dead&&!(P.stl>0)&&!(P.smk>0)){const q=dd(e,P);if(q<w.rng&&(q<b2+1.5||(P.cs&&P.cs.taunt>0))){b2=q;t2=P}}
+      {let sb=null,sd=1e9;[P].concat(G.al||[]).forEach(u=>{if(!u||u.dead||u.stl>0||u.smk>0)return;const q=dd(e,u);if(q<w.rng+(u.size||2)*.3&&q<sd){sd=q;sb=u}});if(sb){b2=sd;t2=sb}if(!P.dead&&P.cs&&P.cs.taunt>0&&dd(e,P)<w.rng){b2=dd(e,P);t2=P}}
       {const tu=(G.al||[]).find(u=>!u.dead&&u.cs&&u.cs.taunt>0&&dd(e,u)<w.rng);if(tu&&!(P.cs&&P.cs.taunt>0&&!P.dead))t2=tu}
       {const dc=window.vfDecoyFor&&window.vfDecoyFor(e,w);if(dc)t2=dc}
       {const mg=window.vfMirageFor&&window.vfMirageFor(e,w);if(mg)t2=mg}
@@ -16303,7 +16303,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL=(window.SE_CFG&&SE_CFG.fb)||'';
-  const VER='v206';
+  const VER='v207';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`
