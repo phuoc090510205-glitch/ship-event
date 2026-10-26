@@ -41,6 +41,7 @@ const st=document.createElement('style');st.textContent=`
   background:linear-gradient(90deg,rgba(20,70,160,.85),rgba(8,16,40,.9) 45%,rgba(8,16,40,.9) 55%,rgba(160,30,40,.85));border:1px solid rgba(120,170,255,.45);border-radius:10px;padding:3px 14px;font:800 18px/1.1 'Be Vietnam Pro',system-ui,sans-serif;color:#fff}
 #c36sc .a{color:#6fc0ff;min-width:22px;text-align:right}#c36sc .b{color:#ff7a7a;min-width:22px}#c36sc small{font-size:10px;color:#cfe0ff;font-weight:700;letter-spacing:.05em}
 #def.pv #c36sc{top:calc(56px + env(safe-area-inset-top,0px))}
+#def:not(.r3) #c36sc{top:calc(50px + env(safe-area-inset-top,0px))}
 #def .dfbars{margin-top:30px}#def.r3 .dfbars{top:30px}#def.r3.pv .dfbars{top:84px}
 #c36rs{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);z-index:6;pointer-events:none;display:none;text-align:center;font:800 22px/1.3 'Be Vietnam Pro',system-ui,sans-serif;color:#fff;text-shadow:0 0 8px #000}
 #c36rs b{display:block;font-size:46px;color:#ffd24a}
