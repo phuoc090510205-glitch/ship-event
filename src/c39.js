@@ -30,7 +30,8 @@ const BDN=['Sọc Ngang','Caro','Viền Đơn','Chấm Bi','Kim Cương','Tròn'
 TIERS.forEach((t,ti)=>KINDS.forEach((k,ki)=>CP.push({id:'cp'+t.k+ki,n:'Thảm '+(ti===1?BDN[ki]:ti===2?SDN[ki]:ti===3?HDN[ki]:k.n)+' · '+t.n,tier:ti,kind:ki,da:t.da,sao:t.sao})));
 const own=c=>c.id==='cp0'||!!(S.own&&S.own[c.id]);
 const cur=()=>{const c=CP.find(x=>x.id===S.carpet);return c&&own(c)?c:CP[0]};
-function desc(c){if(c.tier<0)return ['Thảm xanh tiêu chuẩn bên dưới công trình.'];const t=TIERS[c.tier],k=KINDS[c.kind],L=[`+${NF(t.V)} máu tối đa cho mọi công trình`];if(t.arm)L.push(`+${NF(t.arm)} giáp (khiên) cho mọi công trình`);L.push(k.txt(t.V));return L}
+function desc(c){if(c.tier<0)return ['Thảm xanh tiêu chuẩn bên dưới công trình.'];const t=TIERS[c.tier],k=KINDS[c.kind],L=[`+${NF(t.V)} máu tối đa cho mọi công trình`];if(t.arm)L.push(`+${NF(t.arm)} giáp (khiên) cho mọi công trình`);L.push(k.txt(t.V));if(c.tier===2&&ZTX[c.kind])L.push('Vùng thảm: '+ZTX[c.kind]);return L}
+const ZTX=['kẻ địch bị thiêu đốt 10 sát thương mỗi 0,25 giây và chậm 10% tốc chạy','trong dòng dung nham: thiêu 50 máu mỗi 0,2 giây; ngoài dòng: 10 máu mỗi 0,3 giây và chậm 10%','kẻ địch chậm 30%, mỗi giây 3% bị đóng băng 1,5 giây','đốt 1% năng lượng kẻ địch mỗi giây, mỗi giây 3% hóa đá cát 1 giây','mỗi giây 2% dựng tường đá 1×2 (100 máu) chắn trước mặt kẻ địch','mỗi giây 5% gây chảy máu 300 sát thương trong 10 giây và chậm 5%','mỗi giây 3% làm mù kẻ địch 0,5 giây; dẫm vũng nước 15% bị trói chân 1,2 giây; đốm sáng xanh hồi 5 máu mỗi giây cho tàu ta chạm vào'];
 
 /* ---------- vẽ thảm (ô lặp 256×256) ---------- */
 const CV={};
@@ -210,6 +211,41 @@ setInterval(()=>{try{const c=cur();if(!isAn(c))return;const t=performance.now()/
   const m=document.querySelector('#bboard .c39mat canvas');if(m&&m.offsetParent){const w=m.clientWidth,h=m.clientHeight;if(w&&h){if(m.width!==w||m.height!==h){m.width=w;m.height=h}cover(m.getContext('2d'),epicTick(ek(c)),0,0,w,h)}}
   const def=document.getElementById('def');if(PAD3&&PAD3.k===ek(c)&&def&&def.style.display!=='none'&&typeof DG!=='undefined'&&DG&&!DG.done){epicDraw(ek(c),t);PAD3.tx.needsUpdate=true}}catch(e){}},60);
 
+
+/* ---------- sức mạnh vùng thảm Sử thi (áp lên kẻ địch đi vào vùng thảm) ---------- */
+function region(G){if(G.c39reg)return G.c39reg;const B=(G.bl||[]).filter(b=>b&&!b.c39tmp);if(!B.length)return null;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;B.forEach(b=>{x0=Math.min(x0,b.x-b.w/2);y0=Math.min(y0,b.y-b.h/2);x1=Math.max(x1,b.x+b.w/2);y1=Math.max(y1,b.y+b.h/2)});
+  if(!G.pvp&&G.wd&&G.wd.R&&typeof DFM!=='undefined'){const R=G.wd.R;x0=DFM;y0=DFM;x1=DFM+(R.x1-R.x0);y1=DFM+(R.y1-R.y0)}else{x0-=1;y0-=1;x1+=1;y1+=1}return G.c39reg={x0,y0,x1,y1}}
+/* đổi tọa độ chiến trường -> tọa độ cảnh 330×200 (cảnh phủ kín khung, cắt mép) */
+function toScene(Rg,x,y){const RW=Rg.x1-Rg.x0,RH=Rg.y1-Rg.y0,k=Math.max(RW/EW,RH/EH),w=RW/k,h=RH/k;return [(EW-w)/2+(x-Rg.x0)/RW*w,(EH-h)/2+(y-Rg.y0)/RH*h,k]}
+function fromScene(Rg,sx,sy){const RW=Rg.x1-Rg.x0,RH=Rg.y1-Rg.y0,k=Math.max(RW/EW,RH/EH),w=RW/k,h=RH/k;return [Rg.x0+(sx-(EW-w)/2)/w*RW,Rg.y0+(sy-(EH-h)/2)/h*RH]}
+const roll=(p,dt)=>Math.random()<p*dt;
+function zoneStep(G,dt,F){const c=F.c;if(c.tier!==2)return;const Rg=region(G);if(!Rg)return;const k=c.kind,T=performance.now()/1000,DB=F.DB;
+  const hit=(e,d)=>{try{dfDmgS(e,d*(G.dmM||1)*(e.boss?.35:1))}catch(x){}};
+  const slow=(e,f)=>{e.slowK=Math.min(e.slowK==null?1:e.slowK,f);e.slowT=Math.max(e.slowT||0,.12)};
+  const fx=(e,col,r)=>{try{G.fx.push({x:e.x,y:e.y,r:r||(e.size||2)*.8,t:.5,max:.5,col})}catch(x){}};
+  const E=(G.en||[]).filter(e=>e&&!e.dead&&!e.sb&&!(e.spawn>G.t)&&e.x>=Rg.x0&&e.x<=Rg.x1&&e.y>=Rg.y0&&e.y<=Rg.y1);
+  const L=k===1||k===6?epicLive(20+k):null;
+  E.forEach(e=>{const Z=e.c39z=e.c39z||{};
+    if(k===0){Z.a=(Z.a||0)+dt;while(Z.a>=.25){Z.a-=.25;hit(e,10)}slow(e,.9)}
+    else if(k===1){const q=toScene(Rg,e.x,e.y),yc=100+18*Math.sin(q[0]/48),hw=44+8*Math.sin(q[0]/23+1),inL=Math.abs(q[1]-yc)<=hw;
+      if(inL){Z.a=(Z.a||0)+dt;while(Z.a>=.2){Z.a-=.2;hit(e,50)}if(Math.random()<dt*2)fx(e,'#ff7a1a')}else{Z.b=(Z.b||0)+dt;while(Z.b>=.3){Z.b-=.3;hit(e,10)}slow(e,.9)}}
+    else if(k===2){slow(e,.7);if(roll(.03,dt)){const d=1.5*(e.boss?1/3:1);e.stun=Math.max(e.stun||0,d);e.noFire=Math.max(e.noFire||0,d);e.iceT=Math.max(e.iceT||0,d);fx(e,'#bfe8ff',(e.size||2))}}
+    else if(k===3){if(e.nrgMax>0)e.nrg=Math.max(0,e.nrg-e.nrgMax*.01*dt);if(roll(.03,dt)){const d=e.boss?1/3:1;e.stun=Math.max(e.stun||0,d);e.noFire=Math.max(e.noFire||0,d);e.c39sand=G.t+d;fx(e,'#d9b26f',(e.size||2))}}
+    else if(k===4){if(roll(.02,dt))wallFor(G,e,Rg,DB)}
+    else if(k===5){if(!(Z.bl>G.t)&&roll(.05,dt)){Z.bl=G.t+10;fx(e,'#c01818')}if(Z.bl>G.t){hit(e,30*dt);slow(e,.95)}}
+    else if(k===6){if(roll(.03,dt)){const d=.5*(e.boss?1/3:1);e.noFire=Math.max(e.noFire||0,d);e.c28bl=G.t+d;fx(e,'#9fb5a5')}
+      const st=L.st,q=toScene(Rg,e.x,e.y);let inP=false;(st.pools||[]).forEach(([x,y,a,b])=>{const dx=(q[0]-x)/a,dy=(q[1]-y)/b;if(dx*dx+dy*dy<=1)inP=true});
+      if(inP&&!Z.inP&&!(Z.root>G.t)&&Math.random()<.15){Z.root=G.t+1.2*(e.boss?1/3:1);fx(e,'#5f8a3a')}Z.inP=inP;if(Z.root>G.t)slow(e,0)}});
+  /* đốm sáng xanh của đầm lầy hồi máu cho tàu ta */
+  if(k===6){const st=epicLive(26).st;F.wa=(F.wa||0)+dt;if(F.wa>=1){F.wa-=1;const A=[G.pl].concat(G.al||[]).filter(u=>u&&!u.dead&&!u.ghost);
+    (st.ws||[]).forEach(p=>{const sx=p.x+Math.sin(T*p.s*2+p.o*9)*25,sy=p.y+Math.cos(T*p.s*2.7+p.o*5)*15,w=fromScene(Rg,sx,sy);A.forEach(u=>{if(Math.hypot(u.x-w[0],u.y-w[1])<=(u.size||2)*.5+1.2&&u.hp<u.max){u.hp=Math.min(u.max,u.hp+5);try{G.fx.push({x:u.x,y:u.y,r:1,t:.4,max:.4,col:'#96ffc8'})}catch(x){}}})})}}}
+let WN=0;
+function wallFor(G,e,Rg,DB){const a=isFinite(e.ang)?e.ang:0,cx=Math.cos(a),sy=Math.sin(a),x=e.x+cx*((e.size||2)*.5+1.2),y=e.y+sy*((e.size||2)*.5+1.2);
+  if(x<Rg.x0||x>Rg.x1||y<Rg.y0||y>Rg.y1)return;const vert=Math.abs(cx)>=Math.abs(sy),w=vert?1:2,h=vert?2:1;
+  if((G.bl||[]).some(b=>b.hp>0&&Math.abs(b.x-x)<(b.w+w)/2&&Math.abs(b.y-y)<(b.h+h)/2))return;
+  const hp=100/DB;G.bl.push({id:'c39w'+(++WN),t:'wall',n:'Tường đá cổ',x,y,w,h,v:vert,hp,max:hp,lv:1,cd:0,spec:null,nb:null,used:false,red:0,c39tmp:1});
+  try{G.fx.push({x,y,r:1.4,t:.5,max:.5,col:'#c9b48a'})}catch(x){}}
+
 /* ---------- buff khi vào trận ---------- */
 function apply(G){if(!G||G.c39||G.pv||G.c18sim||!G.bl)return;G.c39=1;const c=cur();if(c.tier<0)return;const t=TIERS[c.tier],K=KINDS[c.kind].k,V=t.V,DB=typeof DFB!=='undefined'?DFB:50;
   const B=G.bl.filter(b=>b&&b.t!=='mine'&&b.hp>0);G.c39f={c,K,V,DB};
@@ -218,6 +254,7 @@ function apply(G){if(!G||G.c39||G.pv||G.c18sim||!G.bl)return;G.c39=1;const c=cur
   G.pb=G.pb||{dm:1,cdm:1,rm:1};if(K==='dmg')G.pb.dm*=1+V*.06/100;if(K==='rof')G.pb.cdm/=1+V*.04/100;if(K==='rng')G.pb.rm*=1+V*.02/100;G.c39dm=G.pb.dm}
 {const _S=dfStep;dfStep=function(dt){const r=_S.apply(this,arguments);try{const G=DG;if(G&&!G.c39)apply(G);const F=G&&G.c39f;if(F&&dt>0){
     if(F.K==='reg')G.bl.forEach(b=>{if(b.hp>0&&b.hp<b.max&&b.t!=='mine')b.hp=Math.min(b.max,b.hp+F.V/50/F.DB*dt)});
+    try{zoneStep(G,dt,F)}catch(e){console.error(e)}
     if(F.K==='rage'&&G.pb){const hq=G.hq,low=hq&&hq.hp>0&&hq.hp<hq.max*.5;G.pb.dm=(G.c39dm||1)*(low?1+F.V*.12/100:1);G.c39low=low}}}catch(e){console.error(e)}return r}}
 {const _B=dfDmgB;dfDmgB=function(b,d){try{const G=DG,F=G&&G.c39f;if(F&&b&&G.bl.includes(b)&&b.hp>0){if(F.K==='red')d*=1-Math.min(50,F.V*.03)/100;
     if(F.K==='rev'&&!b.c39rv&&b.t!=='mine'){const sv=(b.shd&&b.shd.t>0&&b.shd.v)||0;if(b.hp+sv-d*(1-(b.red||0))<=0){b.c39rv=1;b.hp=F.V/F.DB;b.flash=.4;try{G.fx.push({x:b.x,y:b.y,r:Math.max(b.w,b.h)*1.2,t:.7,max:.7,col:'#ffb040'})}catch(e){}return}}}}catch(e){}return _B.apply(this,arguments)}}
