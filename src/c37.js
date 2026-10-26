@@ -20,7 +20,7 @@ const st=document.createElement('style');st.textContent=`
 document.head.appendChild(st);
 const joy=document.createElement('div');joy.id='c37joy';joy.setAttribute('aria-label','Cần điều khiển di chuyển tàu');joy.innerHTML='<b class="u">▲</b><b class="d">▼</b><b class="l">◀</b><b class="r">▶</b><i></i>';
 const btn=document.createElement('div');btn.id='c37btn';btn.innerHTML='<button id="c37stop" title="Dừng tàu (phím Space)"><span>■</span>Dừng</button><button id="c37home" title="Về trụ sở (phím H)"><span>⌂</span>Về TS</button>';
-const key=document.createElement('div');key.id='c37key';key.textContent='Di chuyển: W A S D / phím mũi tên / cần điều khiển · Kỹ năng: phím 1–6 hoặc bấm nút · Dừng: Space · Về trụ sở: H';
+const key=document.createElement('div');key.id='c37key';key.textContent='Di chuyển: W A S D / phím mũi tên / cần điều khiển · Bắn: giữ J / chuột phải / nút BẮN · Kỹ năng: phím 1–6 · Dừng: Space · Về trụ sở: H';
 def.appendChild(joy);def.appendChild(btn);def.appendChild(key);
 const knob=joy.querySelector('i');const J={id:null,x:0,y:0};
 const R3=()=>window.R3D;
@@ -40,5 +40,39 @@ addEventListener('keydown',e=>{if(typeof DG==='undefined'||!DG||def.style.displa
   if(e.code==='Space'){stop();e.preventDefault()}else if((e.key||'').toLowerCase()==='h')home()});
 /* ẩn khi không ở trong trận */
 setInterval(()=>{const on=def.style.display!=='none'&&typeof DG!=='undefined'&&DG&&!DG.done;joy.style.display=btn.style.display=key.style.display=on?'':'none'},300);
+
+/* ---------- nút BẮN + bật/tắt tự bắn ---------- */
+{const fs=document.createElement('style');fs.textContent=`
+#c37fire{position:absolute;right:calc(max(16px,env(safe-area-inset-right,0px)) + 152px);bottom:calc(22px + env(safe-area-inset-bottom,0px));width:84px;height:84px;border-radius:50%;z-index:7;touch-action:none;user-select:none;-webkit-user-select:none;cursor:pointer;
+  border:3px solid #ff8a5a;background:radial-gradient(circle at 40% 35%,#ffb27a,#e0482a 60%,#7a1a10);color:#fff;font:900 15px/1 'Be Vietnam Pro',system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:0 0 18px rgba(255,110,60,.55)}
+#c37fire span{font-size:26px;line-height:1}#c37fire.on{transform:scale(.93);box-shadow:0 0 30px rgba(255,160,80,.95)}
+#c37auto{position:absolute;right:calc(max(16px,env(safe-area-inset-right,0px)) + 152px);bottom:calc(114px + env(safe-area-inset-bottom,0px));width:84px;z-index:7;border-radius:10px;border:2px solid rgba(120,170,255,.55);background:rgba(8,20,50,.85);color:#e8f2ff;font:800 10px/1.2 'Be Vietnam Pro',system-ui,sans-serif;padding:4px 2px;cursor:pointer}
+#c37auto.off{border-color:#ff8a5a;color:#ffd0b0}
+#def:not(.r3) #c37fire,#def:not(.r3) #c37auto{right:calc(max(16px,env(safe-area-inset-right,0px)) + 8px)}
+@media (max-width:600px){#c37fire{width:70px;height:70px;right:calc(max(14px,env(safe-area-inset-right,0px)) + 128px)}#c37auto{width:70px;right:calc(max(14px,env(safe-area-inset-right,0px)) + 128px);bottom:calc(98px + env(safe-area-inset-bottom,0px))}}`;document.head.appendChild(fs)}
+const fire=document.createElement('button');fire.id='c37fire';fire.title='Giữ để bắn (phím J hoặc giữ chuột phải)';fire.innerHTML='<span>⌖</span>BẮN';
+const auto=document.createElement('button');auto.id='c37auto';def.appendChild(fire);def.appendChild(auto);
+let AUTO=true;try{AUTO=localStorage.getItem('c37auto')!=='0'}catch(e){}
+const F={on:false,ids:new Set()};
+function paintAuto(){auto.textContent=AUTO?'Tự bắn: BẬT':'Tự bắn: TẮT';auto.classList.toggle('off',!AUTO)}paintAuto();
+auto.onclick=e=>{e.stopPropagation();AUTO=!AUTO;try{localStorage.setItem('c37auto',AUTO?'1':'0')}catch(x){}paintAuto()};
+const fOn=()=>{F.on=F.ids.size>0||F.key;fire.classList.toggle('on',F.on)};
+fire.addEventListener('pointerdown',e=>{F.ids.add(e.pointerId);try{fire.setPointerCapture(e.pointerId)}catch(x){}fOn();e.preventDefault();e.stopPropagation()});
+['pointerup','pointercancel','lostpointercapture'].forEach(t=>fire.addEventListener(t,e=>{F.ids.delete(e.pointerId);fOn();e.stopPropagation()}));
+['pointerdown','pointerup'].forEach(t=>auto.addEventListener(t,e=>e.stopPropagation()));
+addEventListener('keydown',e=>{if((e.key||'').toLowerCase()==='j'&&!(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))){F.key=1;fOn()}});
+addEventListener('keyup',e=>{if((e.key||'').toLowerCase()==='j'){F.key=0;fOn()}});
+const dfc=document.getElementById('dfcv');if(dfc){dfc.addEventListener('contextmenu',e=>{if(typeof DG!=='undefined'&&DG)e.preventDefault()});
+  dfc.addEventListener('pointerdown',e=>{if(e.button===2){F.ids.add('m');fOn()}});addEventListener('pointerup',e=>{if(e.button===2&&F.ids.delete('m'))fOn()})}
+/* khi giữ BẮN: mọi súng dồn vào kẻ địch nằm gần hướng mũi tàu nhất (trong tầm) */
+function focusTg(G,P){const a=isFinite(P.ang)?P.ang:-Math.PI/2,rng=Math.max(4,...(P.ws||[]).map(w=>w.rng||0));let b=null,bs=1e9;
+  (G.en||[]).forEach(e=>{if(e.dead||e.spawn>G.t)return;const dx=e.x-P.x,dy=e.y-P.y,d=Math.hypot(dx,dy);if(d>rng+(e.size||2)*.4)return;let da=Math.abs(Math.atan2(dy,dx)-a);if(da>Math.PI)da=2*Math.PI-da;const s=da*6+d*.15;if(s<bs){bs=s;b=e}});return b}
+if(typeof bmkFor==='function'){const _b=bmkFor;bmkFor=function(u){try{const G=DG;if(G&&F.on&&u===G.pl){const t=focusTg(G,u);if(t)return t}}catch(e){}return _b.apply(this,arguments)}}
+/* tắt tự bắn: súng chỉ nhả đạn khi đang giữ BẮN */
+{const _S=dfStep;dfStep=function(dt){const G=DG,P=G&&G.pl,hold=P&&!AUTO&&!F.on&&!P.dead&&Array.isArray(P.ws);let sv=null;
+  if(hold){sv=P.ws.map(w=>w.t);P.ws.forEach(w=>w.t=1e9)}
+  try{return _S.apply(this,arguments)}finally{if(sv)P.ws.forEach((w,i)=>{w.t=Math.max(0,sv[i]-dt)})}}}
+setInterval(()=>{const on=def.style.display!=='none'&&typeof DG!=='undefined'&&DG&&!DG.done;fire.style.display=auto.style.display=on?'':'none'},300);
+window.C37F={F,get auto(){return AUTO}};
 window.C37={J,stop,home};
 })();
