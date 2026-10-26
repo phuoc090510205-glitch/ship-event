@@ -24,7 +24,8 @@ const KINDS=[
  {k:'rev',n:'Phượng Hoàng',  h:22, txt:V=>`Công trình bị phá lần đầu sẽ hồi sinh với ${NF(V)} máu`}];
 function r1(x){return String(Math.round(x*10)/10).replace('.',',')}
 const CP=[{id:'cp0',n:'Thảm Xanh Mặc Định',tier:-1,kind:-1,da:0,sao:0}];
-TIERS.forEach((t,ti)=>KINDS.forEach((k,ki)=>CP.push({id:'cp'+t.k+ki,n:'Thảm '+k.n+' · '+t.n,tier:ti,kind:ki,da:t.da,sao:t.sao})));
+const BDN=['Sọc Ngang','Caro','Viền Đơn','Chấm Bi','Kim Cương','Tròn','Chiếu Cói','Tua Rua','Ô Lồng','Zigzag'];
+TIERS.forEach((t,ti)=>KINDS.forEach((k,ki)=>CP.push({id:'cp'+t.k+ki,n:'Thảm '+(ti===1?BDN[ki]:k.n)+' · '+t.n,tier:ti,kind:ki,da:t.da,sao:t.sao})));
 const own=c=>c.id==='cp0'||!!(S.own&&S.own[c.id]);
 const cur=()=>{const c=CP.find(x=>x.id===S.carpet);return c&&own(c)?c:CP[0]};
 function desc(c){if(c.tier<0)return ['Thảm xanh tiêu chuẩn bên dưới công trình.'];const t=TIERS[c.tier],k=KINDS[c.kind],L=[`+${NF(t.V)} máu tối đa cho mọi công trình`];if(t.arm)L.push(`+${NF(t.arm)} giáp (khiên) cho mọi công trình`);L.push(k.txt(t.V));return L}
@@ -32,6 +33,7 @@ function desc(c){if(c.tier<0)return ['Thảm xanh tiêu chuẩn bên dưới cô
 /* ---------- vẽ thảm (ô lặp 256×256) ---------- */
 const CV={};
 function tile(c){if(CV[c.id])return CV[c.id];const N=256,cv=document.createElement('canvas');cv.width=cv.height=N;const q=cv.getContext('2d');CV[c.id]=cv;
+  if(c.tier===1){drawBD(q,N,c.kind);return cv}
   if(c.tier<0){q.fillStyle='#0d2a66';q.fillRect(0,0,N,N);q.strokeStyle='rgba(79,216,255,.35)';q.lineWidth=2;for(let i=0;i<=N;i+=64){q.beginPath();q.moveTo(i,0);q.lineTo(i,N);q.moveTo(0,i);q.lineTo(N,i);q.stroke()}return cv}
   const T=c.tier,K=KINDS[c.kind],h=K.h,sat=[22,40,55,65,75,70][T],li=[24,28,26,28,32,14][T],acc=`hsl(${h},${[35,60,80,90,100,90][T]}%,${[52,55,60,62,70,58][T]}%)`;
   const g=q.createLinearGradient(0,0,N,N);g.addColorStop(0,`hsl(${h},${sat}%,${li+6}%)`);g.addColorStop(1,`hsl(${(h+30)%360},${sat}%,${li-6}%)`);q.fillStyle=g;q.fillRect(0,0,N,N);
@@ -54,6 +56,19 @@ function tile(c){if(CV[c.id])return CV[c.id];const N=256,cv=document.createEleme
   if(T>=4){for(let i=0;i<40;i++){const x=(i*97)%N,y=(i*61+i*i*7)%N,s=1+i%3;const gg=q.createRadialGradient(x,y,0,x,y,s*4);gg.addColorStop(0,'rgba(255,255,255,.95)');gg.addColorStop(1,'rgba(255,240,200,0)');q.fillStyle=gg;q.beginPath();q.arc(x,y,s*4,0,7);q.fill()}}
   if(T>=5){[[N/2,8],[N/2,N-8],[8,N/2],[N-8,N/2],[N/2,N/2]].forEach(([x,y],i)=>{q.save();q.translate(x,y);q.rotate(Math.PI/4);q.fillStyle=['#ff3b6b','#3bd2ff','#7dff6a','#c070ff','#ffd24a'][i];q.shadowColor='#fff';q.shadowBlur=10;q.fillRect(-7,-7,14,14);q.strokeStyle='#ffe28a';q.lineWidth=2;q.strokeRect(-7,-7,14,14);q.restore()})}
   q.restore();return cv}
+
+/* 10 thảm Bình dân theo mẫu: sọc ngang, caro, viền đơn, chấm bi, kim cương, thảm tròn, chiếu cói, tua rua, ô lồng, zigzag */
+function drawBD(q,N,k){const R=(c,x,y,w,h)=>{q.fillStyle=c;q.fillRect(x,y,w,h)},B=(c,w)=>{q.strokeStyle=c;q.lineWidth=w;q.strokeRect(w/2,w/2,N-w,N-w)};
+  if(k===0){R('#f3e0bf',0,0,N,N);for(let i=0;i<N;i+=64)R('#c0392b',0,i,N,32);B('#7a2a22',8)}
+  else if(k===1){R('#f0e3c8',0,0,N,N);for(let y=0;y<N;y+=32)for(let x=(y/32%2)*32;x<N;x+=64)R('#3d6d8f',x,y,32,32);B('#28465e',8)}
+  else if(k===2){R('#2f7d58',0,0,N,N);R('#9fd3b4',22,22,N-44,N-44);q.strokeStyle='#2f7d58';q.lineWidth=4;q.strokeRect(36,36,N-72,N-72)}
+  else if(k===3){R('#e8a23c',0,0,N,N);q.fillStyle='#fff6e2';for(let y=16;y<N;y+=32)for(let x=16;x<N;x+=32){q.beginPath();q.arc(x,y,8,0,7);q.fill()}B('#b0721a',8)}
+  else if(k===4){R('#6a3f8e',0,0,N,N);const d=(r,c)=>{q.fillStyle=c;q.beginPath();q.moveTo(N/2,N/2-r);q.lineTo(N/2+r*.66,N/2);q.lineTo(N/2,N/2+r);q.lineTo(N/2-r*.66,N/2);q.closePath();q.fill()};d(110,'#e8d6f2');d(66,'#6a3f8e');q.fillStyle='#f2c14e';q.beginPath();q.arc(N/2,N/2,13,0,7);q.fill()}
+  else if(k===5){R('#173a63',0,0,N,N);[[120,'#4a7fb5'],[92,'#cfe0f2'],[52,'#4a7fb5']].forEach(([r,c])=>{q.fillStyle=c;q.beginPath();q.ellipse(N/2,N/2,r*.9,r,0,0,7);q.fill()})}
+  else if(k===6){R('#d9c08a',0,0,N,N);q.strokeStyle='#bfa064';q.lineWidth=2;for(let y=10;y<N;y+=14){q.beginPath();q.moveTo(0,y);q.lineTo(N,y);q.stroke()}q.fillStyle='#b89a5c';for(let y=4;y<N;y+=14)for(let x=10+(y/14%2)*12;x<N;x+=24)q.fillRect(x,y,2,7);R('#a63a2c',0,64,N,12);R('#a63a2c',0,N-76,N,12);B('#8a6f3e',8)}
+  else if(k===7){R('#3a2a1c',0,0,N,N);R('#8b5a3c',18,24,N-36,N-48);q.strokeStyle='#f0d2a0';q.lineWidth=4;q.strokeRect(34,40,N-68,N-80);q.strokeStyle='#e8c890';q.lineWidth=3;for(let x=24;x<N-18;x+=18){q.beginPath();q.moveTo(x,0);q.lineTo(x,22);q.moveTo(x,N-22);q.lineTo(x,N);q.stroke()}}
+  else if(k===8){R('#1f5f6b',0,0,N,N);R('#efdfb3',28,28,N-56,N-56);R('#1f5f6b',64,64,N-128,N-128);R('#efdfb3',96,96,N-192,N-192)}
+  else if(k===9){R('#f2d48c',0,0,N,N);q.lineWidth=12;q.lineJoin='miter';['#c94a3a','#2f6b4f','#c94a3a'].forEach((c,i)=>{q.strokeStyle=c;q.beginPath();const y=48+i*80;for(let x=0;x<=N;x+=32)q.lineTo(x,y+((x/32)%2?-18:18));q.stroke()});B('#a8742a',8)}}
 const THUMB={};function thumb(c){if(THUMB[c.id])return THUMB[c.id];const cv=document.createElement('canvas');cv.width=cv.height=128;const q=cv.getContext('2d');q.drawImage(tile(c),0,0,256,256,0,0,128,128);return THUMB[c.id]=cv.toDataURL('image/png')}
 window.C39={CP,TIERS,KINDS,tile,thumb,cur};
 
