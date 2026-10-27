@@ -15342,6 +15342,21 @@ function sk18Init(){if(SK18)return SK18;sk17Init();const AD=SK.AD,M=(c,o)=>new T
       DOT:Pool(()=>{const s=new T.Sprite(ADDM(glowT()));scene.add(s);return s}),TOR:Pool(()=>{const m=new T.Mesh(torus,AD(0xffffff,1));scene.add(m);return m}),
       CONE:Pool(()=>{const m=new T.Mesh(coneG,AD(0xffffff,.4));m.frustumCulled=false;scene.add(m);return m}),
       BAR:Pool(()=>{const s=new T.Sprite(new T.SpriteMaterial({map:WHITE,transparent:true,depthTest:false,depthWrite:false,toneMapped:false,fog:false}));s.center.set(0,.5);s.renderOrder=20;scene.add(s);return s})}})(),
+    LDH:P(()=>{const g=new T.Group(),h=add(g,new T.Mesh(new T.ConeGeometry(.6,1.8,6),gold));h.rotation.x=Math.PI/2;[-1,1].forEach(s=>{const hr=add(g,new T.Mesh(new T.ConeGeometry(.12,.9,6),M(0xfff0c0,{metalness:.6})),s*.32,.45,.35);hr.rotation.x=-1});[-1,1].forEach(s=>add(g,new T.Mesh(new T.SphereGeometry(.1,8,6),E(0xff3a1a,3)),s*.25,.2,-.3));
+      [-1,1].forEach(s=>{const w=add(g,new T.Mesh(new T.CylinderGeometry(.03,.01,1.6,5),gold),s*.5,0,-.9);w.rotation.z=s*1.1});const gl=new T.Sprite(ADDM(glowT()));gl.material.color.set(0xffc23a);gl.scale.setScalar(4);g.add(gl);return g}),
+    LDS:P(()=>{const m=new T.Mesh(new T.SphereGeometry(.5,10,8),gold);m.castShadow=true;return m}),
+    LDF:P(()=>{const m=new T.Mesh(new T.ConeGeometry(.22,.6,4),red);return m}),
+    GOLEM:P(()=>{const g=new T.Group(),bd=add(g,new T.Mesh(rockGeo(1),stone),0,1.6,0);bd.scale.set(1.1,1.2,.9);const hd=add(g,new T.Mesh(rockGeo(.55),stone),0,2.9,0);[-1,1].forEach(s=>add(g,new T.Mesh(new T.SphereGeometry(.09,8,6),E(0x7affd0,3)),s*.2,2.95,-.45));
+      const al=new T.Group(),ar=new T.Group();[al,ar].forEach((a,i)=>{const s=i?1:-1;a.position.set(s*1.2,2.1,0);add(a,new T.Mesh(rockGeo(.45),stone),0,-.6,0);add(a,new T.Mesh(rockGeo(.5),stone),0,-1.3,0);g.add(a)});
+      [-1,1].forEach(s=>add(g,new T.Mesh(rockGeo(.5),stone),s*.55,.5,0));add(g,new T.Mesh(new T.TorusGeometry(.7,.06,6,24),E(0x7affd0,1.5)),0,1.6,-.6);g.userData={al,ar};g.traverse(o=>{if(o.isMesh)o.castShadow=true});return g}),
+    KRB:P(()=>{const g=new T.Group(),km=M(0x6a2a7a,{roughness:.35,emissive:lin(0x1a0a2a),emissiveIntensity:.6}),hd=add(g,new T.Mesh(new T.SphereGeometry(2,24,18),km),0,1.4,0);hd.scale.set(1,1.25,1);[-1,1].forEach(s=>{add(g,new T.Mesh(new T.SphereGeometry(.45,12,10),E(0xffe060,2.5)),s*.9,2,-1.6)});
+      const ring=add(g,new T.Mesh(new T.TorusGeometry(3.4,.25,10,48),B(0x7ad8ff,.5)),0,.15,0);ring.rotation.x=Math.PI/2;g.userData={ring};return g}),
+    TSG:P(()=>new T.Mesh(new T.SphereGeometry(.35,10,8),M(0x8a3a9a,{roughness:.35,emissive:lin(0x2a0a3a),emissiveIntensity:.6}))),
+    ANGEL:P(()=>{const g=new T.Group(),wm=new T.MeshStandardMaterial({color:0xffffff,emissive:lin(0xfff0c0),emissiveIntensity:.5,side:T.DoubleSide,roughness:.6});add(g,new T.Mesh(new T.ConeGeometry(.6,1.8,12),M(0xfff6e0,{emissive:lin(0xffe8a0),emissiveIntensity:.4})),0,0,0);add(g,new T.Mesh(new T.SphereGeometry(.32,12,10),M(0xffe0c0)),0,1.15,0);
+      const halo=add(g,new T.Mesh(new T.TorusGeometry(.38,.05,8,32),E(0xffd36a,2.5)),0,1.6,0);halo.rotation.x=Math.PI/2;const wl=new T.Group(),wr=new T.Group();[wl,wr].forEach((w,i)=>{const s=i?1:-1;w.position.set(s*.25,.5,.25);for(let k=0;k<5;k++){const f=add(w,new T.Mesh(new T.PlaneGeometry(.55,2.6-k*.35),wm),s*(.5+k*.42),.4-k*.12,0);f.rotation.z=s*(-.4-k*.18)}g.add(w)});
+      const s=new T.Sprite(ADDM(glowT()));s.material.color.set(0xfff0b0);s.scale.setScalar(5);g.add(s);g.userData={wl,wr};return g}),
+    PLN:P(()=>{const g=new T.Group(),m=new T.Mesh(new T.SphereGeometry(1,28,20),new T.MeshStandardMaterial({color:0xffffff,roughness:.55,metalness:.1,emissive:0xffffff,emissiveIntensity:.25})),r=new T.Mesh(new T.TorusGeometry(1.6,.12,8,48),new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.7,toneMapped:false}));r.rotation.x=Math.PI/2.4;g.add(m,r);const s=new T.Sprite(ADDM(glowT()));s.scale.setScalar(4);g.add(s);g.userData={m,r,s};return g}),
+    CAGE:P(()=>{const g=new T.Group(),bm=E(0xff7a1a,2.2);for(let i=0;i<10;i++){const a=i/10*TAU,b=add(g,new T.Mesh(new T.CylinderGeometry(.06,.06,2.2,6),bm),Math.cos(a),1.1,Math.sin(a))}[0,2.2].forEach(y=>{const r=add(g,new T.Mesh(new T.TorusGeometry(1,.07,6,32),bm),0,y,0);r.rotation.x=Math.PI/2});const s=new T.Sprite(ADDM(glowT()));s.material.color.set(0xff6a1a);s.scale.setScalar(4);s.position.y=1.1;g.add(s);return g}),
     TXT:Pool(()=>{const cv=document.createElement('canvas');cv.width=512;cv.height=64;const tx=new T.CanvasTexture(cv),s=new T.Sprite(new T.SpriteMaterial({map:tx,transparent:true,depthTest:false,toneMapped:false}));s.renderOrder=20;s.userData={cv,tx,s:''};scene.add(s);return s})};
   return SK18}
 function txt18(x,y,z,str,c,o){const s=SK18.TXT.get(),U=s.userData;if(U.s!==str+c){U.s=str+c;const q=U.cv.getContext('2d');q.clearRect(0,0,512,64);q.font='bold 34px system-ui,sans-serif';q.textAlign='center';q.lineWidth=6;q.strokeStyle='rgba(0,0,0,.85)';q.strokeText(str,256,44);q.fillStyle=c;q.fillText(str,256,44);U.tx.needsUpdate=true}
@@ -15356,6 +15371,12 @@ function sk18Body(G,dt,S){const K=SK18,Y=HOV,V=(x,z,y)=>new T.Vector3(x,y,z),Rg=
     if(Math.random()<.3)spark(cx+Math.cos(D.a)*R,D.h,cz+Math.sin(D.a)*R*.7,rand(-1,1),rand(-1,0),rand(-1,1),'#ff8a2a',.5,.4)}
   if(S.K===34){const q=C39.toScene(Rg,cx,cz),r=45*q[2],c=C39.fromScene(Rg,165,100);tor17(c[0],.15,c[1],r,'#9fd0ff',.45+.15*Math.sin(t3*3));tor17(c[0],.2,c[1],r*.96,'#ffffff',.25)}
   if(S.K===35)(S.sp||[]).forEach(p=>{if(!p.alive||p.x==null)return;const g=K.SPIRIT.get();g.position.set(p.x,1.2+.35*Math.sin(t3*3+p.i),p.y);if(Math.random()<.15)spark(p.x,1.2,p.y,rand(-.3,.3),rand(.2,.8),rand(-.3,.3),'#9affd0',.6,.2)});
+  if(S.K===44&&S.cb&&S.cb.hp>0){const c=S.cb;tor17(c.x,.25,c.y,Math.max(c.w,c.h)*.7,'#7affd0',.6);S.rb.forEach((b,i)=>{if(b.hp<=0)return;beam17(V(c.x,c.y,.5),V(b.x,b.y,.5),'#7affd0',.07,.7);const f=(t3*.6+i*.17)%1;dot17(c.x+(b.x-c.x)*f,.6,c.y+(b.y-c.y)*f,.9,'#bfffe0',.9);tor17(b.x,.2,b.y,Math.max(b.w,b.h)*.6,'#7affd0',.35)})}
+  if(S.K===45)(G.bl||[]).forEach(b=>{const g=b.c42g;if(!g||b.hp<=0)return;tor17(b.x,.3,b.y,Math.max(b.w,b.h)*.75,'#ffd36a',.6,0,0).rotation.y=t3*g.sp;if(Math.random()<.06)spark(b.x,.6,b.y,0,1,0,'#ffd36a',.6,.25)});
+  if(S.K===48&&S.ec){const R=S.Rg,c=S.ec,fl=.5+.3*Math.sin(t3*6);beam17(V(R.x0,c.y,.3),V(R.x1,c.y,.3),'#ffffff',.12,fl);beam17(V(c.x,R.y0,.3),V(c.x,R.y1,.3),'#ffffff',.12,fl);if(S.cb&&S.cb.hp>0){const b=S.cb;['#ff7a2a','#5ac8ff','#d4a060','#e8fff0'].forEach((cl,i)=>{const a=t3*1.5+i*Math.PI/2;dot17(b.x+Math.cos(a)*1.6,1.2,b.y+Math.sin(a)*1.6,1,cl,.9)})}}
+  if(S.K===49&&S.tb&&S.tb.hp>0){const b=S.tb,cols=['#ff5a7a','#5ac8ff','#7aff9a','#ffd36a','#c77dff','#ffffff'];cols.forEach((cl,i)=>{const a=t3*.9+i/6*TAU,x=b.x+Math.cos(a)*2.2,z=b.y+Math.sin(a)*2.2,m=K.SHARD.get();m.position.set(x,1.6+Math.sin(t3*2+i)*.3,z);m.rotation.set(t3*2,t3*3,0);m.scale.setScalar(1.6);dot17(x,1.6,z,.9,cl,.8)});
+    if(b.c42iv>G.t)tor17(b.x,1,b.y,Math.max(b.w,b.h)*.8,'#ffd36a',.8,Math.PI/2)}
+  if(S.K===47)allies18(G).concat(G.bl||[]).forEach(u=>{const s=u&&u.c42st;if(!s||!(s.n>0)||u.hp<=0)return;tor17(u.x,1,u.y,(u.size||Math.max(u.w||2,u.h||2))*.6,'#fff3c0',.6);txt18(u.x,2.6,u.y,'Giáp thiên thần ×'+s.n,'#fff3c0',.9)});
   (G.bl||[]).forEach(b=>{if(b.c40gold&&b.hp>0){tor17(b.x,.25,b.y,Math.max(b.w,b.h)*.7,'#ffd36a',.55+.2*Math.sin(t3*4));if(Math.random()<.08)spark(b.x+rand(-1,1),.5,b.y+rand(-1,1),0,rand(.6,1.4),0,'#ffd36a',.8,.3)}});
   (G.en||[]).forEach(e=>{if(!e||e.dead)return;if(e.c40dot&&Math.random()<.35)spark(e.x+rand(-.4,.4),hy(e)+.3,e.y+rand(-.4,.4),0,rand(.5,1.5),0,'#ff6a1a',.5,.3)});
   allies18(G).forEach(u=>{if(u.c40cl>G.t){tor17(u.x,hy(u)-.2,u.y,(u.size||2)*.45,'#ffffff',.45);if(Math.random()<.1)spark(u.x,hy(u),u.y,0,1,0,'#c8ffd0',.6,.25)}});
@@ -15363,6 +15384,15 @@ function sk18Body(G,dt,S){const K=SK18,Y=HOV,V=(x,z,y)=>new T.Vector3(x,y,z),Rg=
   S.u.forEach(u=>{if(u.dead){if(!u.fx3){u.fx3=1;boom(u.x,(u.h||0)+.6,u.y,u.k==='phoenix'?1.4:.6,u.k==='ghost')}return}
     if(u.k==='grave'){const g=K.GRAVE.get();g.position.set(u.x,0,u.y);g.rotation.y=0;bar17(u.x,2.1,u.y,1.2,u.hp/u.max,'#b08aff');if(!u.gh||u.gh.dead)txt18(u.x,2.6,u.y,'Ma hồi sinh '+Math.max(0,Math.ceil(u.rs||0))+'s','#d0c0ff',.9)}
     else if(u.k==='ghost'){const g=K.GHOST.get(),h=1.2+.25*Math.sin(t3*3+u.ph);g.position.set(u.x,h,u.y);g.rotation.y=-(u.ang||0)-Math.PI/2;g.scale.setScalar(1);bar17(u.x,h+1.1,u.y,.9,u.hp/u.max,'#cfe8ff')}
+    else if(u.k==='tlong'){const tr=u.tr=u.tr||[];tr.unshift([u.x,u.h,u.y]);if(tr.length>60)tr.length=60;const h=K.LDH.get(),nx=tr[1]||[u.x+1,u.h,u.y];h.position.set(u.x,u.h,u.y);h.lookAt(u.x*2-nx[0],u.h*2-nx[1],u.y*2-nx[2]);h.scale.setScalar(1.4);
+      for(let i=3;i<tr.length;i+=3){const p=tr[i],s=K.LDS.get(),f=1-i/70;s.position.set(p[0],p[1]+Math.sin(t3*4-i*.3)*.15,p[2]);s.scale.setScalar(1.15*f+.25);if(i%6===0){const fn=K.LDF.get();fn.position.set(p[0],p[1]+.6*f,p[2]);fn.scale.setScalar(f+.3)}}
+      bar17(u.x,u.h+1.6,u.y,2.4,u.hp/u.max,'#ffd36a');if(Math.random()<.3)spark(u.x,u.h,u.y,rand(-1,1),rand(-1,.5),rand(-1,1),'#ffd36a',.5,.35)}
+    else if(u.k==='golem'){const g=K.GOLEM.get(),sw=u.sw||0;g.position.set(u.x,0,u.y);g.rotation.y=-(u.ang||0)-Math.PI/2;const w=Math.sin((u.walk||0)*6)*.3;g.userData.al.rotation.x=sw>0?-2.2*Math.sin(sw/.6*Math.PI):w;g.userData.ar.rotation.x=sw>0?-2.2*Math.sin(sw/.6*Math.PI):-w;g.scale.setScalar(.85);bar17(u.x,3.4,u.y,1.6,u.hp/u.max,'#c9b48a')}
+    else if(u.k==='kraken'){const g=K.KRB.get(),em=Math.min(1,(40-u.life)*1.5,u.life);g.position.set(u.x,-2.6+em*2.6,u.y);g.userData.ring.rotation.z=t3;g.scale.setScalar(.9);bar17(u.x,4.6,u.y,3.4,u.hp/u.max,'#c77dff');txt18(u.x,5.3,u.y,'Kraken · '+Math.ceil(u.life)+'s','#bfe8ff',.9)}
+    else if(u.k==='tent'){const b=u.body,bx=b?b.x:u.x,bz=b?b.y:u.y,sw=u.sw||0,tx=sw>0&&u.tx!=null?u.tx:u.x+Math.cos(u.a)*1.5,tz=sw>0&&u.ty!=null?u.ty:u.y+Math.sin(u.a)*1.5,n=12;
+      for(let i=0;i<=n;i++){const f=i/n,up=Math.sin(f*Math.PI)*(sw>0?3.5:2.2)+Math.sin(t3*3+u.a*5+i*.5)*.3,x=u.x+(tx-u.x)*f*(sw>0?1:.6),z=u.y+(tz-u.y)*f*(sw>0?1:.6),m=K.TSG.get();m.position.set(x,up+.2,z);m.scale.setScalar(1.2-f*.8)}
+      bar17(u.x,1.6,u.y,.9,u.hp/u.max,'#c77dff')}
+    else if(u.k==='angel'){const g=K.ANGEL.get(),dl=u.dl||0,h=u.h+dl*12+Math.sin(t3*1.6)*.3;g.position.set(u.x,h,u.y);g.rotation.y=t3*.3;const w=Math.sin(t3*2)*.25;g.userData.wl.rotation.y=w;g.userData.wr.rotation.y=-w;g.scale.setScalar(1.3);bar17(u.x,h+2.4,u.y,2,u.hp/u.max,'#fff3c0');if(dl>0)beam17(V(u.x,u.y,30),V(u.x,u.y,0),'#fff3c0',1.2*dl,.4)}
     else if(u.k==='phoenix'){const g=K.PHX.get(),h=u.h+.4*Math.sin(t3*2.5);g.position.set(u.x,h,u.y);g.rotation.y=-(u.ang||0)-Math.PI/2;const w=Math.sin(t3*5)*.55;g.userData.wl.rotation.z=w;g.userData.wr.rotation.z=-w;g.scale.setScalar(1.1);bar17(u.x,h+2.2,u.y,2,u.hp/u.max,'#ffb030');
       if(Math.random()<.6)spark(u.x+rand(-1,1),h,u.y+rand(-1,1),rand(-.5,.5),rand(-1.5,-.3),rand(-.5,.5),'#ffb030',.6,.4)}});
   /* hiệu ứng nhất thời */
@@ -15386,6 +15416,18 @@ function sk18Body(G,dt,S){const K=SK18,Y=HOV,V=(x,z,y)=>new T.Vector3(x,y,z),Rg=
     case 'void':{const g=K.VOID.get(),gr=Math.min(1,v.t/.6)*(v.t>3?Math.max(0,1-(v.t-3)/.2):1),h=5;g.position.set(v.x,h,v.y);g.scale.setScalar(.3+gr*1.6);g.userData.r.rotation.z=t3*3;
       v.T.forEach(e=>{if(e.dead)return;beam17(V(e.x,e.y,hy(e)),V(v.x,v.y,h),'#b07aff',.12,.6);if(Math.random()<.4)spark(e.x,hy(e),e.y,(v.x-e.x)*.8,2,(v.y-e.y)*.8,'#d0a0ff',.5,.3)});break}
     case 'cone':{const a=v.a,A=V(v.x,v.y,v.h),Bp=V(v.x+Math.cos(a)*4,v.y+Math.sin(a)*4,Y);cone17(A,Bp,1.9,'#ff7a1a',.5*o);cone17(A,Bp,1,'#ffd060',.6*o);break}
+    case 'cage':{const e=v.e;if(!e||e.dead)break;const g=K.CAGE.get();g.position.set(e.x,hy(e)-1,e.y);g.scale.setScalar((e.size||2)*.5);g.rotation.y=t3*2;if(Math.random()<.5)spark(e.x+rand(-.6,.6),hy(e),e.y+rand(-.6,.6),0,rand(.5,1.5),0,'#ff9a2a',.4,.35);break}
+    case 'sunsh':{const b=v.b;if(!b)break;tor17(b.x,1,b.y,Math.max(b.w,b.h)*.75,'#ffd36a',o,Math.PI/2);dot17(b.x,1,b.y,3,'#ffd36a',.5*o);break}
+    case 'suck':{const f=Math.min(1,p),x=v.x0+(v.x-v.x0)*f,z=v.y0+(v.y-v.y0)*f;dot17(x,1,z,1.8*(1-f)+.3,'#ff3a1a',.9);beam17(V(v.x0,v.y0,.6),V(x,z,1),'#ff6a2a',.08,.6*(1-f));tor17(v.x,.3,v.y,1+f,'#ff3a1a',.7);break}
+    case 'wave':{const r=v.r||.1;tor17(v.x,.4,v.y,r,'#ff5a2a',.9*o);tor17(v.x,.8,v.y,r*.97,'#ffb06a',.5*o);for(let i=0;i<6;i++){const a=i/6*TAU+t3;if(Math.random()<.5)spark(v.x+Math.cos(a)*r,.4,v.y+Math.sin(a)*r,Math.cos(a)*3,1,Math.sin(a)*3,'#ff7a2a',.4,.35)}break}
+    case 'planet':{const g=K.PLN.get(),U=g.userData,fall=Math.max(0,(v.t-5)/.9),h=fall>0?8*(1-fall*fall)+2.5*(1-fall):8+Math.sin(v.t*2)*.4;g.position.set(v.x,h,v.y);g.scale.setScalar(2.5*Math.min(1,v.t*1.5));U.m.material.color.set(v.P.c);U.m.material.emissive.set(v.P.c);U.m.rotation.y=t3*.5;U.r.visible=/vành|băng/.test(v.P.n);U.r.material.color.set(v.P.c);U.s.material.color.set(v.P.c);
+      tor17(v.x,.15,v.y,2.5,v.P.c,.4+.3*Math.sin(t3*6));if(v.t<5)txt18(v.x,h+3.3,v.y,'Rơi sau '+Math.ceil(5-v.t)+'s','#ffe8a0',.8);break}
+    case 'pshard':{const r=2.5+4*Math.min(1,v.t/.5);(v.sh||[]).forEach((s,i)=>{if(i%2)return;const m=K.SHARD.get();m.position.set(v.x+Math.cos(s.a)*r,.6+Math.sin(Math.min(1,v.t/.5)*Math.PI)*1.2,v.y+Math.sin(s.a)*r);m.rotation.set(t3*6+i,t3*5,0);m.scale.setScalar(1.3)});dot17(v.x,.5,v.y,4*o,v.c,.5*o);break}
+    case 'whirl':{const e=v.e;if(!e||e.dead)break;for(let i=0;i<3;i++)tor17(e.x,.2+i*.35,e.y,(e.size||2)*(.7-i*.15),'#7ad8ff',.7*o,0,0).rotation.y=t3*(4+i);if(Math.random()<.4)spark(e.x+rand(-1,1),.3,e.y+rand(-1,1),0,1,0,'#e0f8ff',.4,.25);break}
+    case 'tent1':{const n=12,f=Math.min(1,p*1.6);for(let i=0;i<=n;i++){const q=i/n*f,m=K.TSG.get();m.position.set(v.x0+(v.x-v.x0)*q,Math.sin(q*Math.PI)*3+.2,v.y0+(v.y-v.y0)*q);m.scale.setScalar(1.3-i/n*.7)}break}
+    case 'slam':{tor17(v.x,.2,v.y,.5+p*3,'#c9b48a',o);if(!v.b3){v.b3=1;for(let i=0;i<14;i++)spark(v.x,.3,v.y,rand(-3,3),rand(1,3),rand(-3,3),'#c9b48a',.5,.4);smoke(v.x,.5,v.y,1.2,1.5)}break}
+    case 'abeam':{const a=v.a,u=v.u;if(!a||!u||a.dead)break;beam17(V(a.x,a.y,a.h+.5),V(u.x,u.y,1),'#fff3c0',.12,o);break}
+    case 'orbhit':{const f=Math.min(1,p*1.5),x=v.x0+(v.x-v.x0)*f,z=v.y0+(v.y-v.y0)*f;dot17(x,1.4,z,1.4,'#c77dff',.9*o);break}
     case 'sword':{const f=Math.min(1,v.t/1.2),g=K.SWORD.get(),h=(1-f*f)*28;g.position.set(v.x,h,v.y);g.rotation.y=t3*.4;g.scale.setScalar(1.2);if(f>=1){tor17(v.x,.2,v.y,(v.t-1.2)*14,'#fff3c0',Math.max(0,1-(v.t-1.2)));dot17(v.x,1,v.y,6,'#fff0a0',.5*o)}break}
     }});
   Object.values(K).forEach(p=>p.end&&p.end())}
@@ -15665,8 +15707,9 @@ const BDN=['Sọc Ngang','Caro','Viền Đơn','Chấm Bi','Kim Cương','Tròn'
 TIERS.forEach((t,ti)=>KINDS.forEach((k,ki)=>CP.push({id:'cp'+t.k+ki,n:'Thảm '+(ti===1?BDN[ki]:ti===2?SDN[ki]:ti===3?HDN[ki]:ti===4?TDN[ki]:ti===5?RDN[ki]:k.n)+' · '+t.n,tier:ti,kind:ki,da:t.da,sao:t.sao})));
 const own=c=>c.id==='cp0'||!!(S.own&&S.own[c.id]);
 const cur=()=>{const c=CP.find(x=>x.id===S.carpet);return c&&own(c)?c:CP[0]};
-function desc(c){if(c.tier<0)return ['Thảm xanh tiêu chuẩn bên dưới công trình.'];const t=TIERS[c.tier],k=KINDS[c.kind],L=[`+${NF(t.V)} máu tối đa cho mọi công trình`];if(t.arm)L.push(`+${NF(t.arm)} giáp (khiên) cho mọi công trình`);L.push(k.txt(t.V));if(c.tier===2&&ZTX[c.kind])L.push('Vùng thảm: '+ZTX[c.kind]);if(c.tier===3&&ZTX3[c.kind])L.push('Vùng thảm: '+ZTX3[c.kind]);return L}
+function desc(c){if(c.tier<0)return ['Thảm xanh tiêu chuẩn bên dưới công trình.'];const t=TIERS[c.tier],k=KINDS[c.kind],L=[`+${NF(t.V)} máu tối đa cho mọi công trình`];if(t.arm)L.push(`+${NF(t.arm)} giáp (khiên) cho mọi công trình`);L.push(k.txt(t.V));if(c.tier===2&&ZTX[c.kind])L.push('Vùng thảm: '+ZTX[c.kind]);if(c.tier===3&&ZTX3[c.kind])L.push('Vùng thảm: '+ZTX3[c.kind]);if(c.tier===4&&ZTX4[c.kind])L.push('Vùng thảm: '+ZTX4[c.kind]);return L}
 const ZTX=['kẻ địch bị thiêu đốt 10 sát thương mỗi 0,25 giây và chậm 10% tốc chạy','trong dòng dung nham: thiêu 50 máu mỗi 0,2 giây; ngoài dòng: 10 máu mỗi 0,3 giây và chậm 10%','kẻ địch chậm 30%, mỗi giây 3% bị đóng băng 1,5 giây','đốt 1% năng lượng kẻ địch mỗi giây, mỗi giây 3% hóa đá cát 1 giây','mỗi giây 2% dựng tường đá 1×2 (100 máu) chắn trước mặt kẻ địch','mỗi giây 5% gây chảy máu 300 sát thương trong 10 giây và chậm 5%','mỗi giây 3% làm mù kẻ địch 0,5 giây; dẫm vũng nước 15% bị trói chân 1,2 giây; đốm sáng xanh hồi 5 máu mỗi giây cho tàu ta chạm vào','kẻ địch dưới 6% máu tối đa bị hóa tro, mỗi tro tặng 5 Đá','giảm 10% sát thương và khống chế từ kỹ năng; thu mảnh tàu bị phá về tâm, đủ 50 mảnh → 10 vì sao rơi, mỗi vì sao 200 sát thương','mỗi 50 giây thả thiên thạch vào kẻ địch gần nhất: 12% máu tối đa và đẩy lùi 1 ô; mỗi đạn pháo hay thiên thạch rơi vào thảm giảm 1 giây hồi'];
+const ZTX4=['thần long 5.000 máu bay vòng quanh thảm trên trời, lao xuống húc mục tiêu: 100 sát thương và đẩy lùi 1 ô; bị hạ cần 100 giây để hồi sinh','25% kẻ địch bị lửa nhốt 2 giây, chịu 500 sát thương trong lúc bị nhốt; công trình chống kết liễu 1 giây khi chạm ngưỡng tử','hố đen và kỹ năng lan to thêm 50%, hố đen và cổng dịch chuyển tồn tại thêm 5 giây; kẻ địch dưới 15% máu bị hút vào tâm và kết liễu; đủ 50 xác tàu → sóng địa ngục lan 17 ô, đẩy lùi và gây 200 sát thương','mỗi 12 giây gọi 1 hành tinh (đường kính 5 ô) lơ lửng 5 giây rồi rơi: 500 sát thương + hiệu ứng của hành tinh, vỡ ra 50 mảnh bay thêm 4 ô, mỗi mảnh 50 sát thương','công trình ở tâm hồi 200 máu/giây và cộng dồn 100 giáp mỗi giây (+10% cho mỗi công trình nhánh rễ); công trình nhánh rễ +10% máu tối đa, hồi 2% máu mỗi 3 giây; tinh linh hồi 5 máu, lá vàng hồi 10 máu; mỗi 10 đồng minh bị hạ → người đá 700 máu, 200 sát thương lan 3 ô mỗi 4 giây','giảm 25 giây hồi chiêu kỹ năng; hồi sinh tàu nhanh hơn 5 giây (boss 10 giây); công trình trên bánh răng lớn/vừa/nhỏ hồi 400/300/200 máu mỗi giây; kỹ năng từ 6 giây trở lên kéo dài thêm','25% cuốn kẻ địch vào xoáy nước 1 giây; kẻ địch dưới 18% máu bị xúc tu nuốt chửng; đủ 30 mạng → Kraken 4.000 máu và 8 xúc tu (500 máu, 400 sát thương, 25% choáng 1 giây) trong 40 giây, hồi 80 giây','25% hồi sinh tàu ta và công trình với 50% máu; đủ 40 đồng minh tử vong → thiên thần 2.000 máu, mỗi 3 giây ban 300 giáp cho 2 đồng minh, đủ 15 cộng dồn hoặc vỡ giáp thì nổ tới 3.000 sát thương','ô đất: +500 máu, hồi 1% máu/giây · ô nước: +10 hồi năng lượng, +200 giáp mỗi 2 giây · ô hỏa: đốt 2% máu/giây, kết liễu dưới 5% · ô băng: 10% đóng băng 1 giây + 50 sát thương, chậm 20% · tia giao thoa 200 sát thương · công trình tâm +2.000 máu, +700 giáp, hồi 4%/giây, đòn đánh thiêu đốt và kết liễu dưới 12%','công trình trên ngai +3.000 máu, +500 giáp, hồi 3% máu mỗi mục tiêu bị hạ trong thảm; mỗi đòn +2.000 sát thương, 25% gây 3 loại khống chế; chỉ bị phá khi mọi công trình khác đã bị phá'];
 const ZTX3=['hỏa long bay trên thảm, mỗi 2 giây thả cầu lửa: 1% máu tối đa + 150 sát thương trong 5 giây','mạ vàng 1 công trình (+1.000 máu, +500 giáp); mây trắng mỗi 5 giây: 3% tàu ta +10 máu/giây trong 5 giây và kháng hiệu ứng 10%; chim bay qua mỗi 8 giây: 1% tặng 10 Sao','tàu ta +2 hồi năng lượng; công trình +10 giáp mỗi 3 giây; 4% cá ngoi lên gây 100 sát thương, hất tung choáng 1 giây','8% băng hà 1,5 giây, 12% đóng băng 0,74 giây, chậm 25% trong thảm','công trình trong vòng tròn tâm +700 máu, +300 giáp mỗi 30 giây; mỗi 3 giây 18% sét đánh 200 sát thương','tinh linh chạm vào tàu/công trình tặng +7 máu tối đa vĩnh viễn (hồi sinh sau 5 giây); hồi 1% máu mỗi 3 giây (5% khi dưới 40%)','mỗi 14 giây dựng mộ (300 máu) sinh ma 100 máu, 50 tấn công; ma hồi sinh sau 10 giây nếu mộ còn','mỗi 100 viên đạn bắn ra trong thảm → sao chổi 400 sát thương; đủ 2.500 mảnh vỡ → hư không hút và kết liễu 4 mục tiêu','thiêu đốt 10 sát thương mỗi 0,25 giây; đủ 60 tàu đi qua thảm → phượng hoàng 1.000 máu phun lửa hình nón 4 ô','8% hồi sinh tàu ta và công trình với 20% máu; đủ 100 lượt bị hạ trong thảm → kiếm thánh: hồi 25% máu tàu ta, gây 20% máu tối đa sát thương chuẩn lên kẻ địch'];
 
 /* ---------- vẽ thảm (ô lặp 256×256) ---------- */
@@ -16096,7 +16139,7 @@ function pv3Sim(c,lay){const DB=typeof DFB!=='undefined'?DFB:50,RW=lay.RW,RH=lay
   const pool=(typeof KSH!=='undefined'?KSH:[]).slice().sort(()=>Math.random()-.5);
   G.c41={M,RW,RH,WW,HH,cx:M+RW/2,cy:MY+RH/2,R0:Math.max(RW,RH)/2+3};
   for(let i=0;i<6;i++){const a=i/6*Math.PI*2,e={sh:pool[i%Math.max(1,pool.length)],team:'e',x:G.c41.cx+Math.cos(a)*G.c41.R0,y:G.c41.cy+Math.sin(a)*G.c41.R0,size:1.9,hp:300,max:300,rv:0,hit:0,dead:false,spawn:0,stun:0,slowT:0,slowK:1,ang:Math.PI/2,red:0,ws:[],a,ph:Math.random()*6,cd:.5+i*.3,c41:1};G.en.push(e)}
-  const prev=DG;DG=G;try{apply(G);if(window.C40&&C40.init){const S=C40.init(G);if(S){/* tua nhanh bộ đếm để thấy sức mạnh trong mô phỏng */S.cd=Math.min(S.cd,6);S.cnt=S.K===28?40:S.K===38?48:S.cnt;S.bul=60;S.frag=S.K===37?2350:0;S.deaths=S.K===39?88:0;if(S.K===36)S.a=12;if(S.K===34)S.a=24;if(S.K===31){S.a=4;S.b=6}}}}catch(e){console.error(e)}finally{DG=prev}
+  const prev=DG;DG=G;try{apply(G);if(window.C40&&C40.init){const S=C40.init(G);if(S){/* tua nhanh bộ đếm để thấy sức mạnh trong mô phỏng */S.cd=Math.min(S.cd,6);S.cnt=S.K===28?40:S.K===38?48:S.cnt;S.bul=60;S.frag=S.K===37?2350:0;S.deaths=S.K===39?88:0;if(S.K===36)S.a=12;if(S.K===34)S.a=24;if(S.K===31){S.a=4;S.b=6}if(S.K===42)S.cnt=46;if(S.K===43)S.a=9;if(S.K===44)S.ad=8;if(S.K===46)S.cnt=28;if(S.K===47)S.ad=37;}}}catch(e){console.error(e)}finally{DG=prev}
   return G}
 function pv3Step(G,dt){const prev=DG;DG=G;try{const Z=G.c41,F=G.c39f;G.t+=dt;
     if(F){if(F.K==='reg')G.bl.forEach(b=>{if(b.hp>0&&b.hp<b.max&&b.t!=='mine')b.hp=Math.min(b.max,b.hp+F.V/50/F.DB*dt)});try{zoneStep(G,dt,F)}catch(e){console.error(e)}
@@ -16111,7 +16154,7 @@ function pv3Step(G,dt){const prev=DG;DG=G;try{const Z=G.c41,F=G.c39f;G.t+=dt;
       if(tg)e.ang=Math.atan2(tg.y-e.y,tg.x-e.x);e.cd-=dt;if(e.cd<=0&&tg&&!(e.noFire>0)){e.cd=1.3;const sp=9,lx=tg.x-e.x,ly=tg.y-e.y,ll=Math.hypot(lx,ly)||1;G.pr.push({x:e.x,y:e.y,vx:lx/ll*sp,vy:ly/ll*sp,dmg:90/(F?F.DB:50),team:'e',k:'shell',spl:.6,col:'#ff8a5a',life:ll/sp+.4})}});
     G.bl.forEach(b=>{b.flash=Math.max(0,(b.flash||0)-dt);if(b.hp<=0||!b.spec)return;b.cd-=dt/((G.pb&&G.pb.cdm)||1);if(b.cd>0)return;const rg=(b.spec.rng||8)*((G.pb&&G.pb.rm)||1);let tg=null,bd=1e9;
       G.en.forEach(e=>{if(e.dead)return;const d=Math.hypot(e.x-b.x,e.y-b.y);if(d<rg&&d<bd){bd=d;tg=e}});if(!tg)return;b.cd=.9;const sp=14,lx=tg.x-b.x,ly=tg.y-b.y,ll=Math.hypot(lx,ly)||1;
-      G.pr.push({x:b.x,y:b.y,vx:lx/ll*sp,vy:ly/ll*sp,dmg:70*((G.pb&&G.pb.dm)||1),team:'p',k:'gun',col:'#7fe8ff',life:ll/sp+.3})});
+      G.pr.push({x:b.x,y:b.y,vx:lx/ll*sp,vy:ly/ll*sp,dmg:70*((G.pb&&G.pb.dm)||1),team:'p',k:'gun',col:'#7fe8ff',life:ll/sp+.3});try{window.C40&&C40.onShot&&C40.onShot(G,b,tg)}catch(e){}});
     G.pr.forEach(p=>{if(p.dead)return;p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;if(p.life<=0||p.x<-2||p.y<-2||p.x>Z.WW+2||p.y>Z.HH+2){p.dead=true;return}
       if(p.team==='e'){const b=dfBuildingAt(p.x,p.y);if(b){p.dead=true;const h0=b.hp+((b.shd&&b.shd.v)||0);dfDmgB(b,p.dmg);G.taken+=Math.max(0,h0-b.hp-((b.shd&&b.shd.v)||0));G.fx.push({x:p.x,y:p.y,r:.5,t:.25,max:.25,col:'#ffb066'})}}
       else for(const e of G.en){if(e.dead)continue;if(Math.hypot(e.x-p.x,e.y-p.y)<(e.size||2)*.45){p.dead=true;dfDmgS(e,p.dmg,false);G.dealt+=p.dmg;break}}});
@@ -16240,7 +16283,7 @@ window.C37={J,stop,home};
 /* ---------- 1) xóa công trình Lò tinh luyện ---------- */
 try{const i=BLD.findIndex(b=>b.id==='refine');if(i>=0)BLD.splice(i,1);if(typeof S!=='undefined'&&S.base&&S.base.pos)delete S.base.pos.refine}catch(e){}
 /* ---------- 2) thời gian hồi sinh ---------- */
-const RS=u=>(u&&(u.boss||(u.sh&&u.sh.bk)||u.c18boss))?20:10;window.c36RS=RS;
+const RS=u=>Math.max(1,((u&&(u.boss||(u.sh&&u.sh.bk)||u.c18boss))?20:10)-(window.c40RS?(+window.c40RS(u)||0):0));window.c36RS=RS;
 /* ---------- 3) đếm hạ gục ---------- */
 const isShip=u=>u&&!u.sb&&!u.c34u&&!u.ghost&&!u.c28clone&&u.w==null;
 function onDie(G,u){if(!G||!isShip(u))return;if(u.team==='e'||(G.en||[]).includes(u))G.c36k=(G.c36k||0)+1;else G.c36d=(G.c36d||0)+1;
@@ -16694,6 +16737,7 @@ const rnd=(a,b)=>a+Math.random()*(b-a),roll=(p,dt)=>Math.random()<p*dt,dist=(a,b
 const DBk=()=>typeof DFB!=='undefined'?DFB:50;
 const BK=e=>e&&e.boss?1/3:1;
 function Z(G){return G.c40}
+const X={init:{},step:{},death:{},lethal:{},dmgB:{}};
 function inR(Rg,u,m){m=m||0;return u&&u.x>=Rg.x0-m&&u.x<=Rg.x1+m&&u.y>=Rg.y0-m&&u.y<=Rg.y1+m}
 function enemies(G,Rg,m){return (G.en||[]).filter(e=>e&&!e.dead&&!e.sb&&!(e.spawn>G.t)&&(Rg?inR(Rg,e,m):true))}
 function allies(G,Rg,m){return [G.pl].concat(G.al||[]).filter(u=>u&&!u.dead&&!u.ghost&&(Rg?inR(Rg,u,m):true))}
@@ -16715,6 +16759,7 @@ function init(G){const c=G.c39c||cur(),K=key(c);if(K<27||((G.pv||G.c18sim)&&!G.c
   if(K===31){const B=blds(G,Rg).filter(b=>!b.c39tmp);if(B.length){const b=B[Math.floor(Math.random()*B.length)];addHP(b,1000,1);shield(b,500/DBk());b.c40gold=1;pop(G,b.x,b.y-2,'Mạ vàng · +1.000 máu +500 giáp','#ffd36a')}}
   if(K===30)S.dragon={a:0,h:12};
   if(K===35)S.sp=[...Array(6)].map((_,i)=>({i,ph:Math.random()*6,alive:1,rs:0}));
+  try{const f=X.init[K];if(f)f(G,S)}catch(e){console.error(e)}
   return S}
 
 /* ---------- cập nhật mỗi khung ---------- */
@@ -16722,7 +16767,7 @@ function step(G,dt){if(!G||(G.pv&&!G.c39c)||!(dt>0)||G.done)return;let S=G.c40;i
   const Rg=S.Rg,K=S.K,E=enemies(G,Rg,0);S.t+=dt;
   /* CC giảm 10% (Pháp Trận) / kháng hiệu ứng (Mây Vàng) */
   if(K===28||K===31){allies(G,Rg,0).concat(blds(G,Rg)).forEach(u=>{const p=S.ccPrev.get(u)||{},res=K===28?.1:(u.c40cl>G.t?.1:0);if(res)cc.forEach(f=>{const v=u[f]||0,o=p[f]||0;if(v>o+1e-4)u[f]=o+(v-o)*(1-res)});const q={};cc.forEach(f=>q[f]=u[f]||0);S.ccPrev.set(u,q)})}
-  ({27:tro,28:phap,29:hothach,30:hoalong,31:mayvang,32:thuycung,33:bangha,34:loithan,35:tinhlinh,36:vonghon,37:hukhong,38:phuong,39:thankiem}[K]||(()=>{}))(G,S,dt,E,Rg);
+  ({27:tro,28:phap,29:hothach,30:hoalong,31:mayvang,32:thuycung,33:bangha,34:loithan,35:tinhlinh,36:vonghon,37:hukhong,38:phuong,39:thankiem}[K]||X.step[K]||(()=>{}))(G,S,dt,E,Rg);
   /* đốt (Hỏa Long) */
   [].concat(G.en||[]).forEach(e=>{if(!e||e.dead||!e.c40dot)return;e.c40dot=e.c40dot.filter(d=>G.t<d.until);e.c40dot.forEach(d=>hurt(G,e,d.dps*dt));if(!e.c40dot.length)e.c40dot=null});
   S.u.forEach(u=>{if(u.dead&&!u.gone){u.gone=1;u.dt0=G.t;vis(G,{k:'boom',x:u.x,y:u.y,h:u.h||1,max:.6})}});
@@ -16798,19 +16843,147 @@ function onDeath(G,u,isB){const S=G&&G.c40;if(!S)return;const Rg=S.Rg,ins=inR(Rg
   if(S.K===28&&ins&&!isB){S.cnt+=5;for(let i=0;i<5;i++)vis(G,{k:'shard',x0:u.x+rnd(-1,1),y0:u.y+rnd(-1,1),x:S.cx,y:S.cy,max:1.2+i*.1})}
   if(S.K===28&&ins&&isB)S.cnt+=5;
   if(S.K===37&&ins)S.frag+=isB?80:50;
-  if(S.K===39&&ins)S.deaths++}
+  if(S.K===39&&ins)S.deaths++;
+  try{const f=X.death[S.K];if(f)f(G,S,u,isB,ins)}catch(e){console.error(e)}}
 const isAlly=(G,u)=>u===G.pl||(G.al||[]).includes(u);
-function revive(G,u,isB){const S=G&&G.c40;if(!S||S.K!==39||!inR(S.Rg,u,0))return false;if(isB?!G.bl.includes(u):!isAlly(G,u))return false;if(Math.random()>=.08)return false;
+function revive(G,u,isB){const S=G&&G.c40;if(S){try{const f=X.lethal[S.K];if(f&&f(G,S,u,isB))return true}catch(e){console.error(e)}}if(!S||S.K!==39||!inR(S.Rg,u,0))return false;if(isB?!G.bl.includes(u):!isAlly(G,u))return false;if(Math.random()>=.08)return false;
   u.hp=u.max*.2;u.hit=.2;if(u===G.pl){u.dead=false;G.respawn=0}vis(G,{k:'ring',x:u.x,y:u.y,c:'#fff3c0',max:.8});pop(G,u.x,u.y-1.6,'Thánh địa hồi sinh!','#fff3c0');return true}
 const skl=(G,u)=>G&&G.c40&&G.c40.K===28&&G.c40skl&&inR(G.c40.Rg,u,0);
 {const _D=dfDmgS;dfDmgS=function(s,d,f){const G=DG;try{if(G&&s&&!s.dead&&G.c40){if(skl(G,s)&&isAlly(G,s))d*=.9;if(s.hp-d<=0&&revive(G,s,0))return}}catch(x){}const was=s&&!s.dead,r=_D.apply(this,arguments);try{if(G&&was&&s.dead&&!s.c40u&&!s.ghost)onDeath(G,s,0)}catch(x){}return r}}
 if(typeof dfDmgA==='function'){const _A=dfDmgA;dfDmgA=function(a,d){const G=DG;try{if(G&&a&&!a.dead&&G.c40){if(skl(G,a))d*=.9;if(a.hp-d*(1-(a.red||0))<=0&&revive(G,a,0))return}}catch(x){}const was=a&&!a.dead,r=_A.apply(this,arguments);try{if(G&&was&&a.dead&&!a.ghost)onDeath(G,a,0)}catch(x){}return r}}
-{const _B=dfDmgB;dfDmgB=function(b,d){const G=DG;try{if(G&&b&&b.hp>0&&G.c40){if(skl(G,b))d*=.9;const sv=(b.shd&&b.shd.t>0&&b.shd.v)||0;if(b.hp+sv-d*(1-(b.red||0))<=0&&revive(G,b,1))return}}catch(x){}const was=b&&b.hp>0,r=_B.apply(this,arguments);try{if(G&&was&&b.hp<=0)onDeath(G,b,1)}catch(x){}return r}}
+{const _B=dfDmgB;dfDmgB=function(b,d){const G=DG;try{if(G&&b&&b.hp>0&&G.c40){if(skl(G,b))d*=.9;{const f=X.dmgB[G.c40.K];if(f){d=f(G,G.c40,b,d);if(!(d>0))return}}const sv=(b.shd&&b.shd.t>0&&b.shd.v)||0;if(b.hp+sv-d*(1-(b.red||0))<=0&&revive(G,b,1))return}}catch(x){}const was=b&&b.hp>0,r=_B.apply(this,arguments);try{if(G&&was&&b.hp<=0)onDeath(G,b,1)}catch(x){}return r}}
 /* đánh dấu lúc kẻ địch thi triển kỹ năng (Pháp Trận giảm 10% sát thương kỹ năng) */
 if(window.CSK&&CSK.cast){const _k=CSK.cast;CSK.cast=function(P){const G=DG,es=G&&P&&(P.team==='e'||(G.en||[]).includes(P));const pv=G&&G.c40skl;if(G&&es)G.c40skl=1;try{return _k.apply(this,arguments)}finally{if(G)G.c40skl=pv}}}
 {const _S=dfStep;dfStep=function(dt){const r=_S.apply(this,arguments);try{step(DG,dt)}catch(e){console.error(e)}return r}}
 /* đá bị phá (Hư Không) */
-window.C40={step,init};
+window.C40={step,init,X,H:{enemies,allies,blds,hurt,hurtPct,pop,vis,unit,inR,shield,addHP,heal,BK,DBk,rnd,roll,dist,isAlly}};
+})();
+
+/* ===== c42: sức mạnh 10 thảm Tối thượng (Thần Long, Mặt Trời, Cổng Địa Ngục, Thiên Hà, Thần Thụ, Thời Không, Kraken, Thiên Giới Môn, Hỗn Độn, Ngai Vàng) · hiệu ứng 3D ở c33 (skill3d18) ===== */
+(function(){
+if(!window.C40||!window.C39)return;
+const C39=window.C39,X=C40.X,H=C40.H,{enemies,allies,blds,hurt,hurtPct,pop,vis,unit,inR,shield,addHP,heal,BK,DBk,rnd,roll,dist,isAlly}=H;
+const DB=()=>DBk(),PI2=Math.PI*2;
+const scn=(S,sx,sy)=>C39.fromScene(S.Rg,sx,sy),kk=S=>C39.toScene(S.Rg,S.cx,S.cy)[2];
+const nearB=(G,S,x,y,ex)=>{let b=null,bd=1e9;const L=blds(G,S.Rg).filter(q=>!q.c39tmp&&q!==ex),nw=L.filter(q=>q.t!=='wall');(nw.length?nw:L).forEach(q=>{const d=Math.hypot(q.x-x,q.y-y);if(d<bd){bd=d;b=q}});return b};
+const ccE=(e,d,f)=>{d*=BK(e);(f||['stun','noFire']).forEach(k=>e[k]=Math.max(e[k]||0,d))};
+const slowE=(e,k,t)=>{e.slowK=Math.min(e.slowK==null?1:e.slowK,k);e.slowT=Math.max(e.slowT||0,t||.12)};
+const kill=(G,e)=>{try{dfDmgS(e,e.hp+1e7)}catch(x){}};
+const dot=(G,e,total,sec)=>{(e.c40dot=e.c40dot||[]).push({dps:total/sec*(G.dmM||1),until:G.t+sec})};
+const isBoss=u=>u&&(u.boss||(u.sh&&u.sh.bk)||u.c18boss);
+
+/* ================= 40 · Thần Long Thăng Thiên ================= */
+function spawnLong(G,S){const R=Math.max(S.Rg.x1-S.Rg.x0,S.Rg.y1-S.Rg.y0)/2+3;S.dr.u=unit(G,S,{k:'tlong',x:S.cx+R,y:S.cy,hp:5000,size:3,hr:1.4,h:9,taunt:0,st:'orb',a:0,cd:2.5,tr:[]});pop(G,S.cx,S.cy-3,'Thần long thăng thiên!','#ffd36a')}
+X.init[40]=(G,S)=>{S.dr={u:null,rs:0};spawnLong(G,S)};
+X.step[40]=(G,S,dt,E,Rg)=>{const D=S.dr,u=D.u;if(!u||u.dead){if(u&&u.dead&&!D.cool){D.cool=1;D.rs=100;pop(G,u.x,u.y-2,'Thần long ngã xuống · hồi sinh sau 100 giây','#ffb070')}if(D.cool){D.rs-=dt;if(D.rs<=0){D.cool=0;spawnLong(G,S)}}return}
+  const R=Math.max(Rg.x1-Rg.x0,Rg.y1-Rg.y0)/2+3;u.a+=dt*.45;
+  const ox=S.cx+Math.cos(u.a)*R,oy=S.cy+Math.sin(u.a)*R,mv=(tx,ty,sp)=>{const dx=tx-u.x,dy=ty-u.y,l=Math.hypot(dx,dy);if(l>.01){const s=Math.min(l,sp*dt);u.x+=dx/l*s;u.y+=dy/l*s;u.ang=Math.atan2(dy,dx)}return l};
+  if(u.st==='orb'){mv(ox,oy,12);u.h+=(9-u.h)*Math.min(1,dt*2);u.cd-=dt;if(u.cd<=0){const tg=enemies(G,Rg,4).sort((a,b)=>dist(a,u)-dist(b,u))[0];if(tg){u.st='dive';u.tg=tg}else u.cd=.5}}
+  else if(u.st==='dive'){const t=u.tg;if(!t||t.dead){u.st='rise';u.rt=1.2;return}const l=mv(t.x,t.y,16);u.h=Math.max(1.4,Math.min(u.h,1.4+l*.9));
+    if(l<=(t.size||2)*.5+1){hurt(G,t,100);const dx=t.x-u.x,dy=t.y-u.y,q=Math.hypot(dx,dy)||1,p=isBoss(t)?.35:1;t.x+=dx/q*p;t.y+=dy/q*p;vis(G,{k:'boom',x:t.x,y:t.y,h:.6,max:.5,c:'#ffd36a'});u.st='rise';u.rt=1.2}}
+  else{u.rt-=dt;mv(ox,oy,10);u.h+=(9-u.h)*Math.min(1,dt*1.5);if(u.rt<=0){u.st='orb';u.cd=2.5}}};
+
+/* ================= 41 · Mặt Trời Vĩnh Hằng ================= */
+X.step[41]=(G,S,dt,E)=>{E.forEach(e=>{if(e.c42cg>G.t||e.c42im>G.t)return;if(roll(.25,dt)){const d=2*BK(e);ccE(e,2);e.c42cg=G.t+d;e.c42im=G.t+d+2;dot(G,e,500,2);vis(G,{k:'cage',e,x:e.x,y:e.y,max:d})}})};
+const antiDeath=(G,S,u,isB)=>{if(!isB||!G.bl.includes(u)||u.c42adc>G.t)return false;u.hp=Math.max(u.hp,u.max*.01);u.c42ad=G.t+1;u.c42adc=G.t+20;vis(G,{k:'sunsh',b:u,x:u.x,y:u.y,max:1});pop(G,u.x,u.y-1.6,'Chống kết liễu 1 giây','#ffd36a');return true};
+X.lethal[41]=antiDeath;X.dmgB[41]=(G,S,b,d)=>b.c42ad>G.t?0:d;
+
+/* ================= 42 · Cổng Địa Ngục ================= */
+X.step[42]=(G,S,dt,E,Rg)=>{E.forEach(e=>{if(e.hp>0&&e.hp<e.max*.15&&!e.c42sk){e.c42sk=1;vis(G,{k:'suck',x0:e.x,y0:e.y,x:S.cx,y:S.cy,sh:e.sh,max:.9});kill(G,e);pop(G,e.x,e.y-1.5,'Bị cổng địa ngục nuốt','#ff6a4a')}});
+  if(S.cnt>=50&&!S.wave){S.cnt-=50;S.wave=vis(G,{k:'wave',x:S.cx,y:S.cy,r:0,R:17,max:1.9,hit:new Set(),up(G,S2,dt){this.r=Math.min(this.R,this.t*10);enemies(G,null).forEach(e=>{const dx=e.x-this.x,dy=e.y-this.y,d=Math.hypot(dx,dy)||.01;if(d>this.r)return;if(!this.hit.has(e)){this.hit.add(e);hurt(G,e,200)}if(this.r<this.R){const p=isBoss(e)?.35:1,nd=d+(this.r-d)*p;e.x=this.x+dx/d*nd;e.y=this.y+dy/d*nd}});if(this.t>=this.max-.02)S.wave=null}});pop(G,S.cx,S.cy-3,'Sóng địa ngục!','#ff6a4a')}};
+X.death[42]=(G,S,u,isB,ins)=>{if(!isB&&ins)S.cnt++};
+
+/* ================= 43 · Thiên Hà Sáng Thế ================= */
+const PL=[{n:'Hành tinh dung nham',c:'#ff6a2a',f:(G,e)=>dot(G,e,300,5)},{n:'Hành tinh băng',c:'#9fe0ff',f:(G,e)=>{ccE(e,1.5,['stun','noFire','iceT']);slowE(e,.6,3)}},{n:'Hành tinh sấm',c:'#c7a0ff',f:(G,e)=>ccE(e,1)},{n:'Hành tinh độc',c:'#7aff7a',f:(G,e)=>{dot(G,e,200,5);slowE(e,.7,3)}},{n:'Hành tinh vành đai',c:'#e8c070',f:(G,e)=>ccE(e,1.5,['silT','noFire'])}];
+X.step[43]=(G,S,dt,E,Rg)=>{S.a+=dt;if(S.a<12)return;S.a=0;const T=enemies(G,Rg,3),tg=T.length?T[Math.floor(Math.random()*T.length)]:null,P=PL[Math.floor(Math.random()*PL.length)],x=tg?tg.x:rnd(Rg.x0,Rg.x1),y=tg?tg.y:rnd(Rg.y0,Rg.y1);
+  pop(G,x,y-3,P.n+' xuất hiện','#ffe8a0');
+  vis(G,{k:'planet',x,y,P,tg,max:6,up(G,S2,dt){if(this.t<5&&this.tg&&!this.tg.dead){this.x+=(this.tg.x-this.x)*Math.min(1,dt*.8);this.y+=(this.tg.y-this.y)*Math.min(1,dt*.8)}
+    if(!this.hit&&this.t>=5.9){this.hit=1;const cx=this.x,cy=this.y;enemies(G,null).forEach(e=>{if(Math.hypot(e.x-cx,e.y-cy)<=2.5+(e.size||2)*.3){hurt(G,e,500);try{this.P.f(G,e)}catch(x){}}});vis(G,{k:'boom',x:cx,y:cy,h:.5,max:1,c:this.P.c});
+      const hitS=[];for(let i=0;i<50;i++)hitS.push({a:i/50*PI2+rnd(-.05,.05),done:new Set()});vis(G,{k:'pshard',x:cx,y:cy,c:this.P.c,sh:hitS,max:.6,up(G,S3,dt){const r=2.5+4*Math.min(1,this.t/.5);this.sh.forEach(s=>{const sx=this.x+Math.cos(s.a)*r,sy=this.y+Math.sin(s.a)*r;enemies(G,null).forEach(e=>{if(s.done.has(e))return;if(Math.hypot(e.x-sx,e.y-sy)<=(e.size||2)*.4+.3){s.done.add(e);hurt(G,e,50)}})})}})}}})};
+
+/* ================= 44 · Thần Thụ Thế Giới ================= */
+X.init[44]=(G,S)=>{const L=C39.epicLive(44),st=L.st,c=scn(S,165,95),k=kk(S);let cb=null,bd=1e9;const LB=blds(G,S.Rg).filter(b=>!b.c39tmp),NW=LB.filter(b=>b.t!=='wall');(NW.length?NW:LB).forEach(b=>{const d=Math.hypot((b.x-c[0])/(38*k),(b.y-c[1])/(32*k));if(d<bd){bd=d;cb=b}});S.cb=cb;S.tc={x:c[0],y:c[1]};
+  const RP=(st.rt||[]).map(pts=>pts.map(p=>scn(S,p[0],p[1])));S.roots=RP;S.rb=blds(G,S.Rg).filter(b=>b!==cb&&!b.c39tmp&&RP.some(pts=>pts.some(p=>Math.abs(p[0]-b.x)<=b.w/2+.5&&Math.abs(p[1]-b.y)<=b.h/2+.5)));
+  S.rb.forEach(b=>{addHP(b,b.max*.1*DB(),1)});if(cb)pop(G,cb.x,cb.y-2,'Thần thụ liên kết '+S.rb.length+' công trình nhánh rễ','#9affd0');S.hit=new Map();S.ad=0;S.uidN=0};
+X.step[44]=(G,S,dt,E,Rg)=>{const cb=S.cb,rb=S.rb.filter(b=>b.hp>0),m=1+.1*rb.length;
+  if(cb&&cb.hp>0){heal(cb,200/DB()*m*dt);S.a+=dt;if(S.a>=1){S.a-=1;const cap=3000/DB(),cur=(cb.shd&&cb.shd.t>0&&cb.shd.v)||0;if(cur<cap)shield(cb,Math.min(cap-cur,100/DB()*m))}}
+  S.b+=dt;if(S.b>=3){S.b-=3;rb.forEach(b=>heal(b,b.max*.02))}
+  /* tinh linh (đom đóm) và lá vàng trong cảnh thảm */
+  S.c=(S.c||0)+dt;if(S.c>=.25){S.c=0;const st=C39.epicLive(44).st,t=performance.now()/1000,A=allies(G,Rg,1),W=330,Hh=200;
+    const chk=(id,sx,sy,v,col)=>{const w=scn(S,sx,sy);A.forEach(u=>{if(Math.hypot(u.x-w[0],u.y-w[1])>(u.size||2)*.45+.8)return;const key=id+'|'+(u.c42id||(u.c42id=++S.uidN)),last=S.hit.get(key)||-9;if(G.t-last<1.5)return;S.hit.set(key,G.t);if(u.hp<u.max){heal(u,v);vis(G,{k:'ring',x:w[0],y:w[1],c:col,max:.5})}})};
+    (st.ff||[]).forEach((p,i)=>chk('f'+i,p.x+Math.sin(t*p.s*2+p.o*9)*15,p.y+Math.cos(t*p.s*2.4+p.o*7)*10,5,'#dfff8a'));
+    (st.lv||[]).forEach((p,i)=>{const k=(t*p.s*.4+p.o)%1,x=((p.x+k*20+Math.sin(t*1.5+p.o*10)*14)%W+W)%W,y=-8+k*(Hh+16);chk('l'+i,x,y,10,'#ffd36a')})}
+  if(S.ad>=10){S.ad-=10;let x,y,ok=false;for(let i=0;i<40&&!ok;i++){x=rnd(Rg.x0+1,Rg.x1-1);y=rnd(Rg.y0+1,Rg.y1-1);ok=!(G.bl||[]).some(b=>b.hp>0&&Math.abs(b.x-x)<b.w/2+1&&Math.abs(b.y-y)<b.h/2+1)}if(!ok){x=Rg.x0-1.5;y=S.cy}
+    unit(G,S,{k:'golem',x,y,hp:700,size:2.2,hr:1.1,taunt:0,cd:1,h:0});pop(G,x,y-2.5,'Người đá thức tỉnh!','#c9b48a')}
+  S.u.forEach(u=>{if(u.k!=='golem'||u.dead)return;const tg=enemies(G,Rg,8).sort((a,b)=>dist(a,u)-dist(b,u))[0];u.cd-=dt;u.sw=Math.max(0,(u.sw||0)-dt);if(!tg)return;const dx=tg.x-u.x,dy=tg.y-u.y,l=Math.hypot(dx,dy)||1;u.ang=Math.atan2(dy,dx);
+    if(l>2){u.x+=dx/l*Math.min(l-2,2.2*dt);u.y+=dy/l*Math.min(l-2,2.2*dt);u.walk=(u.walk||0)+dt}
+    if(l<=2.6&&u.cd<=0){u.cd=4;u.sw=.6;const ax=u.x+dx/l*1.4,ay=u.y+dy/l*1.4;enemies(G,null).forEach(e=>{if(Math.hypot(e.x-ax,e.y-ay)<=3+(e.size||2)*.3)hurt(G,e,200)});vis(G,{k:'slam',x:ax,y:ay,max:.7})}})};
+X.death[44]=(G,S,u,isB,ins)=>{if(ins&&(isB||isAlly(G,u)))S.ad++};
+
+/* ================= 45 · Thời Không Đồng Hồ ================= */
+X.init[45]=(G,S)=>{const st=C39.epicLive(45).st,k=kk(S);S.gears=(st.gr||[]).map(g=>{const w=scn(S,g.x,g.y),sz=g.R>=24?'L':g.R<=16?'S':'M';return {x:w[0],y:w[1],r:(g.R+4)*k,sp:g.sp,R:g.R,sz,hp:sz==='L'?400:sz==='M'?300:200}});S.cdp=new WeakMap()};
+X.step[45]=(G,S,dt,E,Rg)=>{blds(G,Rg).forEach(b=>{const g=S.gears.find(g=>Math.hypot(b.x-g.x,b.y-g.y)<=g.r);if(g){heal(b,g.hp/DB()*dt);b.c42g=g}else b.c42g=null});
+  [G.pl].concat(G.al||[]).forEach(u=>{if(!u||!u.sk)return;u.sk.forEach(k=>{const p=S.cdp.get(k);if(p!=null&&k.cd>p+1){k.cd=Math.max(1,k.cd-25);vis(G,{k:'ring',x:u.x,y:u.y,c:'#7ab8ff',max:.6})}S.cdp.set(k,k.cd)})})};
+window.c40RS=u=>{const G=DG,S=G&&G.c40;if(!S||S.K!==45||!u||u.team==='e'||(G.en||[]).includes(u))return 0;return isBoss(u)?10:5};
+
+/* kỹ năng phe ta: Cổng Địa Ngục phóng to hố đen / kỹ năng lan, kéo dài hố đen & cổng dịch chuyển; Thời Không kéo dài kỹ năng từ 6 giây trở lên */
+function skArrs(G){const A=[];if(G.csk)Object.values(G.csk).forEach(v=>{if(Array.isArray(v))A.push(v)});if(G.c34&&G.c34.u)A.push(G.c34.u);if(G.c26fx)A.push(G.c26fx);if(G.c34&&G.c34.fx)A.push(G.c34.fx);return A}
+if(window.CSK&&CSK.cast){const _k=CSK.cast;CSK.cast=function(P,k){const G=DG,S=G&&G.c40;if(!S||(S.K!==42&&S.K!==45)||!P||P.team==='e'||(G.en||[]).includes(P))return _k.apply(this,arguments);
+  const before=new Map();skArrs(G).forEach(a=>before.set(a,new Set(a)));const r=_k.apply(this,arguments);
+  try{const nm=((k&&k.m&&k.m.n)||(k&&k.cap&&k.cap[0])||'')+' '+((k&&k.cap&&k.cap[5])||''),bh=/hố đen|hút/i.test(nm),pt=/dịch chuyển|cổng/i.test(nm),sp=/lan/i.test(nm);let n=0;
+    skArrs(G).forEach(a=>{const old=before.get(a)||new Set();a.forEach(o=>{if(!o||typeof o!=='object'||old.has(o))return;n++;
+      if(S.K===42){if(bh||sp){['R','r','rad'].forEach(f=>{if(typeof o[f]==='number')o[f]*=1.5})}if(bh||pt){['t','max','life','dur'].forEach(f=>{if(typeof o[f]==='number'&&o[f]>0)o[f]+=5})}}
+      else{['t','life','dur'].forEach(f=>{if(typeof o[f]==='number'&&o[f]>=6){o[f]+=3;if(typeof o.max==='number')o.max+=3}})}})});
+    if(n&&S.K===42&&(bh||sp||pt))pop(G,P.x,P.y-1.8,'Cổng địa ngục cường hóa kỹ năng','#ff8a6a');if(n&&S.K===45)pop(G,P.x,P.y-1.8,'Thời không kéo dài kỹ năng','#9fd0ff')}catch(e){console.error(e)}return r}}
+
+/* ================= 46 · Xoáy Nước Kraken ================= */
+X.init[46]=(G,S)=>{S.kcd=0;S.kr=null};
+function krakenUp(G,S){const b=unit(G,S,{k:'kraken',x:S.cx,y:S.cy,hp:4000,size:4,hr:2,taunt:0,life:40,h:0});b.tn=[];for(let i=0;i<8;i++){const a=i/8*PI2,t=unit(G,S,{k:'tent',x:S.cx+Math.cos(a)*3.6,y:S.cy+Math.sin(a)*3.6,a,hp:500,size:1.2,hr:.7,taunt:0,cd:1+i*.35,body:b,h:0});b.tn.push(t)}S.kr=b;pop(G,S.cx,S.cy-3.5,'KRAKEN trồi lên!','#7ad8ff')}
+X.step[46]=(G,S,dt,E,Rg)=>{S.kcd=Math.max(0,S.kcd-dt);
+  E.forEach(e=>{if(e.c42wh>G.t){const dx=S.cx-e.x,dy=S.cy-e.y,l=Math.hypot(dx,dy)||1,p=isBoss(e)?.35:1;e.x+=(dx/l*1.2-dy/l*1.6)*dt*p;e.y+=(dy/l*1.2+dx/l*1.6)*dt*p;slowE(e,.5)}
+    else if(!(e.c42wi>G.t)&&roll(.25,dt)){e.c42wh=G.t+1;e.c42wi=G.t+3;vis(G,{k:'whirl',e,x:e.x,y:e.y,max:1})}
+    if(e.hp>0&&e.hp<e.max*.18&&!e.dead){vis(G,{k:'tent1',x0:S.cx,y0:S.cy,x:e.x,y:e.y,max:.7});kill(G,e);S.cnt++;pop(G,e.x,e.y-1.5,'Xúc tu nuốt chửng ('+(S.cnt%30)+'/30)','#7ad8ff')}});
+  const K=S.kr;if(K&&!K.dead){K.life-=dt;if(K.life<=0){K.dead=true;K.tn.forEach(t=>t.dead=true);pop(G,K.x,K.y-3,'Kraken lặn xuống','#7ad8ff')}else K.tn.forEach(t=>{if(t.dead)return;t.cd-=dt;t.sw=Math.max(0,(t.sw||0)-dt);if(t.cd>0)return;const tg=enemies(G,null).filter(e=>dist(e,t)<=8).sort((a,b)=>dist(a,t)-dist(b,t))[0];if(!tg)return;t.cd=3;t.sw=.5;t.tg=tg;t.tx=tg.x;t.ty=tg.y;
+      if(tg.hp<tg.max*.15){kill(G,tg);K.max+=200;K.hp+=200;vis(G,{k:'tent1',x0:t.x,y0:t.y,x:tg.x,y:tg.y,max:.7});pop(G,tg.x,tg.y-1.5,'Kraken nuốt xác · +200 máu tối đa','#7ad8ff')}
+      else{hurt(G,tg,400);if(Math.random()<.25)ccE(tg,1);vis(G,{k:'boom',x:tg.x,y:tg.y,h:.3,max:.4,c:'#7ad8ff'})}})}
+  if(K&&K.dead){K.tn.forEach(t=>t.dead=true);S.kr=null;S.kcd=80}
+  if(!S.kr&&S.kcd<=0&&S.cnt>=30){S.cnt-=30;krakenUp(G,S)}};
+
+/* ================= 47 · Thiên Giới Môn ================= */
+X.init[47]=(G,S)=>{S.ad=0};
+X.lethal[47]=(G,S,u,isB)=>{if(isB?!G.bl.includes(u):!isAlly(G,u))return false;if(!inR(S.Rg,u,isB?0:2)||Math.random()>=.25)return false;u.hp=u.max*.5;u.hit=.2;if(u===G.pl){u.dead=false;G.respawn=0}vis(G,{k:'ring',x:u.x,y:u.y,c:'#fff3c0',max:.8});pop(G,u.x,u.y-1.6,'Thiên giới hồi sinh!','#fff3c0');return true};
+X.death[47]=(G,S,u,isB,ins)=>{if(ins&&(isB||isAlly(G,u)))S.ad++};
+function angExp(G,S,u){const n=u.c42st.n;u.c42st.n=0;if(n<=0)return;const d=3000*(1-.05*(15-n));enemies(G,null).forEach(e=>{if(Math.hypot(e.x-u.x,e.y-u.y)<=3+(e.size||2)*.3)hurt(G,e,d)});vis(G,{k:'boom',x:u.x,y:u.y,h:.8,max:.9,c:'#fff3c0'});pop(G,u.x,u.y-2,'Giáp thiên thần nổ · '+Math.round(d).toLocaleString('vi-VN'),'#fff3c0')}
+X.step[47]=(G,S,dt,E,Rg)=>{if(S.ad>=40&&!S.u.some(u=>u.k==='angel'&&!u.dead)){S.ad-=40;unit(G,S,{k:'angel',x:S.cx,y:S.cy,hp:2000,size:2.4,hr:1.2,taunt:0,cd:1,h:5,dl:1.2});pop(G,S.cx,S.cy-3,'Thiên thần giáng thế!','#fff3c0')}
+  S.u.forEach(a=>{if(a.k!=='angel'||a.dead)return;a.dl=Math.max(0,(a.dl||0)-dt);a.cd-=dt;if(a.cd>0)return;a.cd=3;const L=allies(G,Rg,2).concat(blds(G,Rg).filter(b=>!b.c39tmp)).sort((p,q)=>p.hp/p.max-q.hp/q.max).slice(0,2);
+    L.forEach(u=>{const isB=G.bl.includes(u);u.c42st=u.c42st||{n:0};shield(u,isB?300/DB():300);u.c42st.n++;u.c42st.sv=(u.shd&&u.shd.v)||0;vis(G,{k:'abeam',a,u,x:u.x,y:u.y,max:.6});if(u.c42st.n>=15)angExp(G,S,u)})});
+  /* giáp vỡ → nổ theo số cộng dồn */
+  allies(G,null).concat(G.bl||[]).forEach(u=>{const s=u&&u.c42st;if(!s||s.n<=0)return;const v=(u.shd&&u.shd.t>0&&u.shd.v)||0;if(v<=1e-6||u.dead||u.hp<=0)angExp(G,S,u)})};
+
+/* ================= 48 · Hỗn Độn Nguyên Tố ================= */
+X.init[48]=(G,S)=>{const c=scn(S,165,100);S.ec={x:c[0],y:c[1]};S.cb=nearB(G,S,c[0],c[1]);S.bt=new WeakMap();
+  const cb=S.cb;if(cb){addHP(cb,2000,1);shield(cb,700/DB());pop(G,cb.x,cb.y-2,'Tâm hỗn độn · +2.000 máu +700 giáp','#ffd36a')}
+  blds(G,S.Rg).forEach(b=>{if(b!==cb&&!b.c39tmp&&elem(S,b)===2)addHP(b,500,1)})};
+function elem(S,u){const q=C39.toScene(S.Rg,u.x,u.y);let a=Math.atan2(q[1]-100,q[0]-165);if(a<0)a+=PI2;return Math.floor(a/(Math.PI/2))%4}/* 0 hỏa · 1 nước · 2 đất · 3 băng */
+X.step[48]=(G,S,dt,E,Rg)=>{const cb=S.cb;S.a+=dt;S.b+=dt;
+  blds(G,Rg).forEach(b=>{if(b.c39tmp)return;if(b===cb){heal(b,b.max*.04*dt);return}const el=elem(S,b);if(el===2)heal(b,b.max*.01*dt)});
+  if(S.b>=2){S.b-=2;blds(G,Rg).forEach(b=>{if(b!==cb&&elem(S,b)===1){const cap=2000/DB(),cur=(b.shd&&b.shd.t>0&&b.shd.v)||0;if(cur<cap)shield(b,Math.min(cap-cur,200/DB()))}})}
+  allies(G,Rg,0).forEach(u=>{if(elem(S,u)===1&&u.nrgMax>0)u.nrg=Math.min(u.nrgMax,(u.nrg||0)+10*dt)});
+  const x0=S.ec.x,y0=S.ec.y;
+  E.forEach(e=>{const el=elem(S,e);if(el===0){hurtPct(G,e,.02*dt);if(e.hp>0&&e.hp<e.max*.05){kill(G,e);pop(G,e.x,e.y-1.5,'Thiêu rụi','#ff7a2a')}}
+    else if(el===3){slowE(e,.8);if(roll(.1,dt)){ccE(e,1,['stun','noFire','iceT']);hurt(G,e,50);vis(G,{k:'ice',e,x:e.x,y:e.y,max:BK(e)})}}
+    const onL=(Math.abs(e.y-y0)<=.6+(e.size||2)*.25)||(Math.abs(e.x-x0)<=.6+(e.size||2)*.25);if(onL&&G.t-(S.bt.get(e)||-9)>=1){S.bt.set(e,G.t);hurt(G,e,200);vis(G,{k:'ring',x:e.x,y:e.y,c:'#ffffff',max:.4})}})};
+/* ================= 49 · Ngai Vàng Vũ Trụ ================= */
+X.init[49]=(G,S)=>{const c=scn(S,165,95);S.tb=nearB(G,S,c[0],c[1]);const b=S.tb;if(b){addHP(b,3000,1);shield(b,500/DB());pop(G,b.x,b.y-2,'Ngai vàng · +3.000 máu +500 giáp','#ffd36a')}};
+X.step[49]=()=>{};
+X.death[49]=(G,S,u,isB,ins)=>{const b=S.tb;if(!isB&&ins&&b&&b.hp>0&&(G.en||[]).includes(u)){heal(b,b.max*.03);vis(G,{k:'ring',x:b.x,y:b.y,c:'#ffd36a',max:.5})}};
+X.dmgB[49]=(G,S,b,d)=>{if(b!==S.tb)return d;const other=(G.bl||[]).some(q=>q!==b&&q.hp>0&&q.t!=='mine'&&!q.c39tmp);if(other){b.c42iv=G.t+.3;return 0}return d};
+/* đòn đánh của công trình trung tâm (Hỗn Độn) / công trình trên ngai (Ngai Vàng) */
+function onShot(G,b,tg){const S=G&&G.c40;if(!S||!tg||tg.dead)return;
+  if(S.K===48&&b===S.cb){dot(G,tg,tg.max*.05*BK(tg)+300,5);if(tg.hp<tg.max*.12){kill(G,tg);pop(G,tg.x,tg.y-1.5,'Kết liễu nguyên tố','#ffb02e')}vis(G,{k:'ring',x:tg.x,y:tg.y,c:'#ff7a2a',max:.4})}
+  if(S.K===49&&b===S.tb){hurt(G,tg,2000);if(Math.random()<.25){ccE(tg,1);ccE(tg,1.5,['silT']);slowE(tg,.6,2);pop(G,tg.x,tg.y-1.5,'Nguyên tố vũ trụ: 3 khống chế','#c7a0ff')}vis(G,{k:'orbhit',x0:b.x,y0:b.y,x:tg.x,y:tg.y,max:.4})}}
+C40.onShot=onShot;
+if(typeof dfFire==='function'){const _F=dfFire;dfFire=function(src,wp,tg,team){const r=_F.apply(this,arguments);try{const G=DG,S=G&&G.c40;if(S&&(S.K===48||S.K===49)&&team!=='e'&&src&&!src.o&&tg){const b=(G.bl||[]).find(q=>q.x===src.x&&q.y===src.y);if(b)onShot(G,b,tg)}}catch(e){console.error(e)}return r}}
 })();
 
 /* gộp pháo công trình hạng nặng vào pháo hạng nặng */
@@ -17065,7 +17238,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL=(window.SE_CFG&&SE_CFG.fb)||'';
-  const VER='v211';
+  const VER='v212';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`
