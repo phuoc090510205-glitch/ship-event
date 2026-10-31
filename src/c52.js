@@ -53,5 +53,5 @@ function card(){const g=$('uggrid');if(!g||g.querySelector('.ugc[data-i="8"]'))r
 card();
 document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('button[data-k="Nâng cấp"]');if(t)setTimeout(card,0);
   const c=e.target.closest&&e.target.closest('#uggrid .ugc[data-i="8"]');if(c){e.stopPropagation();openGup('h',1)}},true);
-window.C52={enter,exit,load,hasLoad,get BM(){return BM}};
+window.C52={enter,exit,load,hasLoad,raw:_bs,get BM(){return BM}};
 })();
