@@ -15470,7 +15470,7 @@ function sk18Init(){if(SK18)return SK18;sk17Init();const AD=SK.AD,M=(c,o)=>new T
       const ax=new T.Group();ax.position.set(.35,1.5,0);hm.add(ax);add(ax,new T.Mesh(new T.CylinderGeometry(.03,.03,1.4,6),M(0x6a4a2a)),0,-.2,.2).rotation.x=.4;add(ax,new T.Mesh(new T.BoxGeometry(.06,.4,.35),pt),0,.35,.45);[-.15,.15].forEach(x=>{const l=add(hm,new T.Mesh(new T.CylinderGeometry(.09,.08,.65,8),dk),x,.32,0)});
       g.traverse(o=>{if(o.isMesh)o.castShadow=true});g.userData={q,hd,ears,mane,sn,lg,tail,w,wl,wr,hm,ax,bd};return g}),
     DICE3:P(()=>{const g=new T.Group(),cs=[];for(let k=0;k<3;k++){const c=new T.Mesh(new T.BoxGeometry(1.1,1.1,1.1),new T.MeshStandardMaterial({color:0xfff6e8,roughness:.3,metalness:.1}));c.position.x=(k-1)*1.6;const e=new T.LineSegments(new T.EdgesGeometry(c.geometry),new T.LineBasicMaterial({color:0xd4a72c}));c.add(e);
-      for(let d=0;d<3;d++){const p=new T.Mesh(new T.SphereGeometry(.11,8,6),M(0xc02a2a));p.position.set(-.3+d*.3,-.3+d*.3,.56);c.add(p)}g.add(c);cs.push(c)}g.userData={cs};return g}),
+      const pips=[];[[0,0],[-.3,-.3],[.3,.3]].forEach(([x,y])=>{const fs=[[0,0,.56,0,0],[0,0,-.56,0,Math.PI],[.56,0,0,0,Math.PI/2],[-.56,0,0,0,-Math.PI/2],[0,.56,0,-Math.PI/2,0],[0,-.56,0,Math.PI/2,0]];const grp=new T.Group();fs.forEach(f=>{const p=new T.Mesh(new T.CircleGeometry(.11,12),M(0xc02a2a));const q=new T.Group();q.rotation.set(f[3],f[4],0);q.position.set(f[0],f[1],f[2]);p.position.set(x,y,.005);q.add(p);grp.add(q)});c.add(grp);pips.push(grp)});c.userData.pips=pips;g.add(c);cs.push(c)}g.userData={cs};return g}),
     STAR8:P(()=>{const sh=new T.Shape();for(let k=0;k<16;k++){const a=k/16*TAU,r=k%2?.45:1;k?sh.lineTo(Math.cos(a)*r,Math.sin(a)*r):sh.moveTo(r,0)}const g=new T.Group(),m=add(g,new T.Mesh(new T.ExtrudeGeometry(sh,{depth:.25,bevelEnabled:false}),E(0xffe27a,2.5)));const s=new T.Sprite(ADDM(glowT()));s.material.color.set(0xffe27a);s.scale.setScalar(4);g.add(s);g.userData={m};return g}),
     TXT:Pool(()=>{const cv=document.createElement('canvas');cv.width=512;cv.height=64;const tx=new T.CanvasTexture(cv),s=new T.Sprite(new T.SpriteMaterial({map:tx,transparent:true,depthTest:false,toneMapped:false}));s.renderOrder=20;s.userData={cv,tx,s:''};scene.add(s);return s})};
   return SK18}
@@ -15506,7 +15506,7 @@ function sk18Body(G,dt,S){const K=SK18,Y=HOV,V=(x,z,y)=>new T.Vector3(x,y,z),Rg=
   if(S.K===2009)(G.bl||[]).forEach(b=>{if(b.c46g>G.t){tor17(b.x,1,b.y,Math.max(b.w,b.h)*.75,'#ffd36a',.8,Math.PI/2);if(Math.random()<.2)spark(b.x+rand(-1,1),1.2,b.y+rand(-1,1),0,1,0,'#ffd36a',.6,.3)}});
   if(S.K===55){const R=S.roll,g=K.GEM.get(),U=g.userData,cols=['#ff3a3a','#c060ff','#3ab8ff','#3aff7a'],c=R?cols[Math.floor(R.t*12)%4]:(S.last&&G.t-S.last.t<4?S.last.g.c:'#9fb8e8'),hh=8.5;g.position.set(S.cx,hh+Math.sin(t3*2)*.2,S.cy);g.rotation.y=t3*(R?9:1);g.scale.setScalar(R?1.1:.8);U.m.color.set(c);U.m.emissive.set(c);U.s.material.color.set(c);
     if(!R)txt18(S.cx,hh+2,S.cy,'Ngọc khảm · '+Math.max(0,Math.ceil(S.cd))+'s','#bfe3ff',.8);allies18(G).concat(G.bl||[]).forEach(u=>{const c2=u&&u.c48s;if(!c2||c2.n<=0||u.hp<=0)return;for(let k=0;k<c2.n;k++){const a=t3*3+k/3*TAU;dot17(u.x+Math.cos(a)*.7,1.8,u.y+Math.sin(a)*.7,.6,c2.c,.9)}})}
-  if(S.K===57&&S.dice){const g=K.DICE3.get(),U=g.userData;g.position.set(S.cx,7.5,S.cy);g.rotation.y=R3.yaw;U.cs.forEach((c,i)=>{const done=S.dice.t>=1+i;c.rotation.set(done?0:t3*9+i,done?0:t3*7,0);if(done)txt18(S.cx+(i-1)*1.6*Math.cos(R3.yaw),8.6,S.cy-(i-1)*1.6*Math.sin(R3.yaw),String(S.dice.r[i]),'#ffd36a',1)})}
+  if(S.K===57&&S.dice){const g=K.DICE3.get(),U=g.userData;g.position.set(S.cx,6,S.cy);g.rotation.y=R3.yaw;const D=S.dice,sh=D.show||[1,1,1];U.cs.forEach((c,i)=>{const done=D.t>=1+i,v=sh[i]||1;c.rotation.set(done?0:t3*9+i,done?0:t3*7,0);const P=c.userData.pips;P[0].visible=v!==2;P[1].visible=v>=2;P[2].visible=v>=2;if(done)txt18(S.cx+(i-1)*1.6*Math.cos(R3.yaw),7.1,S.cy-(i-1)*1.6*Math.sin(R3.yaw),String(D.r[i]),'#ffd36a',1)});if(D.t>=3)txt18(S.cx,8,S.cy,'Tổng '+D.sum+' điểm','#ffffff',1)}
   (G.bl||[]).forEach(b=>{if(b.c40gold&&b.hp>0){tor17(b.x,.25,b.y,Math.max(b.w,b.h)*.7,'#ffd36a',.55+.2*Math.sin(t3*4));if(Math.random()<.08)spark(b.x+rand(-1,1),.5,b.y+rand(-1,1),0,rand(.6,1.4),0,'#ffd36a',.8,.3)}});
   (G.en||[]).forEach(e=>{if(!e||e.dead)return;if(e.c40dot&&Math.random()<.35)spark(e.x+rand(-.4,.4),hy(e)+.3,e.y+rand(-.4,.4),0,rand(.5,1.5),0,'#ff6a1a',.5,.3)});
   allies18(G).forEach(u=>{if(u.c40cl>G.t){tor17(u.x,hy(u)-.2,u.y,(u.size||2)*.45,'#ffffff',.45);if(Math.random()<.1)spark(u.x,hy(u),u.y,0,1,0,'#c8ffd0',.6,.25)}});
@@ -18060,8 +18060,10 @@ X.step[57]=(G,S,dt,E,Rg)=>{S.u.forEach(u=>{if(u.k==='golem'&&u.big&&!u.dead){u.l
   live(S,'stick').forEach(u=>fight(G,S,u,dt,{range:1.6,dmg:14,cd:1,speed:2.6}));
   S.u.forEach(u=>{if(u.c48arm&&G.t>=u.c48arm.until){if(u.shd&&u.shd.t>0)u.shd.v=Math.max(0,Math.min(u.shd.v,u.c48arm.base));u.c48arm=null}});
   (G.bl||[]).concat(allies(G,null)).forEach(u=>{if(u.c48arm&&G.t>=u.c48arm.until){if(u.shd&&u.shd.t>0)u.shd.v=Math.max(0,Math.min(u.shd.v,u.c48arm.base));u.c48arm=null}});
-  if(S.dice){S.dice.t+=dt;if(S.dice.t<3){hud(G,'🎲 Xúc xắc 7 sao: '+S.dice.r.map((v,i)=>S.dice.t<1+i?'<b>'+(1+Math.floor(Math.random()*3))+'</b>':'<b style="color:#ffd36a">'+v+'</b>').join(' + '),'#ffd36a');return}
-    const sum=S.dice.r.reduce((a,b)=>a+b,0);S.dice=null;S.last={sum,t:G.t};hud(G,'🎲 '+'Xúc xắc ra <b style="color:#ffd36a">'+sum+'</b> · '+DICE[sum],'#ffd36a');pop(G,S.cx,S.cy-3,'Xúc xắc '+sum+' · '+DICE[sum],'#ffd36a');dice(G,S,sum);return}
+  if(S.dice){const D=S.dice;D.t+=dt;if(D.t<3){D.show=D.r.map((v,i)=>D.t<1+i?1+Math.floor(Math.random()*3):v);hud(G,'🎲 Xúc xắc 7 sao: '+D.show.map((v,i)=>D.t<1+i?'<b>'+v+'</b>':'<b style="color:#ffd36a">'+v+'</b>').join(' + '),'#ffd36a');return}
+    const sum=D.r.reduce((a,b)=>a+b,0);D.show=D.r.slice();D.sum=sum;
+    if(D.t<5){hud(G,'🎲 Kết quả: <b style="color:#ffd36a">'+D.r.join(' + ')+' = '+sum+'</b> → '+DICE[sum]+' <span style="opacity:.75">(nhận sau '+Math.ceil(5-D.t)+' giây)</span>','#ffd36a');return}
+    S.dice=null;S.last={sum,t:G.t};hud(G,'🎲 '+'Xúc xắc ra <b style="color:#ffd36a">'+sum+'</b> · '+DICE[sum],'#ffd36a');pop(G,S.cx,S.cy-3,'Xúc xắc '+sum+' · '+DICE[sum],'#ffd36a');dice(G,S,sum);return}
   if(S.q>0){S.q--;S.dice={t:0,r:[0,0,0].map(()=>1+Math.floor(Math.random()*3))}}};
 function dice(G,S,n){const Rg=S.Rg;
   if(n===3)give(G,0,3);
@@ -18330,7 +18332,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL=(window.SE_CFG&&SE_CFG.fb)||'';
-  const VER='v220';
+  const VER='v221';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`
