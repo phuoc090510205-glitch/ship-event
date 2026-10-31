@@ -39,7 +39,7 @@ const AI={};function autoIds(id){if(AI[id])return AI[id];const b=BSH.find(x=>x.i
 {const _so=shopOwn;shopOwn=function(x){if(_so.apply(this,arguments))return true;const id=window.__c53b||(window.C52&&C52.BM&&S.khob?S.khob.sel:null);const k=x&&x.id?x.id:x;return !!(id&&k&&autoIds(id).has(k))}}
 {const _be=bsEquip;bsEquip=function(sh){const p=window.__c53b;window.__c53b=sh&&sh.bk?sh.id:p;try{return _be.apply(this,arguments)}finally{window.__c53b=p}}}
 /* trang bị cũ trên lưới 5×6 không còn khớp: xóa để tự lắp lại trên lưới mới */
-try{if(S.c53v!==2){S.c53v=2;S.c53m=1;if(S.cx53)S.cx53={};const K=S.khob;if(K){['wp','ar','en','rc','ms','sk','ct'].forEach(k=>{if(K[k])BSH.forEach(b=>delete K[k][b.id])});if(K.init)K.init={}}save()}}catch(e){console.error(e)}
+try{if(S.c53v!==3){S.c53v=3;S.c53m=1;if(S.cx53)S.cx53={};const K=S.khob;if(K){['wp','ar','en','rc','ms','sk','ct'].forEach(k=>{if(K[k])BSH.forEach(b=>delete K[k][b.id])});if(K.init)K.init={}}save()}}catch(e){console.error(e)}
 /* boss địch trong chiến dịch: dùng lưới gốc 58 ô, không theo ô người chơi mở */
 const CL={};{const _b=bossShip;bossShip=function(c){const b=_b.apply(this,arguments);if(!b)return b;setup(b);if(CL[b.id])return CL[b.id];const o=Object.create(b);
   Object.defineProperty(o,'g',{value:b.gBase.slice(),writable:true,configurable:true});o._pr={};o._sl=null;o._br=null;return CL[b.id]=o}}
