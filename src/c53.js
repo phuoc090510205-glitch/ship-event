@@ -5,7 +5,13 @@ const BLK=["..rrrr..","..rrrr..","bbbbbbbb","bbbbbbbb","bbggggbb","bbggggbb","gg
 const BASE=58,MAXC=(typeof GMAX!=='undefined'?GMAX:100)-1,CN={b:'Xanh nước biển',g:'Xanh lá',y:'Vàng',r:'Đỏ'},CC={b:'#3aa0ff',g:'#3ddc84',y:'#ffc53d',r:'#ff4a5a'},N4=[[1,0],[-1,0],[0,1],[0,-1]];
 const cred=l=>Math.max(0,Math.min(MAXC,l-1)),pos=l=>l>=100?6:7;
 const E0=[];function ext(id,w){if(!w)return (S.cx53&&S.cx53[id])||E0;S.cx53=S.cx53||{};return S.cx53[id]=S.cx53[id]||[]}
-function setup(b){if(b._c53)return;b._c53=1;const W0=b.W,H0=b.H;let k=1;
+__D53__
+function dec(v){const [W,H,x0,y0,cols,rows,rle,mh]=v;const base=rle.replace(/\d+/g,n=>'.'.repeat(+n)).split('/');const M=mh.split('/').map(h=>{let s='';for(const ch of h)s+=parseInt(ch,16).toString(2).padStart(4,'0');s=s.replace(/^0+/,'');return s.padStart(cols,'0').slice(-cols).split('').map(Number)});return {W,H,x0,y0,cols,rows,base,M}}
+function setup(b){if(b._c53)return;const DD=D53[b.id];if(DD){b._c53=1;const q=dec(DD);b.W=q.W;b.H=q.H;b.x0=q.x0;b.y0=q.y0;b.gc=q.cols;b.gr=q.rows;b.gBase=q.base;b._mk=q.M;b._mg=null;b._k53=null;b._pr={};b._sl=null;b._br=null;
+  Object.defineProperty(b,'g',{configurable:true,get(){sync(b);return b._mg},set(){}});
+  Object.defineProperty(b,'pos',{configurable:true,get(){return pos(aLv(b.id))},set(){}});
+  Object.defineProperty(b,'hull',{configurable:true,get(){return 'Boss · '+pos(aLv(b.id))+' đơn vị'},set(){}});return}
+  b._c53=1;const W0=b.W,H0=b.H;let k=1;
   for(;k<8;k+=.05){const c=Math.floor(W0*k/56),r=Math.floor(H0*k/56);if(c>=10&&r>=12&&c*r>=210)break}
   b.W=Math.round(W0*k);b.H=Math.round(H0*k);const cols=Math.floor(b.W/56),rows=Math.floor(b.H/56);
   b.x0=Math.round((b.W-cols*56)/2);b.y0=Math.round((b.H-rows*56)/2);b.gc=cols;b.gr=rows;
@@ -33,7 +39,7 @@ const AI={};function autoIds(id){if(AI[id])return AI[id];const b=BSH.find(x=>x.i
 {const _so=shopOwn;shopOwn=function(x){if(_so.apply(this,arguments))return true;const id=window.__c53b||(window.C52&&C52.BM&&S.khob?S.khob.sel:null);const k=x&&x.id?x.id:x;return !!(id&&k&&autoIds(id).has(k))}}
 {const _be=bsEquip;bsEquip=function(sh){const p=window.__c53b;window.__c53b=sh&&sh.bk?sh.id:p;try{return _be.apply(this,arguments)}finally{window.__c53b=p}}}
 /* trang bị cũ trên lưới 5×6 không còn khớp: xóa để tự lắp lại trên lưới mới */
-try{if(!S.c53m){S.c53m=1;const K=S.khob;if(K){['wp','ar','en','rc','ms','sk','ct'].forEach(k=>{if(K[k])BSH.forEach(b=>delete K[k][b.id])});if(K.init)K.init={}}save()}}catch(e){console.error(e)}
+try{if(S.c53v!==2){S.c53v=2;S.c53m=1;if(S.cx53)S.cx53={};const K=S.khob;if(K){['wp','ar','en','rc','ms','sk','ct'].forEach(k=>{if(K[k])BSH.forEach(b=>delete K[k][b.id])});if(K.init)K.init={}}save()}}catch(e){console.error(e)}
 /* boss địch trong chiến dịch: dùng lưới gốc 58 ô, không theo ô người chơi mở */
 const CL={};{const _b=bossShip;bossShip=function(c){const b=_b.apply(this,arguments);if(!b)return b;setup(b);if(CL[b.id])return CL[b.id];const o=Object.create(b);
   Object.defineProperty(o,'g',{value:b.gBase.slice(),writable:true,configurable:true});o._pr={};o._sl=null;o._br=null;return CL[b.id]=o}}
