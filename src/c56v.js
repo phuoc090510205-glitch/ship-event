@@ -14,8 +14,8 @@ function sk20Init(){if(SK20)return SK20;sk17Init();const add=(g,m,x,y,z)=>{m.pos
      CONE:Pool(()=>{const c=new T.ConeGeometry(1,1,24,1,true);c.translate(0,-.5,0);const m=new T.Mesh(c,SK.AD(0xffffff,.4));m.frustumCulled=false;scene.add(m);return m}),
      BAR:Pool(()=>{const s=new T.Sprite(new T.SpriteMaterial({map:WHITE,transparent:true,depthTest:false,depthWrite:false,toneMapped:false,fog:false}));s.center.set(0,.5);s.renderOrder=20;scene.add(s);return s})}};return SK20}
 function sk20End(){if(!SK20)return;SK20.CAR.end();Object.values(SK20.H).forEach(p=>p.end())}
-function skill3d20(G,dt){const S=G.c40;const L=S&&S.u?S.u.filter(u=>u.k==='scar'&&!u.dead):[];if(!L.length){if(SK20)sk20End();return}sk20Init();const s17=SK17;SK17=SK20.H;
-  try{const Y=HOV;L.forEach(u=>{const g=SK20.CAR.get(),U=g.userData,big=u.big,sc=big?5:1.15,bob=u.prep>0?Math.sin(t3*40)*.012*sc:0;g.position.set(u.x,bob,u.y);g.rotation.y=-(u.ang||0)-Math.PI/2;g.scale.set(sc,big?5.7:sc,sc);U.paint.color.set(u.col);U.hl.material.opacity=u.prep>0?.5+.5*Math.abs(Math.sin(t3*6)):1;
+function skill3d20(G,dt){const S=G.c40;const L=S&&S.u?S.u.filter(u=>(u.k==='scar'||u.k==='f1')&&!u.dead):[];if(!L.length){if(SK20)sk20End();return}sk20Init();const s17=SK17;SK17=SK20.H;
+  try{const Y=HOV;L.forEach(u=>{const g=SK20.CAR.get(),U=g.userData,big=u.big,sc=big?5:1.15,bob=u.prep>0?Math.sin(t3*40)*.012*sc:0;g.position.set(u.x,bob,u.y);g.rotation.y=-(u.ang||0)-Math.PI/2;if(u.k==='f1')g.scale.set(1.05,.55,1.35);else g.scale.set(sc,big?5.7:sc,sc);U.paint.color.set(u.col);U.hl.material.opacity=u.prep>0?.5+.5*Math.abs(Math.sin(t3*6)):1;
     if(u.prep>0){dot17(u.x-u.dx*1.3*sc,.25,u.y-u.dy*1.3*sc,.8*sc,'#a0a0a0',.35)}else{if(Math.random()<.5)dot17(u.x-u.dx*1.2*sc+rand(-.3,.3),.2,u.y-u.dy*1.2*sc+rand(-.3,.3),.6*sc,'#8a8a90',.4)}
     bar17(u.x,(big?4.6:.95),u.y,big?3:1,u.hp/u.max,big?'#ff4a4a':'#ffffff');if(big&&u.prep>0)tor17(u.x,.1,u.y,4+Math.sin(t3*8)*.4,'#ff3030',.6)})}
   catch(e){console.error(e)}finally{SK17=s17;sk20End()}}
