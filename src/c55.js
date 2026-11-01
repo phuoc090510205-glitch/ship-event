@@ -33,7 +33,7 @@ const T={
 'Hố Đen Nuốt Hạm Đội':['Triệu Hồi Thế Giới Thứ 3','Triệu hồi hố đen lớn; từ hố đen bay ra biến thể bóng tối của các tàu đồng minh và tàu địch, lao vào tấn công kẻ địch và công trình của chúng. Biến thể bóng tối có 100% máu tối đa của tàu gốc.',[['Hố đen','10 giây'],['Biến thể bóng tối','Tối đa 10 · 100% máu tối đa tàu gốc'],['Thời gian biến thể','25 giây']],'Hố đen xoáy tím đen mở ra, từng con tàu bóng tối đen kịt bay vụt ra lao vào địch.'],
 'Phượng Hoàng Lửa':['Phượng Hoàng Lửa','Triệu hồi phượng hoàng 3D. Vừa xuất hiện sải cánh gây sát thương và cấm kỹ năng toàn bộ kẻ địch; sau 2 giây vào trạng thái chiến đấu, thân bốc lửa, ưu tiên mục tiêu cao nhất và xa nhất với 3 đòn luân phiên.',[['Sải cánh','200 sát thương · cấm kỹ năng 3 giây toàn bộ kẻ địch'],['Phượng hoàng','4.000 máu · 20 giây'],['Đòn 1','Cầu lửa 800 · thiêu đốt 50 mỗi 0,5 giây trong 3 giây'],['Đòn 2','Vỗ cánh 400 · đẩy bay 4 ô'],['Đòn 3','Lao xuyên 500 · kết liễu dưới 12% máu (trừ boss)']],'Phượng hoàng lửa sải đôi cánh rực cháy, thân bốc lửa, phóng cầu lửa, vỗ cánh tạo gió lửa và lao xuyên mục tiêu.']};
 const NEW={};
-KI.forEach(k=>{const t=T[k[0]];if(!t||k[2]!==2)return;if(k[0]==='Hủy Diệt'&&k[1]!=='Tối thượng')return;const cd=(k[6].find(r=>r[0]==='Hồi chiêu')||[0,'60 giây'])[1];
+KI.forEach(k=>{const t=T[k[0]];if(!t||k[2]!==2)return;if(k[0]==='Hủy Diệt'&&k[1]!=='Tối thượng')return;const cd=k.c50?(k[6].find(r=>r[0]==='Hồi chiêu')||[0,'600 giây'])[1]:'500 giây';
   k[0]=t[0];k[5]=t[1];k[6]=t[2].map(r=>r.slice()).concat([['Hồi chiêu',cd],['Hoạt họa 3D',t[3]]]);k.c55=1;k.c50=0;NEW[t[0]]=1});
 /* --- 3) cơ chế --- */
 const Z=G=>G.c55=G.c55||{u:[],o:[]};
