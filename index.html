@@ -4076,7 +4076,7 @@ function bkPrice(b){return {da:400000*(b.k+1),sao:5000*(b.k+1)}}
 function bkMul(l){return 1+.06*(l-1)}
 function bkBuild(sh,x,y,main){
   const l=aLv(sh.id),q=bsEquip(sh,sh.c0),em=lvInfo(sh.c0,LPC).em,m=bkMul(l);
-  const e=dfMakeShip(sh,'p',q.wm,{},x,y,{dmgDiv:12,size:main?4.6:4.2,arm:q.arm,eng:q.eng,nuc:q.nuc,tnk:q.tnk,mrd:q.mrd,sks:main?q.sks:[],lvl:1,inf:1,hpMul:em*3*.8*BOSS_HP*m,dmMul:(1+.3*(em-1))*m});
+  const e=dfMakeShip(sh,'p',q.wm,{},x,y,{dmgDiv:12,size:main?4.6:8.8,arm:q.arm,eng:q.eng,nuc:q.nuc,tnk:q.tnk,mrd:q.mrd,sks:main?q.sks:[],lvl:1,inf:1,hpMul:em*3*.8*BOSS_HP*m,dmMul:(1+.3*(em-1))*m});
   e.bkBoss=1;return e;
 }
 function bkStat(sh,l){
@@ -7384,7 +7384,7 @@ const ARCH=[
 function pvGenBase(rank){
   const ar=ARCH[(Math.random()*ARCH.length)|0],pl=bLv('hq');
   const hqLv=Math.max(1,Math.min(100,Math.round(pl*(.7+Math.random()*.8)+(rank-1)*(.6+Math.random()*1))));
-  const R=16+(rank>=6&&Math.random()<.6?2:0)+(rank>=11&&Math.random()<.6?2:0);
+  let R=16+(rank>=6&&Math.random()<.6?2:0)+(rank>=11&&Math.random()<.6?2:0);try{const mine=bPlaced().filter(b=>b.t!=='mine'&&b.t!=='hangar'&&b.t!=='warp');const ar0=mine.reduce((a,b)=>a+(b.w||2)*(b.h||2),0);R=Math.max(R,Math.ceil(Math.sqrt(ar0*2.6)))}catch(e){}
   const ok=b=>b.hl<=hqLv+4+((Math.random()*8)|0)&&b.t!=='hq'&&b.t!=='mine'&&b.t!=='hangar'&&b.t!=='warp';
   const all=BLD.filter(ok);
   let tur=all.filter(b=>BT[b.t]&&(!b.nb||b.nb.k==='tur')),walls=all.filter(b=>b.t==='wall'),fill=all.filter(b=>!BT[b.t]&&b.t!=='wall'&&b.t!=='pylon'&&b.t!=='droneb');
@@ -7398,7 +7398,7 @@ function pvGenBase(rank){
   // HQ: vị trí ngẫu nhiên, thiên về phía sau
   const hx=1+((Math.random()*(R-hq.w-2))|0),hy=Math.max(1,Math.min(R-hq.h-1,Math.round((R-hq.h)*(.1+Math.random()*.5))));
   occ.push({x:hx,y:hy,w:hq.w,h:hq.h,t:'hq',lv:hqLv,hqf:1,def:hq});
-  const N=Math.max(5,Math.min(20,Math.round(6+rank*.7+Math.random()*6+(ar.spread?1:0))));
+  let N=Math.max(5,Math.min(20,Math.round(6+rank*.7+Math.random()*6+(ar.spread?1:0))));{let myN=0;try{myN=bPlaced().filter(b=>b.t!=='hq'&&b.t!=='mine'&&b.t!=='hangar'&&b.t!=='warp').length}catch(e){}if(myN>0)N=myN}
   for(let i=0;i<N;i++){
     const r=Math.random();let b,k;
     if(r<ar.t){b=pick(tur);k='t'}else if(r<ar.t+ar.w){b=pick(walls);k='w'}else{b=pick(fill);k='f'}
@@ -19344,6 +19344,31 @@ Object.assign(window.C49TXT,{
  1017:'mỗi 12 giây triệu hồi 1 thuyền buồm nhỏ nhiều màu (200 máu) húc mục tiêu 10 sát thương và đẩy nhẹ 1 ô; đủ 12 thuyền thì cả 12 phát nổ (500 sát thương trong 3 ô) và du thuyền trắng hùng vĩ (cao 12 ô, dài 35 ô, 1.200 máu) chạy qua thảm gây 300 sát thương lên mọi mục tiêu va phải; nếu bị phá hủy, du thuyền nổ tung 5.000 sát thương trong 7 ô'});
 })();
 
+/* ===== c61: tàu vào trận luôn đứng ngoài thảm, không đè lên công trình (Level + PvP) ===== */
+(function(){
+function spawnFix(G){const P=G.pl;if(!P||!G.wd)return;
+  let Rg=null;try{Rg=window.C39&&C39.region?C39.region(G):null}catch(e){}
+  const W=G.wd.Wd,H=G.wd.Hd,blk=[];
+  (G.bl||[]).forEach(b=>{if(b&&b.hp>0&&b.w)blk.push([b.x,b.y,b.w/2,b.h/2])});
+  (G.eu||[]).forEach(u=>{if(u&&!u.dead&&u.w)blk.push([u.x,u.y,u.w/2,u.h/2])});
+  const placed=[];
+  const rad=s=>Math.max(.8,(s.size||2.2)*.5);
+  const free=(x,y,r)=>{if(x<r+.5||y<r+.5||x>W-r-.5||y>H-r-.5)return false;
+    if(Rg&&x>Rg.x0-r-.6&&x<Rg.x1+r+.6&&y>Rg.y0-r-.6&&y<Rg.y1+r+.6)return false;
+    for(const b of blk)if(Math.abs(x-b[0])<b[2]+r+.4&&Math.abs(y-b[1])<b[3]+r+.4)return false;
+    for(const q of placed)if(Math.hypot(x-q[0],y-q[1])<q[2]+r+.4)return false;return true};
+  const find=(tx,ty,r)=>{if(free(tx,ty,r))return [tx,ty];let best=null,bd=1e9;
+    for(let R=.8;R<60&&!best;R+=.8){for(let k=0;k<36;k++){const a=k/36*Math.PI*2,x=tx+Math.cos(a)*R,y=ty+Math.sin(a)*R;if(free(x,y,r)){const d=Math.hypot(x-tx,y-ty);if(d<bd){bd=d;best=[x,y]}}}}
+    return best||[tx,ty]};
+  const put=(s,x,y)=>{s.x=x;s.y=y;s.sx=x;s.sy=y;s.tx=x;s.ty=y};
+  const pr=rad(P),pp=find(P.x,P.y,pr);put(P,pp[0],pp[1]);placed.push([pp[0],pp[1],pr]);
+  const A=(G.al||[]).filter(a=>a&&!a.dead);
+  A.forEach((a,i)=>{const r=rad(a),tx=P.x+(i-(A.length-1)/2)*Math.max(3,r*2+.8),ty=P.y+1.6;const q=find(tx,ty,r);put(a,q[0],q[1]);placed.push([q[0],q[1],r])});
+  G.cam={x:P.x,y:P.y}}
+window.c61Spawn=spawnFix;
+{const _St=dfStep;dfStep=function(){const G=DG;if(G&&!G._c61&&G.pl&&G.hq){G._c61=1;try{spawnFix(G)}catch(e){console.error(e)}}return _St.apply(this,arguments)}}
+})();
+
 /* gộp pháo công trình hạng nặng vào pháo hạng nặng */
 WP.forEach(w=>{if(w.cat===5){w.cat=4;w.tag='PHÁO HẠNG NẶNG'}});
 /* ===== Sở hữu vật phẩm bán ở Shop khuyến mãi ===== */
@@ -19596,7 +19621,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL=(window.SE_CFG&&SE_CFG.fb)||'';
-  const VER='v240';
+  const VER='v241';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`
