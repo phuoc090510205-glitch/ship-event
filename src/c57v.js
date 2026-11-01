@@ -21,7 +21,7 @@ function sk21Init(){if(SK21)return SK21;sk17Init();const M=(c,o)=>new T.MeshStan
 function sk21End(){if(!SK21)return;Object.keys(SK21).forEach(k=>{if(k!=='H')SK21[k].end()});Object.values(SK21.H).forEach(p=>p.end())}
 function skill3d21(G,dt){const S=G.c40;if(!S||!(S.K>=1007&&S.K<=1010)){if(SK21)sk21End();return}sk21Init();const s17=SK17;SK17=SK21.H;
   try{const K=SK21,Y=HOV,V=(x,z,y)=>new T.Vector3(x,y,z),Rg=S.Rg;
-   if(S.K===1007&&S.pl){const P=S.pl,g=K.PLANE.get();g.position.set(P.x,12,P.y);g.rotation.set(0,P.dx>0?0:Math.PI,0);dot17(P.x,.1,P.y,20,'#000000',.25);for(let i=0;i<4;i++)dot17(P.x-P.dx*(15+i*2),11.6,P.y+(i%2?6:-6),2,'#ffffff',.35-i*.07)}
+   if(S.K===1007&&S.pl){const P=S.pl,g=K.PLANE.get();g.position.set(P.x,5,P.y);g.rotation.set(0,P.dx>0?0:Math.PI,0);dot17(P.x,.1,P.y,20,'#000000',.25);for(let i=0;i<4;i++)dot17(P.x-P.dx*(15+i*2),4.6,P.y+(i%2?6:-6),2,'#ffffff',.35-i*.07)}
    if(S.K===1008){if(S.ph===1){const W=Rg.x1-Rg.x0,H=Rg.y1-Rg.y0,rise=Math.min(1,S.a*1.5);const seg=(x,z,ry)=>{const g=K.CAB.get();g.position.set(x,-3.4*(1-rise),z);g.rotation.y=ry};
       for(let x=Rg.x0+1;x<Rg.x1;x+=2){seg(x,Rg.y0-.3,0);seg(x,Rg.y1+.3,0)}for(let y=Rg.y0+1;y<Rg.y1;y+=2){seg(Rg.x0-.3,y,Math.PI/2);seg(Rg.x1+.3,y,Math.PI/2)}
       for(let x=Rg.x0+2;x<Rg.x1;x+=4)beam17(V(x,Rg.y0-.3,3.5*rise),V(x,Rg.y1+.3,3.5*rise),'#e8dcc0',.12,.8)}
