@@ -14486,7 +14486,7 @@ function render(G,L){const now=performance.now(),dt=Math.min(.05,(now-lastT)/100
   G.fx.forEach(f=>{const k=f.t/f.max;if(k<=0)return;const y=hAtW(f.x,f.y,HOV)*.9;if(!seenFx.has(f)){seenFx.add(f);if(f.ex||f.r>=1)boom(f.x,y,f.y,Math.max(.22,f.r*.42),!f.ex&&/^#?[0-9a-f]{0,2}[89a-f]/i.test(f.col||''));else boom(f.x,y,f.y,.22,false)}
     const m=XB.get(),R=f.r*(1.1-k*.5)*(f.ex?.6:.8);m.position.set(f.x,y,f.y);m.scale.setScalar(Math.max(.05,R));m.material.color.copy(col(f.ex?'#ffb347':f.col));m.material.opacity=Math.min(1,k*.6)});
   BUL.end();BC.end();BG.end();XB.end();MS.end();TRL.end();ARW.end();SHL.end();
-  try{imp3d(G)}catch(e){console.error(e)}try{skill3d16(G,dt)}catch(e){console.error(e)}try{skill3d17(G,dt)}catch(e){console.error(e)}try{skill3d18(G,dt)}catch(e){console.error(e)}try{skill3d19(G,dt)}catch(e){console.error(e)}try{skill3d20(G,dt)}catch(e){console.error(e)}try{skill3d21(G,dt)}catch(e){console.error(e)}try{skill3d22(G,dt)}catch(e){console.error(e)}try{shields3d(G)}catch(e){console.error(e)}XS.end();IMP.end();stepFx(dt);
+  try{imp3d(G)}catch(e){console.error(e)}try{skill3d16(G,dt)}catch(e){console.error(e)}try{skill3d17(G,dt)}catch(e){console.error(e)}try{skill3d18(G,dt)}catch(e){console.error(e)}try{skill3d19(G,dt)}catch(e){console.error(e)}try{skill3d20(G,dt)}catch(e){console.error(e)}try{skill3d21(G,dt)}catch(e){console.error(e)}try{skill3d22(G,dt)}catch(e){console.error(e)}try{skill3d23(G,dt)}catch(e){console.error(e)}try{shields3d(G)}catch(e){console.error(e)}XS.end();IMP.end();stepFx(dt);
   const P=G.pl;marker.visible=!PV&&!P.dead&&R3.joy.id===null&&Math.hypot(P.tx-P.x,P.ty-P.y)>.3;if(marker.visible){marker.position.x=P.tx;marker.position.z=P.ty;marker.rotation.z+=dt*2;marker.scale.setScalar(1+.15*Math.sin(t3*6))}
   try{skill3d(G,dt)}catch(e){console.error(e)}
   try{rocks3d(G)}catch(e){console.error(e)}tlb(G,dt);BAR.end();if(!PV)hud(G,true);
@@ -16117,6 +16117,43 @@ function skill3d22(G,dt){const S=G.c40;if(!S||!(S.K>=1011&&S.K<=1014)){if(SK22)s
      const tx=Rg.x0+1.2,ty=Rg.y1-1.2;tor17(tx,.05,ty,.5,'#ffffff',.5);beam17(V(tx+.6,ty-.4,0),V(tx+.6,ty-.4,2.4),'#ffffff',.03,.9);dot17(tx+.95,2.2,ty-.4,.5,'#ff3a3a',.9)}
    if(S.K===1014){S.u.forEach(u=>{if(u.k!=='horse'||u.dead)return;const g=K.HORSE.get(),U=g.userData;U.body.color.set(u.col);U.jk.color.set(u.jc);const ph=t3*14+u.born*5;U.legs.forEach((l,i)=>l.rotation.z=Math.sin(ph+(i<2?0:Math.PI)+(i%2)*.6)*.7);g.position.set(u.x,Math.abs(Math.sin(ph))*.12,u.y);g.rotation.y=-(u.ang||0);g.scale.setScalar(1.15);bar17(u.x,2.6,u.y,1.1,u.hp/u.max,u.jc);if(Math.random()<.3)spark(u.x-Math.cos(u.ang)*.8,.1,u.y-Math.sin(u.ang)*.8,0,.4,0,'#c8a878',.4,.3)})}}
   catch(e){console.error(e)}finally{SK17=s17;sk22End()}}
+
+/* ===== c59v: hình 3D thảm polo / tennis / regatta ===== */
+let SK23=null;
+function sk23Init(){if(SK23)return SK23;sk17Init();const M=(c,o)=>new T.MeshStandardMaterial(Object.assign({color:lin(c),roughness:.55,metalness:.1},o||{})),E=(c,i)=>M(c,{emissive:lin(c),emissiveIntensity:i||1.3,toneMapped:false}),add=(g,m,x,y,z)=>{m.position.set(x||0,y||0,z||0);g.add(m);return m},P=mk=>Pool(()=>{const o=mk();scene.add(o);return o});
+  SK23={
+  POLO:P(()=>{const g=new T.Group(),U={};const body=M(0x8a5a2a),dark=M(0x1a1008),hel=M(0xffd700,{metalness:.4,roughness:.3}),shirt=M(0xffffff),skin=M(0xe8c0a0),steel=M(0xd8dce4,{metalness:.9,roughness:.2});
+    const b=add(g,new T.Mesh(new T.SphereGeometry(.5,14,10),body),0,1,0);b.scale.set(1.7,.85,.75);const nk=add(g,new T.Mesh(new T.CylinderGeometry(.16,.24,.8,10),body),.7,1.35,0);nk.rotation.z=-.7;const hd=add(g,new T.Mesh(new T.BoxGeometry(.5,.2,.22),body),1.05,1.62,0);hd.rotation.z=-.3;
+    const mane=add(g,new T.Mesh(new T.BoxGeometry(.5,.08,.06),dark),.58,1.55,0);mane.rotation.z=-.7;const tl=add(g,new T.Mesh(new T.CylinderGeometry(.03,.09,.7,6),dark),-.95,1,0);tl.rotation.z=-.9;
+    U.legs=[[.5,.22],[.5,-.22],[-.5,.22],[-.5,-.22]].map(([x,z])=>{const p=new T.Group();p.position.set(x,.85,z);add(p,new T.Mesh(new T.CylinderGeometry(.06,.05,.85,6),body),0,-.42,0);add(p,new T.Mesh(new T.CylinderGeometry(.07,.07,.08,6),dark),0,-.85,0);g.add(p);return p});
+    const r=new T.Group();r.position.set(0,1.45,0);add(r,new T.Mesh(new T.BoxGeometry(.3,.5,.34),shirt),0,.25,0);add(r,new T.Mesh(new T.SphereGeometry(.13,10,8),skin),0,.62,0);add(r,new T.Mesh(new T.SphereGeometry(.16,12,8,0,Math.PI*2,0,Math.PI/2),hel),0,.66,0);add(r,new T.Mesh(new T.BoxGeometry(.2,.03,.3),hel),.12,.66,0);
+    const lance=new T.Group();lance.position.set(.1,.35,.22);add(lance,new T.Mesh(new T.CylinderGeometry(.03,.04,2.6,6),M(0x6a4422)),0,0,0).rotation.z=-Math.PI/2;const tip=add(lance,new T.Mesh(new T.ConeGeometry(.07,.35,8),steel),1.45,0,0);tip.rotation.z=-Math.PI/2;r.add(lance);g.add(r);
+    U.body=body;U.hel=hel;U.lance=lance;g.userData=U;return g}),
+  HELM:P(()=>{const g=new T.Group(),m=M(0xffd700,{metalness:.5,roughness:.25,emissive:lin(0x302000),emissiveIntensity:.6});add(g,new T.Mesh(new T.SphereGeometry(.35,14,10,0,Math.PI*2,0,Math.PI/2),m));add(g,new T.Mesh(new T.BoxGeometry(.5,.05,.7),m),.0,0,.15);g.userData={m};return g}),
+  TBALL:P(()=>new T.Mesh(new T.SphereGeometry(.16,12,8),M(0xd8ff3a,{emissive:lin(0x6a8a00),emissiveIntensity:.8,roughness:.8}))),
+  SBOAT:P(()=>{const g=new T.Group(),hull=M(0xffffff,{roughness:.35}),sail=M(0xff4a4a,{side:T.DoubleSide,roughness:.7}),wood=M(0x8a5a2a);const h=add(g,new T.Mesh(new T.CylinderGeometry(.35,.18,1.6,10,1,false,0,Math.PI),hull),0,.2,0);h.rotation.set(Math.PI/2,0,Math.PI/2);h.scale.set(1,1,.6);
+    add(g,new T.Mesh(new T.BoxGeometry(1.5,.05,.5),wood),0,.22,0);add(g,new T.Mesh(new T.CylinderGeometry(.03,.03,1.8,6),wood),.1,1.1,0);const sh=new T.Shape();sh.moveTo(0,0);sh.lineTo(0,1.6);sh.lineTo(-.9,0);sh.lineTo(0,0);const s=add(g,new T.Mesh(new T.ShapeGeometry(sh),sail),.08,.3,0);
+    const sh2=new T.Shape();sh2.moveTo(0,0);sh2.lineTo(0,1.3);sh2.lineTo(.6,0);sh2.lineTo(0,0);add(g,new T.Mesh(new T.ShapeGeometry(sh2),sail),.12,.3,0);g.userData={sail};return g}),
+  YACHT:P(()=>{const g=new T.Group(),wh=M(0xfafcff,{roughness:.25,metalness:.2}),gl=M(0x10223a,{roughness:.1,metalness:.8}),gold=M(0xd9a520,{metalness:.9,roughness:.25}),lt=E(0xbfe8ff,1.4);
+    const sh=new T.Shape();sh.moveTo(-17.5,-3);sh.lineTo(12,-3);sh.quadraticCurveTo(17.5,-1.5,18,0);sh.quadraticCurveTo(17.5,1.5,12,3);sh.lineTo(-17.5,3);sh.lineTo(-17.5,-3);const hull=new T.ExtrudeGeometry(sh,{depth:3.2,bevelEnabled:false});hull.rotateX(-Math.PI/2);add(g,new T.Mesh(hull,wh),0,0,0);
+    add(g,new T.Mesh(new T.BoxGeometry(35.6,.25,6.2),gold),0,3.2,0);add(g,new T.Mesh(new T.BoxGeometry(35.4,.5,6.1),M(0x1a2a4a)),0,.6,0);
+    [[26,2.6,5.2,-3,3.3],[19,2.4,4.6,-4,5.9],[12,2.2,4,-5,8.3],[6,1.8,3.2,-6,10.3]].forEach(([l,h,w,x,y])=>{add(g,new T.Mesh(new T.BoxGeometry(l,h,w),wh),x,y+h/2,0);add(g,new T.Mesh(new T.BoxGeometry(l*.92,h*.42,w*1.02),gl),x,y+h*.55,0);for(let i=0;i<l/2;i++)[-1,1].forEach(s=>add(g,new T.Mesh(new T.BoxGeometry(.3,.12,.04),lt),x-l/2+1+i*2,y+h*.55,s*w*.515))});
+    add(g,new T.Mesh(new T.CylinderGeometry(.12,.12,2,8),gold),-6,13.1,0);const rd=add(g,new T.Mesh(new T.SphereGeometry(.5,12,8),wh),-6,12.3,0);return g}),
+  H:{B:Pool(()=>{const beamG=new T.CylinderGeometry(1,1,1,8,1,true),g=new T.Group(),a=new T.Mesh(beamG,SK.AD(0xffffff,.5)),b=new T.Mesh(beamG,SK.AD(0xffffff,1));a.frustumCulled=b.frustumCulled=false;g.add(a,b);g.userData={a,b};scene.add(g);return g}),
+     DOT:Pool(()=>{const s=new T.Sprite(ADDM(glowT()));scene.add(s);return s}),TOR:Pool(()=>{const t=new T.TorusGeometry(1,.035,8,72);t.rotateX(Math.PI/2);const m=new T.Mesh(t,SK.AD(0xffffff,1));scene.add(m);return m}),
+     CONE:Pool(()=>{const c=new T.ConeGeometry(1,1,24,1,true);c.translate(0,-.5,0);const m=new T.Mesh(c,SK.AD(0xffffff,.4));m.frustumCulled=false;scene.add(m);return m}),
+     BAR:Pool(()=>{const s=new T.Sprite(new T.SpriteMaterial({map:WHITE,transparent:true,depthTest:false,depthWrite:false,toneMapped:false,fog:false}));s.center.set(0,.5);s.renderOrder=20;scene.add(s);return s})}};return SK23}
+function sk23End(){if(!SK23)return;Object.keys(SK23).forEach(k=>{if(k!=='H')SK23[k].end()});Object.values(SK23.H).forEach(p=>p.end())}
+function skill3d23(G,dt){const S=G.c40;if(!S||!(S.K>=1015&&S.K<=1017)){if(SK23)sk23End();return}sk23Init();const s17=SK17;SK17=SK23.H;
+  try{const K=SK23,V=(x,z,y)=>new T.Vector3(x,y,z),Rg=S.Rg;
+   if(S.K===1015){S.u.forEach(u=>{if(u.k!=='polo'||u.dead)return;const g=K.POLO.get(),U=g.userData;U.body.color.set(u.col);U.hel.color.set(u.hel);const ph=u.mv?t3*14+u.i:0;U.legs.forEach((l,i)=>l.rotation.z=u.mv?Math.sin(ph+(i<2?0:Math.PI)+(i%2)*.6)*.7:0);U.lance.position.x=.1+(u.sw>0?Math.sin(u.sw/.35*Math.PI)*.6:0);
+       g.position.set(u.x,u.mv?Math.abs(Math.sin(ph))*.12:0,u.y);g.rotation.y=-(u.ang||0);g.scale.setScalar(1.15);bar17(u.x,2.7,u.y,1.1,u.hp/u.max,u.hel);if(u.mv&&Math.random()<.3)spark(u.x-Math.cos(u.ang)*.8,.1,u.y-Math.sin(u.ang)*.8,0,.4,0,'#c8e8a0',.4,.3)});
+     (S.hel||[]).forEach(h=>{const g=K.HELM.get();g.userData.m.color.set(h.col);const up=Math.min(1,h.t*2);g.position.set(h.x,.4+up*.8+Math.sin(t3*4)*.1,h.y);g.rotation.y=t3*4;for(let i=0;i<5;i++){const a=t3*3+i*1.257;dot17(h.x+Math.cos(a)*.8,1+Math.sin(t3*5+i)*.3,h.y+Math.sin(a)*.8,.45,h.q[0]==='da'?'#8fd8ff':'#ffd700',.8)}tor17(h.x,.06,h.y,.9,h.col,.6)})}
+   if(S.K===1016){if(S.cam){(G.bl||[]).forEach(b=>{if(b.hp<=0||!(b.smk>0))return;const r=Math.max(b.w||1,b.h||1)*.6;dot17(b.x,1,b.y,r*2.4,'#7adf6a',.25+.08*Math.sin(t3*3+b.x));tor17(b.x,.15+.1*Math.sin(t3*2),b.y,r,'#c8ff8a',.35)})}
+     (S.tb||[]).forEach(b=>{const g=K.TBALL.get();g.position.set(b.x,b.h,b.y);dot17(b.x,b.h,b.y,.6,'#e8ff6a',.6);tor17(b.ex,.06,b.ey,.6,'#e8ff6a',.6)})}
+   if(S.K===1017){S.u.forEach(u=>{if(u.dead)return;if(u.k==='sboat'){const g=K.SBOAT.get();g.userData.sail.color.set(u.col);g.position.set(u.x,.05+Math.sin(t3*2+u.born)*.05,u.y);g.rotation.set(Math.sin(t3*1.6+u.born)*.08,-(u.ang||0),0);bar17(u.x,2.3,u.y,.9,u.hp/u.max,u.col);if(Math.random()<.25)spark(u.x-Math.cos(u.ang)*.8,.05,u.y-Math.sin(u.ang)*.8,0,.3,0,'#e8f8ff',.35,.3)}
+       else if(u.k==='ryacht'){const g=K.YACHT.get();g.position.set(u.x,0,u.y);g.rotation.y=u.dx>0?0:Math.PI;bar17(u.x,13.6,u.y,5,u.hp/u.max,'#ffffff');for(let i=0;i<4;i++)spark(u.x-u.dx*18+rand(-1,1),.1,u.y+rand(-3,3),-u.dx*2,.5,0,'#e8f8ff',.6,.5)}})}}
+  catch(e){console.error(e)}finally{SK17=s17;sk23End()}}
 
 function skill3d18(G,dt){const S=G.c40;if(!S){if(SK18&&SK18.on){SK18.on=0;Object.values(SK18).forEach(p=>p&&p.end&&p.end());Object.values(SK18.H).forEach(p=>p.end())}return}sk18Init();SK18.on=1;const s17=SK17;SK17=SK18.H;try{sk18Body(G,dt,S)}finally{SK17=s17;Object.values(SK18.H).forEach(p=>p.end())}}
 function sk18Body(G,dt,S){const K=SK18,Y=HOV,V=(x,z,y)=>new T.Vector3(x,y,z),Rg=S.Rg,cx=S.cx,cz=S.cy,RW=Rg.x1-Rg.x0,RH=Rg.y1-Rg.y0;
@@ -19215,6 +19252,57 @@ Object.assign(window.C49TXT,{
  1014:'mỗi 12 giây thả 1 ngựa đua có nài (300 máu, nhiều màu, không có màu đỏ) tông mục tiêu 120 sát thương và đẩy lùi 2 ô; mỗi mục tiêu ngựa hạ gục sinh ra 1 người que (50 máu, 30 sát thương/đòn) tại chỗ'});
 })();
 
+/* ===== c59: thảm Người giàu — Sân polo quý tộc, Sân tennis cỏ danh giá, Cuộc đua thuyền buồm Regatta ===== */
+(function(){
+if(!window.C40||!C40.H2||!window.C49TXT)return;
+const X=C40.X,{enemies,blds,hurt,pop,vis,unit,rnd,dist,inR}=C40.H,{fight,live}=C40.H2;
+const SVS=()=>{try{return S}catch(e){return null}},SAVE=()=>{try{save()}catch(e){}};
+const stun=(e,t)=>{if(e&&!e.dead)e.stun=Math.max(e.stun||0,t*(e.boss?1/3:1))};
+const push=(G,e,dx,dy,d)=>{if(!e||e.dead||e.sb)return;const l=Math.hypot(dx,dy)||1,k=d*(e.boss?.3:1);e.x+=dx/l*k;e.y+=dy/l*k;try{e.x=Math.max(.5,Math.min(G.wd.Wd-.5,e.x));e.y=Math.max(.5,Math.min(G.wd.Hd-.5,e.y))}catch(x){}};
+const all=G=>(G.en||[]).filter(e=>e&&!e.dead&&!(e.spawn>G.t));
+const reach=(e,r)=>r+(e.size||2)*.3;
+const hq=G=>(G.bl||[]).find(b=>(b.t==='hq'||b.hq)&&!b.c39tmp&&b.hp>0);
+/* ============ 1015 · Sân polo quý tộc ============ */
+const HEL=['#ffd700','#2f7dff','#2ecc71','#9b4dff','#ff8a1a','#00d2d2','#ff4fa8','#ffffff','#e8302a','#c4c8d0'],HOR=['#3a2414','#8a5a2a','#f2efe8','#1a1a1a','#c8a070','#7a7a80','#b07a40'];
+/* quà: càng cao càng hiếm, mốc cao nhất 0,4% */
+const RW=[['da',40,30],['da',80,18],['da',150,10],['da',300,5],['da',600,1.6],['da',1200,.4],['sao',3,20],['sao',6,9],['sao',12,4],['sao',20,1.6],['sao',40,.4]];
+function roll(){let r=Math.random()*100;for(const q of RW){if((r-=q[2])<0)return q}return RW[0]}
+function slot(G,S,i){const H=hq(G);const cx=G.wd?G.wd.Wd/2:S.cx,cy=G.wd?G.wd.Hd/2:S.cy;if(!H)return {x:S.cx-3+i,y:S.cy+3,a:0};let dx=H.x-cx,dy=H.y-cy,l=Math.hypot(dx,dy);if(l<.5){dx=0;dy=1;l=1}dx/=l;dy/=l;const back=Math.max(H.w,H.h)/2+2.5,px=-dy,py=dx,o=(i-3)*1.5;return {x:H.x+dx*back+px*o,y:H.y+dy*back+py*o,a:Math.atan2(-dy,-dx)}}
+function rider(G,S,i){const p=slot(G,S,i);return unit(G,S,{k:'polo',i,x:p.x,y:p.y,ang:p.a,hp:500,size:1.4,hr:.8,col:HOR[i%HOR.length],hel:HEL[Math.floor(Math.random()*HEL.length)],cd:0,born:G.t})}
+X.init[1015]=(G,S)=>{S.a=0;S.go=0;S.hel=[];S.rs={};for(let i=0;i<7;i++)rider(G,S,i)};
+X.step[1015]=(G,S,dt,E,Rg)=>{S.a+=dt;if(!S.go&&S.a>=15){S.go=1;pop(G,S.cx,S.cy-4,'Kỵ binh polo xung trận!','#ffe6a8')}
+  const rs=live(S,'polo');for(let i=0;i<7;i++){if(rs.some(u=>u.i===i))continue;S.rs[i]=(S.rs[i]||0)+dt;if(S.rs[i]>=30){S.rs[i]=0;const u=rider(G,S,i);u.wait=S.go?2:0}}
+  rs.forEach(u=>{u.cd-=dt;u.mv=0;if(!S.go||(u.wait=Math.max(0,(u.wait||0)-dt))>0){const p=slot(G,S,u.i);u.x+=(p.x-u.x)*Math.min(1,dt*2);u.y+=(p.y-u.y)*Math.min(1,dt*2);return}
+    const tg=enemies(G,null).sort((a,b)=>dist(a,u)-dist(b,u))[0];if(!tg)return;const dx=tg.x-u.x,dy=tg.y-u.y,l=Math.hypot(dx,dy)||1,rc=reach(tg,1.6);u.ang=Math.atan2(dy,dx);
+    if(l>rc-.2){const s=Math.min(l-rc+.2,8/1.5*dt);u.x+=dx/l*s;u.y+=dy/l*s;u.mv=1}
+    if(l<=rc&&u.cd<=0){u.cd=1;u.sw=.35;hurt(G,tg,120);if(tg.dead||tg.hp<=0){const q=roll();S.hel.push({x:tg.x,y:tg.y,col:u.hel,t:0,q})}}
+    u.sw=Math.max(0,(u.sw||0)-dt)});
+  S.hel=S.hel.filter(h=>{h.t+=dt;if(h.t>=2&&!h.got){h.got=1;const SS=SVS();if(SS){if(h.q[0]==='da')SS.da=(SS.da||0)+h.q[1];else SS.sao=(SS.sao||0)+h.q[1];SAVE()}pop(G,h.x,h.y-2,'+'+h.q[1]+(h.q[0]==='da'?' Đá':' Sao'),h.q[0]==='da'?'#8fd8ff':'#ffd700')}return h.t<2.6})};
+/* ============ 1016 · Sân tennis cỏ danh giá ============ */
+X.init[1016]=(G,S)=>{S.a=0;S.cam=1;S.tb=[];S.k=0};
+X.step[1016]=(G,S,dt,E,Rg)=>{S.a+=dt;const B=blds(G,Rg).concat([hq(G)]).filter((b,i,a)=>b&&b.hp>0&&a.indexOf(b)===i);
+  if(S.cam){if(S.a<13){B.forEach(b=>{b.smk=Math.max(b.smk||0,13-S.a)})}else{S.cam=0;S.k=0;B.forEach(b=>{b.smk=0;const r=Math.max(b.w||1,b.h||1)/2+3;all(G).forEach(e=>{if(Math.hypot(e.x-b.x,e.y-b.y)<=reach(e,r)){if(!e.c59t||e.c59t!==G.t){e.c59t=G.t;hurt(G,e,200)}}});vis(G,{k:'boom',x:b.x,y:b.y,h:.5,max:.6,c:'#c8ff8a'})});pop(G,S.cx,S.cy-4,'Lộ diện! 200 sát thương quanh công trình','#c8ff8a')}return}
+  S.k+=dt;if(S.k>=5){const L=all(G).filter(e=>inR(Rg,e,4));if(L.length){S.k=0;const e=L[Math.floor(Math.random()*L.length)];S.tb.push({e,x0:S.cx,y0:S.cy,t:0,T:.6})}else S.k=5}
+  S.tb=S.tb.filter(b=>{b.t+=dt;const e=b.e;if(!e.dead){b.ex=e.x;b.ey=e.y}const k=Math.min(1,b.t/b.T);b.x=b.x0+(b.ex-b.x0)*k;b.y=b.y0+(b.ey-b.y0)*k;b.h=Math.sin(k*Math.PI)*2.5+.3;if(k>=1){if(!e.dead){hurt(G,e,50);stun(e,.5)}return false}return true})};
+/* ============ 1017 · Cuộc đua thuyền buồm Regatta ============ */
+const SAIL=['#ff4a4a','#ffd02a','#2f7dff','#2ecc71','#ff8a1a','#9b4dff','#00d2d2','#ff4fa8','#ffffff','#ffe066','#7ad0ff','#c4ff4a'];
+X.init[1017]=(G,S)=>{S.a=10;S.n=0;S.y=null};
+X.step[1017]=(G,S,dt,E,Rg)=>{const bs=live(S,'sboat');
+  if(!S.y){S.a+=dt;if(S.a>=12){S.a-=12;const x=rnd(Rg.x0,Rg.x1),y=rnd(Rg.y0,Rg.y1);unit(G,S,{k:'sboat',x,y,hp:200,size:1.2,hr:.7,col:SAIL[S.n++%SAIL.length],ang:Math.random()*6.28,cd:0,born:G.t,wt:Math.random()*6});pop(G,x,y-2,'Thuyền buồm '+(bs.length+1)+'/12','#e8f8ff')}}
+  bs.forEach(u=>{u.cd-=dt;const tg=enemies(G,Rg,6).sort((a,b)=>dist(a,u)-dist(b,u))[0];let ta;if(tg)ta=Math.atan2(tg.y-u.y,tg.x-u.x);else{u.wt+=dt*.5;const tx=S.cx+Math.cos(u.wt)*6,ty=S.cy+Math.sin(u.wt*1.3)*6;ta=Math.atan2(ty-u.y,tx-u.x)}
+    let da=ta-u.ang;while(da>Math.PI)da-=2*Math.PI;while(da<-Math.PI)da+=2*Math.PI;u.ang+=Math.max(-3*dt,Math.min(3*dt,da));u.x+=Math.cos(u.ang)*3.5*dt;u.y+=Math.sin(u.ang)*3.5*dt;u.x=Math.max(Rg.x0-6,Math.min(Rg.x1+6,u.x));u.y=Math.max(Rg.y0-6,Math.min(Rg.y1+6,u.y));
+    if(tg&&u.cd<=0&&Math.hypot(tg.x-u.x,tg.y-u.y)<=reach(tg,1.1)){u.cd=1;hurt(G,tg,10);push(G,tg,Math.cos(u.ang),Math.sin(u.ang),1)}});
+  if(!S.y&&bs.length>=12){bs.forEach(u=>{all(G).forEach(e=>{if(Math.hypot(e.x-u.x,e.y-u.y)<=reach(e,3))hurt(G,e,500)});vis(G,{k:'boom',x:u.x,y:u.y,h:.4,max:.7,c:u.col});u.dead=true;u.fx3=1});
+    const s=Math.random()<.5?1:-1,y=S.cy;S.y=unit(G,S,{k:'ryacht',x:s>0?Rg.x0-22:Rg.x1+22,y,dx:s,x1:s>0?Rg.x1+22:Rg.x0-22,hp:1200,size:6,hr:4,h:0,ang:s>0?0:Math.PI,born:G.t,hit:new Set()});S.a=0;pop(G,S.cx,S.cy-5,'12 thuyền phát nổ · du thuyền trắng hùng vĩ tiến vào!','#ffffff')}
+  const Y=S.y;if(Y){if(Y.dead){if(!Y.done){all(G).forEach(e=>{if(Math.hypot(e.x-Y.x,e.y-Y.y)<=reach(e,7))hurt(G,e,5000)});vis(G,{k:'boom',x:Y.x,y:Y.y,h:2,max:1.2,c:'#ffd08a'});pop(G,Y.x,Y.y-4,'Du thuyền nổ tung! 5.000 sát thương','#ffb040')}S.y=null;return}
+    Y.x+=Y.dx*4*dt;all(G).forEach(e=>{if(Y.hit.has(e))return;if(Math.abs(e.x-Y.x)<=17.5+(e.size||2)*.3&&Math.abs(e.y-Y.y)<=3+(e.size||2)*.3){Y.hit.add(e);hurt(G,e,300);vis(G,{k:'boom',x:e.x,y:e.y,h:.3,max:.4,c:'#ffffff'})}});
+    if((Y.dx>0&&Y.x>=Y.x1)||(Y.dx<0&&Y.x<=Y.x1)){Y.done=1;Y.dead=true;Y.fx3=1;S.y=null}}};
+Object.assign(window.C49TXT,{
+ 1015:'triệu hồi sẵn 7 kỵ binh polo (500 máu, cầm giáo, mũ nhiều màu) sau trụ sở, tốc chạy 8 ô mỗi 1,5 giây; 15 giây sau khi trận bắt đầu đồng loạt lao lên, mỗi đòn 120 sát thương; mỗi mục tiêu bị hạ để lại 1 chiếc mũ quà thưởng: 40–1.200 Đá hoặc 3–40 Sao (quà càng cao càng hiếm, mốc cao nhất chỉ 0,4%)',
+ 1016:'ngụy trang mọi công trình và trụ sở trên thảm trong 13 giây đầu trận (kẻ địch không nhắm vào được); khi lộ diện gây 200 sát thương lên mục tiêu trong 3 ô quanh mỗi công trình; sau đó mỗi 5 giây tung 1 quả bóng tennis vào 1 mục tiêu trong phạm vi: 50 sát thương và choáng 0,5 giây',
+ 1017:'mỗi 12 giây triệu hồi 1 thuyền buồm nhỏ nhiều màu (200 máu) húc mục tiêu 10 sát thương và đẩy nhẹ 1 ô; đủ 12 thuyền thì cả 12 phát nổ (500 sát thương trong 3 ô) và du thuyền trắng hùng vĩ (cao 12 ô, dài 35 ô, 1.200 máu) chạy qua thảm gây 300 sát thương lên mọi mục tiêu va phải; nếu bị phá hủy, du thuyền nổ tung 5.000 sát thương trong 7 ô'});
+})();
+
 /* gộp pháo công trình hạng nặng vào pháo hạng nặng */
 WP.forEach(w=>{if(w.cat===5){w.cat=4;w.tag='PHÁO HẠNG NẶNG'}});
 /* ===== Sở hữu vật phẩm bán ở Shop khuyến mãi ===== */
@@ -19467,7 +19555,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL=(window.SE_CFG&&SE_CFG.fb)||'';
-  const VER='v234';
+  const VER='v235';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`
