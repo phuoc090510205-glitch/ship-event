@@ -3,7 +3,7 @@
    Chữ ký chỉ tạo được trên máy đã nhập khoá chủ game (KHOA-CHU-GAME.txt); khoá bí mật không nằm trong mã game. */
 (function(){
 const MAXV=999999999,MSG=a=>'SE-ADMIN|v1|'+a;
-const acc=()=>{try{return localStorage.getItem('hdvt_acc')||''}catch(e){return''}};
+const acc=()=>{try{return localStorage.getItem('hdvt_acc')||'khach'}catch(e){return'khach'}};
 const sub=()=>window.crypto&&crypto.subtle;
 const b64u=b=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 const ub64=t=>{t=t.replace(/-/g,'+').replace(/_/g,'/');while(t.length%4)t+='=';const s=atob(t),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u};
@@ -20,19 +20,21 @@ function badge(){const d=document.getElementById('da');if(!d)return;let b=docume
   if(!b){b=document.createElement('span');b.id='c60b';b.title='Tài khoản chủ game · vô hạn tài nguyên';b.style.cssText='display:inline-flex;align-items:center;gap:4px;margin-left:6px;padding:2px 8px;border-radius:999px;background:linear-gradient(90deg,#ffd02a,#ff9a2a);color:#3a2000;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap';b.textContent='👑 Chủ game · ∞';b.onclick=menu;const c=d.closest('.chip')||d.parentNode;c.parentNode.insertBefore(b,c)}
   d.textContent='∞';const s=document.getElementById('sao');if(s)s.textContent='∞'}
 function menu(){const old=document.getElementById('c60m');if(old){old.remove();return}const m=document.createElement('div');m.id='c60m';m.style.cssText='position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:99999;background:#0e1838;border:1px solid #ffd02a;border-radius:14px;padding:16px;color:#fff;max-width:320px;font:14px system-ui;box-shadow:0 10px 40px #000a';
-  m.innerHTML='<b style="color:#ffd02a">👑 Tài khoản chủ game</b><div style="margin:8px 0;opacity:.85">Tài khoản <b>'+String(acc()).replace(/[<>&"]/g,'')+'</b> đang được vô hạn Đá, Sao và vật liệu. Các tài khoản khác chơi bình thường.</div><div style="display:flex;gap:8px;justify-content:flex-end"><button data-a="off" style="padding:6px 10px;border-radius:8px;border:0;background:#3a4670;color:#fff">Tắt cho tài khoản này</button><button data-a="x" style="padding:6px 10px;border-radius:8px;border:0;background:#ffd02a;color:#3a2000;font-weight:700">Đóng</button></div>';
+  m.innerHTML='<b style="color:#ffd02a">👑 Tài khoản chủ game</b><div style="margin:8px 0;opacity:.85">Tài khoản <b>'+String(acc()==='khach'?'Khách (chưa đăng ký)':acc()).replace(/[<>&"]/g,'')+'</b> đang được vô hạn Đá, Sao và vật liệu. Các tài khoản khác chơi bình thường.</div><div style="display:flex;gap:8px;justify-content:flex-end"><button data-a="off" style="padding:6px 10px;border-radius:8px;border:0;background:#3a4670;color:#fff">Tắt cho tài khoản này</button><button data-a="x" style="padding:6px 10px;border-radius:8px;border:0;background:#ffd02a;color:#3a2000;font-weight:700">Đóng</button></div>';
   m.querySelector('[data-a="x"]').onclick=()=>m.remove();m.querySelector('[data-a="off"]').onclick=()=>{off();m.remove()};document.body.appendChild(m)}
 function off(){S.admOff=1;delete S.admSig;ADM=false;if(S.admBak){S.da=S.admBak.da;S.sao=S.admBak.sao;_tk.d=S.da;_tk.s=S.sao;try{if(S.admBak.inv)S.inv=S.admBak.inv}catch(e){}delete S.admBak}try{save()}catch(e){}try{refresh()}catch(e){}badge()}
-async function check(){if(busy)return;busy=true;try{const a=acc();let ok=false;
+let CUR=null;function check(){if(CUR)return CUR;CUR=check0().finally(()=>{CUR=null});return CUR}
+async function check0(){busy=true;try{const a=acc();let ok=false;
   if(a&&S.admSig&&S.admAcc===a)ok=await verify(a,S.admSig);
   let oa='';try{oa=localStorage.getItem('se_owner_acc')||''}catch(e){}
   if(!ok&&a&&!S.admOff&&(!oa||oa===a)){const sig=await signWithOwner(a);if(sig){S.admSig=sig;S.admAcc=a;ok=true;try{if(!oa)localStorage.setItem('se_owner_acc',a)}catch(e){}}}
   if(ok&&!ADM){if(!S.admBak)S.admBak={da:S.da,sao:S.sao,inv:JSON.parse(JSON.stringify(S.inv||{}))};ADM=true;topUp();try{refresh()}catch(e){}}
   if(!ok&&ADM){ADM=false}
   if(!ok&&S.admSig&&S.admAcc!==a){delete S.admSig}
-  badge()}finally{busy=false}}
+  badge();return ADM}finally{busy=false}}
 /* bật lại khi chủ game muốn (gọi SEADM.on() hoặc nhập lại khoá) */
-window.SEADM={get on(){return ADM},check,enable(){delete S.admOff;try{localStorage.setItem('se_owner_acc',acc())}catch(e){}try{save()}catch(e){}return check()},disable:off};
+async function activate(){delete S.admOff;try{localStorage.setItem('se_owner_acc',acc())}catch(e){}if(CUR)await CUR;const r=await check();try{refresh()}catch(e){}return r}
+window.SEADM={get on(){return ADM},get acc(){return acc()},activate,check,enable(){delete S.admOff;try{localStorage.setItem('se_owner_acc',acc())}catch(e){}try{save()}catch(e){}return check()},disable:off};
 {const _r=refresh;refresh=function(){const r=_r.apply(this,arguments);try{badge()}catch(e){}return r}}
 setInterval(()=>{topUp();badge()},700);setInterval(check,4000);setTimeout(check,600);
 })();
