@@ -12786,7 +12786,7 @@ window.SE_CFG=window.SE_CFG||{};
   C.bank=C.bank||{name:'Agribank',full:'Ngân hàng Nông nghiệp và Phát triển Nông thôn Việt Nam',bin:'970405',acc:'2000236003939',holder:''};
   C.zalo=C.zalo||'0905110205';            /* Zalo chủ game nhận mã đơn */
   C.prefix=C.prefix||'SE';               /* tiền tố nội dung chuyển khoản */
-  C.pub=C.pub||{x:'kMyXxNpT5lDXqJGPZs5s5C4f7tLPQ22k3INYDJ7lwP8',y:'lKt9cZK-bvEY_A5-7excb2f7qizNqqOR5tDNTDIMvlA'}; /* khoá công khai kiểm tra mã nhận quà */
+  C.pub=C.pub||{x:'rwamPqbLIghJ29CAKXdRtRJe5ur9QA8pFvE55RmqW7s',y:'MsZVDSoMaoFaHt669W8_XCuDYmnxno_9dR9jNk6HNxA'}; /* khoá công khai kiểm tra mã nhận quà */
 })(window.SE_CFG);
 (function(){
 /* qrcode-generator 1.4.4 — (c) 2009 Kazuhiko Arase, MIT license */
@@ -19594,7 +19594,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL=(window.SE_CFG&&SE_CFG.fb)||'';
-  const VER='v237';
+  const VER='v238';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`

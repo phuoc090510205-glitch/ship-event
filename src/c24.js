@@ -6,7 +6,7 @@ window.SE_CFG=window.SE_CFG||{};
   C.bank=C.bank||{name:'Agribank',full:'Ngân hàng Nông nghiệp và Phát triển Nông thôn Việt Nam',bin:'970405',acc:'2000236003939',holder:''};
   C.zalo=C.zalo||'0905110205';            /* Zalo chủ game nhận mã đơn */
   C.prefix=C.prefix||'SE';               /* tiền tố nội dung chuyển khoản */
-  C.pub=C.pub||{x:'kMyXxNpT5lDXqJGPZs5s5C4f7tLPQ22k3INYDJ7lwP8',y:'lKt9cZK-bvEY_A5-7excb2f7qizNqqOR5tDNTDIMvlA'}; /* khoá công khai kiểm tra mã nhận quà */
+  C.pub=C.pub||{x:'rwamPqbLIghJ29CAKXdRtRJe5ur9QA8pFvE55RmqW7s',y:'MsZVDSoMaoFaHt669W8_XCuDYmnxno_9dR9jNk6HNxA'}; /* khoá công khai kiểm tra mã nhận quà */
 })(window.SE_CFG);
 (function(){
 /*QRLIB*/
