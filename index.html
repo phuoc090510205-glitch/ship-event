@@ -7484,13 +7484,13 @@ function arm(G){const hs=Math.sqrt((G.pvo&&G.pvo.fr)||1);let pas=0;
     u.c65={k:f.k,r:f.r||6,l,jam:f.jam,slow:f.slow,pulse:f.pulse,dot:f.dot,a:f.a,v:f.v,cd:0}});
   const m=1+Math.min(.5,pas*.05);if(pas)G.eu.forEach(u=>(u.ws||[]).forEach(w=>w.dmg*=m));G.c65on=1}
 function atk(G,dt){if(G.t-(G.pvT0||0)<60)return;G.c69at=(G.c69at||0)+dt;if(G.c69at<5)return;G.c69at-=5;if((G.c69n||0)>=50)return;const n=G.c69n=(G.c69n||0)+1;
-  (G.eu||[]).forEach(u=>{if(u.dead||!u.ws||!u.ws.length)return;u.ws.forEach(w=>{w.rng=(w.rng||6)+1});try{G.fx.push({x:u.x,y:u.y,r:Math.max(u.w||2,u.h||2)*.9,t:.6,max:.6,col:'#ff5a5a'})}catch(e){}});
+  (G.eu||[]).forEach(u=>{if(u.dead||!u.ws||!u.ws.length)return;u.ws.forEach(w=>{w.rng=(w.rng||6)+1});try{G.fx.push({x:u.x,y:u.y,r:Math.max(u.w||2,u.h||2)*.9,t:.6,max:.6,ns:1,col:'#ff5a5a'})}catch(e){}});
   G.pb=G.pb||{dm:1,cdm:1,rm:1};if(G.c69rm0==null)G.c69rm0=G.pb.rm||1;G.pb.rm=G.c69rm0*(1+.125*n);
-  (G.bl||[]).forEach(b=>{if(b.hp<=0)return;const gun=(typeof BT!=='undefined'&&BT[b.t])||(b.nb&&(b.nb.k==='tur'||/drone/.test(b.t)));if(gun)try{G.fx.push({x:b.x,y:b.y,r:Math.max(b.w,b.h)*.9,t:.6,max:.6,col:'#ffb04a'})}catch(e){}});
+  (G.bl||[]).forEach(b=>{if(b.hp<=0)return;const gun=(typeof BT!=='undefined'&&BT[b.t])||(b.nb&&(b.nb.k==='tur'||/drone/.test(b.t)));if(gun)try{G.fx.push({x:b.x,y:b.y,r:Math.max(b.w,b.h)*.9,t:.6,max:.6,ns:1,col:'#ffb04a'})}catch(e){}});
   try{toast('⚔ Mọi công trình vào trạng thái tấn công · tầm đánh +'+n)}catch(e){}}
 function pow(G,dt){if(G.t-(G.pvT0||0)<60)return;G.c69pt=(G.c69pt||0)+dt;if(G.c69pt<6)return;G.c69pt-=6;if((G.c69k||0)>=50)return;const k=G.c69k=(G.c69k||0)+1;G.c69f=100*k;
-  (G.eu||[]).forEach(u=>{if(u.dead||!u.ws||!u.ws.length)return;u.ws.forEach(w=>{w.dmg=(w.dmg||0)+100/Math.max(.2,u.dm||1)});try{G.fx.push({x:u.x,y:u.y,r:Math.max(u.w||2,u.h||2)*1.1,t:.7,max:.7,col:'#ff3a8a'})}catch(e){}});
-  (G.bl||[]).forEach(b=>{if(b.hp<=0)return;const gun=(typeof BT!=='undefined'&&BT[b.t])||(b.nb&&(b.nb.k==='tur'||/drone/.test(b.t)));if(gun)try{G.fx.push({x:b.x,y:b.y,r:Math.max(b.w,b.h)*1.1,t:.7,max:.7,col:'#ff3a8a'})}catch(e){}});
+  (G.eu||[]).forEach(u=>{if(u.dead||!u.ws||!u.ws.length)return;u.ws.forEach(w=>{w.dmg=(w.dmg||0)+100/Math.max(.2,u.dm||1)});try{G.fx.push({x:u.x,y:u.y,r:Math.max(u.w||2,u.h||2)*1.1,t:.7,max:.7,ns:1,col:'#ff3a8a'})}catch(e){}});
+  (G.bl||[]).forEach(b=>{if(b.hp<=0)return;const gun=(typeof BT!=='undefined'&&BT[b.t])||(b.nb&&(b.nb.k==='tur'||/drone/.test(b.t)));if(gun)try{G.fx.push({x:b.x,y:b.y,r:Math.max(b.w,b.h)*1.1,t:.7,max:.7,ns:1,col:'#ff3a8a'})}catch(e){}});
   try{toast('💥 Công trình hai bên +100 sát thương mỗi viên đạn · tổng +'+G.c69f+' ('+k+'/50)')}catch(e){}}
 function ecarp(G,dt){const F=G.c65cp;if(!F||!window.C39)return;const c=F.c;
   if(!G.c65reg){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;(G.eu||[]).forEach(u=>{if(!u.w)return;x0=Math.min(x0,u.x-u.w/2);y0=Math.min(y0,u.y-u.h/2);x1=Math.max(x1,u.x+u.w/2);y1=Math.max(y1,u.y+u.h/2)});G.c65reg={x0:x0-1,y0:y0-1,x1:x1+1,y1:y1+1}}
@@ -14598,7 +14598,7 @@ function boom(x,y,z,s,blue){s=Math.min(1.6,s);const n=Math.round([16,26,40][R3.q
   for(let i=0;i<n;i++){const v=new T.Vector3(rand(-1,1),rand(-.5,1),rand(-1,1)).normalize().multiplyScalar(rand(1.7,8.3)*s);spark(x,y,z,v.x,v.y,v.z,cs[i%5===0?2:i%2],.75+.35*s*rand(.6,1),.62*s*rand(.7,1.2))}
   rings.push({x,y,z,r:3.2*s,t:0,max:.6+.3*s,c:blue?'#4fd6ff':'#ff9a3c'});
   const X=XS.get();X.position.set(x,y,z);X.userData.boom={t:0,max:.6,s};
-  flash(x,y,z,blue?'#4fd6ff':'#ffa855',5*s);if(s>.5)R3.shake+=s*.33/(1+cam.position.distanceTo(new T.Vector3(x,y,z))/12.5);
+  flash(x,y,z,blue?'#4fd6ff':'#ffa855',5*s);if(s>.5&&!R3.noShk)R3.shake+=s*.33/(1+cam.position.distanceTo(new T.Vector3(x,y,z))/12.5);
   for(let i=0;i<Math.min(6,s*4);i++)smoke(x+rand(-.4,.4)*s,y,z+rand(-.4,.4)*s,rand(.7,1.1),.6*s)}
 const booms=[];
 function debris(g,b){const m=g.userData.model,ww=b.w,hh=b.h,n=Math.min(18,Math.round(5+Math.max(ww,hh)*3));
@@ -14677,7 +14677,7 @@ function render(G,L){const now=performance.now(),dt=Math.min(.05,(now-lastT)/100
   /* tia: từ đầu tháp tới mục tiêu */
   G.bm.forEach(B=>{const o=Math.min(1,B.t*8);if(o<=0)return;a.set(B.x1,hAtW(B.x1,B.y1,HOV),B.y1);b.set(B.x2,hAtW(B.x2,B.y2,HOV),B.y2);const r=Math.max(.035,(B.w||3)/26*.5);beam(BC,a,b,r*.5,'#ffffff',.9*o);beam(BG,a,b,r*1.7,B.col,.45*o)});
   /* vụ nổ */
-  G.fx.forEach(f=>{const k=f.t/f.max;if(k<=0)return;const y=hAtW(f.x,f.y,HOV)*.9;if(!seenFx.has(f)){seenFx.add(f);if(f.ex||f.r>=1)boom(f.x,y,f.y,Math.max(.22,f.r*.42),!f.ex&&/^#?[0-9a-f]{0,2}[89a-f]/i.test(f.col||''));else boom(f.x,y,f.y,.22,false)}
+  G.fx.forEach(f=>{const k=f.t/f.max;if(k<=0)return;const y=hAtW(f.x,f.y,HOV)*.9;if(!seenFx.has(f)){seenFx.add(f);R3.noShk=!!f.ns;if(f.ex||f.r>=1)boom(f.x,y,f.y,Math.max(.22,f.r*.42),!f.ex&&/^#?[0-9a-f]{0,2}[89a-f]/i.test(f.col||''));else boom(f.x,y,f.y,.22,false);R3.noShk=false}
     const m=XB.get(),R=f.r*(1.1-k*.5)*(f.ex?.6:.8);m.position.set(f.x,y,f.y);m.scale.setScalar(Math.max(.05,R));m.material.color.copy(col(f.ex?'#ffb347':f.col));m.material.opacity=Math.min(1,k*.6)});
   BUL.end();BC.end();BG.end();XB.end();MS.end();TRL.end();ARW.end();SHL.end();
   try{imp3d(G)}catch(e){console.error(e)}try{skill3d16(G,dt)}catch(e){console.error(e)}try{skill3d17(G,dt)}catch(e){console.error(e)}try{skill3d18(G,dt)}catch(e){console.error(e)}try{skill3d19(G,dt)}catch(e){console.error(e)}try{skill3d20(G,dt)}catch(e){console.error(e)}try{skill3d21(G,dt)}catch(e){console.error(e)}try{skill3d22(G,dt)}catch(e){console.error(e)}try{skill3d23(G,dt)}catch(e){console.error(e)}try{skill3d24(G,dt)}catch(e){console.error(e)}try{shields3d(G)}catch(e){console.error(e)}XS.end();IMP.end();stepFx(dt);
@@ -20023,7 +20023,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL=(window.SE_CFG&&SE_CFG.fb)||'';
-  const VER='v259';
+  const VER='v260';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`
