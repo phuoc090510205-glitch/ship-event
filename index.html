@@ -2011,7 +2011,7 @@ function uUnlockText(l){
   for(let m=l+1;m<=UMAX;m++){
     const g={};BLD.filter(b=>b.hl===m&&b.hl>1).forEach(b=>{g[b.t]=(g[b.t]||0)+1});
     const parts=Object.keys(g).map(t=>UPD[t].n+(g[t]>1?' ×'+g[t]:uCount(t,m)>1?' (+1)':' (mới)'));
-    if(m%25===0)parts.push('mở rộng bản đồ +1 ô mỗi phía');
+    if(m%5===0)parts.push('mở rộng bản đồ +1 ô mỗi phía');
     if(parts.length)return 'Cấp '+m+(m===l+1?' mở khóa: ':' (mốc kế tiếp): ')+parts.join(', ');
   }
   return '';
@@ -2019,7 +2019,7 @@ function uUnlockText(l){
 const UMAX=100;
 var uSel='hq';
 function hqHP(){return UPD.hq.st(bLv('hq'))[0][1]}
-function ucost(t){const l=bLv(t),u=UPD[t];return {da:Math.round(1200*(1+(l-1)*.6+Math.pow(l,1.9)/12)*u.m/100)*100,sao:u.sao?10+10*l:0}}
+function ucost(t){const l=bLv(t),u=UPD[t];const da=Math.round(1200*(1+(l-1)*.6+Math.pow(l,1.9)/12)*u.m/100)*100;if(t==='hq')return {da:da*3,sao:100+50*(l-1)};return {da,sao:u.sao?10+10*l:0}}
 function uThumb(t){
   if(t==='hq')return `<img src="${SPR.hq4}" alt="">`;
   if(SPR[t]||BSPR[t])return `<img src="${SPR[t]||BSPR[t]}" alt="">`;
@@ -19723,7 +19723,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL=(window.SE_CFG&&SE_CFG.fb)||'';
-  const VER='v245';
+  const VER='v246';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`
