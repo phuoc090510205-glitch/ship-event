@@ -91,6 +91,9 @@ const TPL=[
  {n:'Bàn cờ',f:(dx,y)=>y*100+Math.abs(dx),gap:1},
  {n:'Xoắn ốc',f:(dx,y)=>Math.hypot(dx,y)+Math.atan2(y,dx)*1.6},
  {n:'Pháo đài',f:(dx,y,k,R)=>{const r=Math.hypot(dx,y);return k==='f'?r:k==='t'?Math.abs(r-R*.38):Math.abs(r-R*.6)},ord:['f','t','w']}];
+/* cấp công trình địch tăng dần theo bậc: bậc 1 ≈ cấp 1 · bậc 15 = toàn bộ cấp 100 */
+function lvRank(B,rank){const r=Math.max(1,Math.min(15,rank||1)),fl=Math.round(1+99*Math.pow((r-1)/14,1.35));
+  B.items.forEach(it=>{const f=it.hqf?fl:Math.max(1,fl-((Math.random()*Math.max(1,fl*.08))|0));it.lv=Math.min(100,Math.max(it.lv||1,r>=15?100:f))});const hq=B.items.find(i=>i.hqf);if(hq)B.hqLv=hq.lv;B.lvFloor=fl;return B}
 function layout(B,ti){const items=B.items,hq=items.find(i=>i.hqf);if(!hq)return B;const rest=items.filter(i=>i!==hq),T=TPL[ti!=null?ti:(Math.random()*TPL.length)|0],gap=T.gap||0;
   const kind=i=>i.t==='wall'?'w':(typeof BT!=='undefined'&&BT[i.t])?'t':'f',ord=T.ord||['t','w','f'];
   rest.sort((a,b)=>ord.indexOf(kind(a))-ord.indexOf(kind(b))||(b.w*b.h-a.w*a.h));
@@ -102,12 +105,12 @@ function layout(B,ti){const items=B.items,hq=items.find(i=>i.hqf);if(!hq)return 
       let q=null;for(const c of L){if(free(c[0],c[1],it.w,it.h,gap)){q=c;break}}if(!q){ok=false;break}put(q[0],q[1],it.w,it.h);pos.push([it,q[0],q[1]])}
     if(ok){pos.forEach(([it,x,y])=>{it.x=x;it.y=y});B.R=R;B.tpl=T.n;return B}}
   return B}
-{const _G=pvGenBase;pvGenBase=function(rank){const B=_G.apply(this,arguments);try{layout(B)}catch(e){console.error(e)}return B}}
+{const _G=pvGenBase;pvGenBase=function(rank){const B=_G.apply(this,arguments);try{layout(B)}catch(e){console.error(e)}try{lvRank(B,rank)}catch(e){console.error(e)}return B}}
 /* ---- 3) kỹ năng thuyền trưởng của đối thủ (dùng chung bộ máy kỹ năng boss c54) ---- */
 function skills(G){if(!window.C54||!C54.pool)return;const pool=C54.pool();if(!pool.length)return;
   G.en.filter(e=>!e.dead&&(e.pvE||e.pvEsc)).forEach(e=>{const k=pool[(Math.random()*pool.length)|0];e.c54k=k;try{e.c54s=CSK.style(k,CSK.plan(k))}catch(x){e.c54s={m:'star',c1:'#ff7a5c',c2:'#fff',sd:1}}
     const m=String(((k[6]||[]).find(r=>r[0]==='Hồi chiêu')||[])[1]||'').match(/\d+/);e.c54cd0=Math.max(12,Math.min(30,m?+m[0]:20));e.c54cd=4+Math.random()*4})}
 {const _P=pvSetup;pvSetup=function(G,o){const r=_P.apply(this,arguments);try{G.c69d0={da:S.da,sao:S.sao}}catch(e){}try{carpet(G,o)}catch(e){console.error(e)}try{arm(G)}catch(e){console.error(e)}try{skills(G)}catch(e){console.error(e)}try{if(!(o&&o.human))G.eu.forEach(u=>{u.max*=1.5;u.hp=Math.min(u.max,u.hp*1.5);(u.ws||[]).forEach(w=>{w.dmg*=1.5})})}catch(e){console.error(e)}return r}}
 {const _S=dfStep;dfStep=function(dt){const r=_S.apply(this,arguments);try{const G=DG;if(G&&G.pvp&&!G.done)step(G,dt)}catch(e){console.error(e)}return r}}
-window.C65={carpet,arm,skills,layout,TPL,esum,ckey};
+window.C65={carpet,arm,skills,layout,TPL,esum,ckey,lvRank};
 })();
