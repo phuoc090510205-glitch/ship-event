@@ -57,22 +57,23 @@ function step(G,dt){try{atk(G,dt);pow(G,dt);if(!esum(G,dt))ecarp(G,dt);else if(!
   /* làm chậm tàu ta trong vùng công trình địch */
   players(G).forEach(s=>{if(slowK<1&&s===P){if(!s.c65sk){s.c65sk=slowK;s.sp*=slowK}}else if(s.c65sk){s.sp/=s.c65sk;s.c65sk=0}})}
 
-/* ---- 4) thảm đối thủ có quân triệu hồi (người que, khách sạn, trực thăng, kraken…): chạy đúng cơ chế thảm đó cho phe địch ---- */
-let SUMK=null;
-function sumK(){if(SUMK)return SUMK;SUMK=new Set();try{const X=C40.X;Object.keys(X.step).forEach(k=>{const src=String(X.step[k])+String(X.init[k]||'');if(/k:'(stick|hotel|heli)'|krakenUp/.test(src)&&!/save\(|S_\(/.test(src))SUMK.add(+k)})}catch(e){}return SUMK}
+/* ---- 4) thảm đối thủ dùng TOÀN BỘ sức mạnh thảm như của ta (thần long, khách sạn, hành tinh rơi, xúc xắc, thuyền, máy bay, kraken…): chạy chính bộ máy thảm C40 cho phe địch ---- */
 const ckey=c=>c&&c.tier>=2?(c.vk!=null?c.vk:c.tier*10+c.kind):-1;
-function mirror(G){const M=G.c72M||(G.c72M={pvp:true,c72:1});M.en=players(G);M.pl=(G.pvEn&&!G.pvEn.dead)?G.pvEn:{dead:true,x:-99,y:-99,hp:0,max:1};M.al=(G.en||[]).filter(e=>e.pvEsc&&!e.dead);
-  if(!G.c72eh||G.c72eh.o!==G.eh){const o=G.eh;G.c72eh={o,p:new Proxy(o,{get:(t,k)=>k==='t'?'hq':t[k]})}}const EP=G.c72eh.p;M.bl=G.eu.map(u=>u===G.eh?EP:u);M.hq=EP;M.t=G.t;M.fx=G.fx;M.bm=G.bm;M.pr=[];M.dmM=1;M.wd=G.wd;M.c39reg=G.c65reg;M.c39c=G.c65cp&&G.c65cp.c;return M}
-function esum(G,dt){const F=G.c65cp;if(!F||!window.C40||!C40.X||!G.c65reg)return false;const K=ckey(F.c);if(!sumK().has(K)||!C40.X.step[K])return false;
-  const M=mirror(G),H=C40.H;let S=G.c40e;
-  if(!S){const Rg=G.c65reg;S=G.c40e={K,Rg,cx:(Rg.x0+Rg.x1)/2,cy:(Rg.y0+Rg.y1)/2,vis:[],u:[],t:0,cnt:0,cd:50,a:0,b:0,seen:new WeakSet(),shell:new Map(),bul:0,frag:0,met:new Set(),deaths:0,ccPrev:new WeakMap(),c72:1};M.c40=S;
-    try{const f=C40.X.init[K];if(f)f(M,S)}catch(e){console.error(e)}try{toast('Thảm đối thủ «'+F.c.n.replace(/^Thảm /,'')+'» bắt đầu triệu hồi quân!')}catch(e){}}
-  M.c40=S;S.t+=dt;const E=H.enemies(M,S.Rg,0);
+function mirror(G){const M=G.c72M||(G.c72M={pvp:true,c72:1,c39sim:1});M.en=players(G);M.pl=(G.pvEn&&!G.pvEn.dead)?G.pvEn:{dead:true,x:-99,y:-99,hp:0,max:1,ws:[]};M.al=(G.en||[]).filter(e=>e.pvEsc&&!e.dead);
+  if(!G.c72eh||G.c72eh.o!==G.eh){const o=G.eh;G.c72eh={o,p:new Proxy(o,{get:(t,k)=>k==='t'?'hq':t[k]})}}const EP=G.c72eh.p;M.bl=G.eu.map(u=>u===G.eh?EP:u);M.hq=EP;
+  M.t=G.t;M.fx=G.fx;M.bm=G.bm;M.pr=G.pr;M.rocks=G.rocks;M.dmM=1;M.wd=G.wd;M.c39reg=G.c65reg;M.c39c=G.c65cp&&G.c65cp.c;M.kills=0;return M}
+function esum(G,dt){const F=G.c65cp;if(!F||!window.C40||!C40.step||!G.c65reg)return false;const K=ckey(F.c);if(K<27)return false;
+  const M=mirror(G);if(M.c40x&&!M.c40)return false;M.c40=G.c40e||null;
   const _D=dfDmgS;dfDmgS=function(u,d,f){if(u&&u!==G.pl&&(G.al||[]).includes(u)&&typeof dfDmgA==='function')return dfDmgA(u,d);return _D.apply(this,arguments)};
-  try{C40.X.step[K](M,S,dt,E,S.Rg)}catch(e){console.error(e)}finally{dfDmgS=_D}
-  S.u.forEach(u=>{if(u.dead&&!u.gone){u.gone=1;u.dt0=G.t;H.vis(M,{k:'boom',x:u.x,y:u.y,h:u.h||1,max:.6})}});
-  S.vis.forEach(v=>{v.t+=dt;if(v.up){try{v.up(M,S,dt)}catch(e){}}});S.vis=S.vis.filter(v=>v.t<v.max);if(S.u.length>300)S.u=S.u.filter(u=>!u.gone||G.t-u.dt0<3);
-  return true}
+  try{C40.step(M,dt)}catch(e){console.error(e)}finally{dfDmgS=_D}
+  if(!M.c40)return false;
+  if(!G.c40e){G.c40e=M.c40;G.c40e.c72=1;try{toast('Thảm đối thủ «'+F.c.n.replace(/^Thảm /,'')+'» phát huy toàn bộ sức mạnh!')}catch(e){}}
+  const S=G.c40e;if(S.u.length>300)S.u=S.u.filter(u=>!u.gone||G.t-u.dt0<3);return true}
+/* tàu ta bị hạ trong vùng thảm địch: đếm cho các thảm tính theo lượt hạ (Pháp Trận, Hư Không, Thánh Kiếm, Cổng Địa Ngục…) */
+{const ours=(G,u)=>u===G.pl||(G.al||[]).includes(u);
+ const hook=u=>{const G=DG,S=G&&G.c40e,M=G&&G.c72M;if(!S||!M)return;const ins=C40.H.inR(S.Rg,u,2);if(S.K===28&&ins)S.cnt+=5;if(S.K===37&&ins)S.frag+=50;if(S.K===39&&ins)S.deaths++;try{const f=C40.X.death[S.K];if(f)f(M,S,u,false,ins)}catch(e){}};
+ const _S=dfDmgS;dfDmgS=function(s,d,f){const G=DG,was=s&&!s.dead,r=_S.apply(this,arguments);try{if(G&&G.c40e&&was&&s.dead&&ours(G,s))hook(s)}catch(e){}return r};
+ if(typeof dfDmgA==='function'){const _A=dfDmgA;dfDmgA=function(a,d){const G=DG,was=a&&!a.dead,r=_A.apply(this,arguments);try{if(G&&G.c40e&&was&&a.dead&&ours(G,a))hook(a)}catch(e){}return r}}}
 /* phe ta bắn được quân thảm đối thủ */
 window.c72Hit=function(p){const G=DG,S=G&&G.c40e;if(!S||!S.u.length||p.team==='e'||p.dead)return false;for(const u of S.u){if(u.dead||u.noT)continue;if(Math.hypot(u.x-p.x,u.y-p.y)<=(u.hr||.6)+.15){p.dead=true;try{if(p.spl)dfBlast(p.x,p.y,p.spl,p.dmg,'p');dfDmgS(u,p.dmg||0)}catch(e){}return true}}return false};
 {const _B=bmkFor;bmkFor=function(u){const r=_B.apply(this,arguments);if(r)return r;try{const G=DG,S=G&&G.c40e;if(!S||!u||!S.u.length||!G.pvp)return null;const rg=(u.ws&&u.ws.length)?Math.max(...u.ws.map(w=>w.rng||0)):8;let b=null,bd=rg;
@@ -108,5 +109,5 @@ function skills(G){if(!window.C54||!C54.pool)return;const pool=C54.pool();if(!po
     const m=String(((k[6]||[]).find(r=>r[0]==='Hồi chiêu')||[])[1]||'').match(/\d+/);e.c54cd0=Math.max(12,Math.min(30,m?+m[0]:20));e.c54cd=4+Math.random()*4})}
 {const _P=pvSetup;pvSetup=function(G,o){const r=_P.apply(this,arguments);try{G.c69d0={da:S.da,sao:S.sao}}catch(e){}try{carpet(G,o)}catch(e){console.error(e)}try{arm(G)}catch(e){console.error(e)}try{skills(G)}catch(e){console.error(e)}return r}}
 {const _S=dfStep;dfStep=function(dt){const r=_S.apply(this,arguments);try{const G=DG;if(G&&G.pvp&&!G.done)step(G,dt)}catch(e){console.error(e)}return r}}
-window.C65={carpet,arm,skills,layout,TPL,esum,sumK};
+window.C65={carpet,arm,skills,layout,TPL,esum,ckey};
 })();
