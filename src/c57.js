@@ -45,12 +45,15 @@ X.step[1009]=(G,S,dt,E,Rg)=>{S.bombs=S.bombs.filter(b=>{b.t+=dt;if(b.t>=.7&&!b.h
   const tg=all(G).filter(e=>dist(e,h)<=16).sort((a,b)=>dist(a,h)-dist(b,h))[0];h.tg=tg;h.fire=!!tg;if(tg){h.ang=Math.atan2(tg.y-h.y,tg.x-h.x);h.gcd-=dt;while(h.gcd<=0){h.gcd+=1/12;hurt(G,tg,14)}}};
 /* ============ 1010 · Hồ bơi vô cực hoàng hôn ============ */
 const SKC=['#ff6a3a','#ffd02a','#2f7dff','#2ecc71','#ff4fa8','#9b4dff','#00d2d2','#ffffff','#ff8a1a'];
-function hotelSpot(G,S,h){for(let i=0;i<60;i++){const a=rnd(-Math.PI*.15,Math.PI*1.15),r=Math.max(h.w,h.h)/2+rnd(1.6,5.5),x=h.x+Math.cos(a)*r,y=h.y+Math.sin(a)*r;
-  if((G.bl||[]).some(b=>b.hp>0&&Math.abs(b.x-x)<b.w/2+.9&&Math.abs(b.y-y)<b.h/2+.9))continue;if(S.u.some(u=>!u.dead&&u.k==='hotel'&&Math.hypot(u.x-x,u.y-y)<1.8))continue;return [x,y]}return [h.x+rnd(-5,5),h.y+rnd(2,6)]}
+function hotelSpot(G,S,h){let Rg=null;try{Rg=C39.region(G)}catch(e){}const Wd=G.wd?G.wd.Wd:99,Hd=G.wd?G.wd.Hd:99;
+  const bad=(x,y)=>x<1.5||y<1.5||x>Wd-1.5||y>Hd-1.5||(Rg&&x>Rg.x0-1.6&&x<Rg.x1+1.6&&y>Rg.y0-1.6&&y<Rg.y1+1.6)||(G.bl||[]).some(b=>b.hp>0&&Math.abs(b.x-x)<b.w/2+1.2&&Math.abs(b.y-y)<b.h/2+1.2)||S.u.some(u=>!u.dead&&u.k==='hotel'&&Math.hypot(u.x-x,u.y-y)<2.2);
+  const cx=Rg?(Rg.x0+Rg.x1)/2:h.x,cy=Rg?(Rg.y0+Rg.y1)/2:h.y,R0=Rg?Math.max(Rg.x1-Rg.x0,Rg.y1-Rg.y0)/2:6;
+  for(let ring=0;ring<6;ring++)for(let i=0;i<40;i++){const a=rnd(0,Math.PI*2),r=R0+2.2+ring*1.6+rnd(0,1),x=cx+Math.cos(a)*r,y=cy+Math.sin(a)*r;if(!bad(x,y))return [x,y]}
+  return [cx+R0+3,cy]}
 X.init[1010]=(G,S)=>{S.a=10;S.sun=0;S.sunHP=500;S.buff=0};
 X.step[1010]=(G,S,dt,E,Rg)=>{const H=hq(G);S.a+=dt;const hot=live(S,'hotel');
   if(S.a>=12&&H){S.a-=12;if(S.made===undefined)S.made=0;if(hot.length<14){const p=hotelSpot(G,S,H);unit(G,S,{k:'hotel',x:p[0],y:p[1],hp:300,size:1.8,hr:1,v:Math.floor(Math.random()*5),born:G.t,sc:6});pop(G,p[0],p[1]-3,'Khách sạn biển mới','#ffd9a0')}}
-  hot.forEach(u=>{u.sc-=dt;if(u.sc<=0){u.sc=8;unit(G,S,{k:'stick',col:SKC[Math.floor(Math.random()*SKC.length)],x:u.x+rnd(-.6,.6),y:u.y+1,hp:200,size:1,hr:.6,cd:.5,hs:1,born:G.t})}});
+  hot.forEach(u=>{u.sc-=dt;if(u.sc<=0&&(u.made||0)<3){u.sc=8;u.made=(u.made||0)+1;unit(G,S,{k:'stick',col:SKC[Math.floor(Math.random()*SKC.length)],x:u.x+rnd(-.6,.6),y:u.y+1,hp:200,size:1,hr:.6,cd:.5,hs:1,born:G.t})}});
   live(S,'stick').forEach(u=>{if(u.hs)fight(G,S,u,dt,{scan:10,range:1.1,speed:3,cd:1,dmg:50})});
   const full=live(S,'hotel').length>=14&&S.sunHP>0;S.sun=Math.max(0,Math.min(1,S.sun+(full?dt/5:-dt/5)));if(!full&&S.sun<=0&&S.sunHP<=0&&live(S,'hotel').length<14)S.sunHP=500;
   if(H){S.sx=H.x;S.sy=H.y;S.sr=Math.max(H.w,H.h)/2}
@@ -65,5 +68,5 @@ Object.assign(window.C49TXT,{
  1007:'mỗi 50 giây chuyên cơ trắng khổng lồ (dài 28 ô, sải cánh 30 ô, bay cao 12 ô) bay qua thảm — mỗi kẻ địch bị hạ rút ngắn 1 giây; 3.000 sát thương chia đều cho mọi mục tiêu bên dưới, 50% mục tiêu bị cuốn theo máy bay và bị kết liễu khi máy bay nổ cách thảm 30 ô',
  1008:'sau 80 giây khoang chuyên cơ đóng kín quanh thảm trong 25 giây, mỗi giây gọi 2 tiếp viên (1 nam 1 nữ, 200 máu, 20 sát thương/đòn, đánh kẻ địch trong 4 ô); hết giờ tiếp viên phát nổ 300 sát thương trong 3 ô, bầu trời chuyển xanh, bão axit kéo đến 5 giây rồi trút mưa axit 5 giây: tối đa 400 sát thương lên mọi kẻ địch, 2.000 lên công trình địch và công trình địch không thể tấn công',
  1009:'triệu hồi trực thăng đen (1.200 máu) lơ lửng cách thảm 12 ô, liên tục rọi đèn xuống thảm trong 30 giây rồi bay đi; sau 2 giây chuẩn bị: từ giây thứ 3 cứ 3 giây thả 2 quả bom xuống vị trí bất kỳ trên thảm (300 sát thương, 2 ô) và súng gatling bắn 12 viên/giây, mỗi viên 14 sát thương',
- 1010:'mỗi 12 giây dựng 1 khách sạn biển (300 máu) sau lưng và hai bên trụ sở, tối đa 14; mỗi khách sạn 8 giây cho ra 1 người que (200 máu, 50 sát thương); đủ 14 khách sạn: sau 5 giây mặt trời hoàng hôn (500 máu) hiện trên trụ sở 12 ô — mọi đồng minh, trụ sở, công trình, khách sạn, người que +200 giáp, đồng minh +10% tốc chạy; mất 1 khách sạn thì mặt trời từ từ tắt'});
+ 1010:'mỗi 12 giây dựng 1 khách sạn biển (300 máu) bên ngoài thảm, tối đa 14; mỗi khách sạn 8 giây cho ra 1 người que (200 máu, 50 sát thương), tối đa 3 người que mỗi khách sạn; đủ 14 khách sạn: sau 5 giây mặt trời hoàng hôn (500 máu) hiện trên trụ sở 12 ô — mọi đồng minh, trụ sở, công trình, khách sạn, người que +200 giáp, đồng minh +10% tốc chạy; mất 1 khách sạn thì mặt trời từ từ tắt'});
 })();
