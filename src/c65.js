@@ -7,7 +7,7 @@ const near=(a,b,r)=>Math.hypot(a.x-b.x,a.y-b.y)<=r+(b.size||2)*.3;
 const LVK=l=>1+.1*((l||1)-1);
 /* ---- 1) thảm của đối thủ: chọn ngẫu nhiên 1 thảm bất kỳ, áp chỉ số lên công trình địch ---- */
 function carpet(G,o){if(!window.C39||!C39.CP||!C39.TIERS||!C39.KINDS)return;const r=o.rank||1;
-  const L=C39.CP.filter(c=>c.tier>=0&&c.tier<=Math.min(5,Math.floor(r/3)+1));const c=(L.length?L:C39.CP)[(Math.random()*(L.length||C39.CP.length))|0];if(!c)return;
+  const tr=2+((Math.random()*4)|0);let L=C39.CP.filter(c=>c.tier===tr);if(!L.length)L=C39.CP.filter(c=>c.tier>=2);const c=L[(Math.random()*L.length)|0];if(!c)return;
   const t=C39.TIERS[c.tier],K=(C39.KINDS[c.kind]||{}).k,V=t.V;G.c65cp={c,K,V};
   G.eu.forEach(u=>{if(u.dead)return;const add=V+(K==='hp'||K==='rev'?V:0)+(K==='hq'&&u===G.eh?V*3:0);u.max+=add/DB();u.hp+=add/DB();
     const sh=(t.arm||0)+(K==='shd'?V:0);if(sh>0){const v=sh/DB();u.shd={v:(u.shd&&u.shd.v||0)+v,max:(u.shd&&u.shd.max||0)+v,t:1e9}}

@@ -42,7 +42,7 @@ X.step[1009]=(G,S,dt,E,Rg)=>{S.bombs=S.bombs.filter(b=>{b.t+=dt;if(b.t>=.7&&!b.h
   const age=G.t-h.born;if(age>=30){h.leave=(h.leave||0)+dt;h.x+=Math.cos(h.ang+Math.PI)*8*dt;h.y+=Math.sin(h.ang+Math.PI)*8*dt;h.h+=dt*3;h.fire=0;if(h.leave>3){h.dead=true;h.fx3=1}return}
   h.spot.x=S.cx+Math.sin(G.t*.7)*(Rg.x1-Rg.x0)*.35;h.spot.y=S.cy+Math.cos(G.t*.9)*(Rg.y1-Rg.y0)*.35;if(age<2){h.fire=0;return}
   h.bcd-=dt;if(h.bcd<=0&&age>=3){h.bcd=3;for(let i=0;i<2;i++)S.bombs.push({x:rnd(Rg.x0,Rg.x1),y:rnd(Rg.y0,Rg.y1),t:0})}
-  const tg=all(G).filter(e=>dist(e,h)<=16).sort((a,b)=>dist(a,h)-dist(b,h))[0];h.tg=tg;h.fire=!!tg;if(tg){h.ang=Math.atan2(tg.y-h.y,tg.x-h.x);h.gcd-=dt;while(h.gcd<=0){h.gcd+=1/12;hurt(G,tg,14)}}};
+  const tg=all(G).sort((a,b)=>dist(a,h)-dist(b,h))[0];h.tg=tg;h.fire=!!tg;if(tg){h.ang=Math.atan2(tg.y-h.y,tg.x-h.x);h.gcd-=dt;while(h.gcd<=0){h.gcd+=1/12;hurt(G,tg,14)}}};
 /* ============ 1010 · Hồ bơi vô cực hoàng hôn ============ */
 const SKC=['#ff6a3a','#ffd02a','#2f7dff','#2ecc71','#ff4fa8','#9b4dff','#00d2d2','#ffffff','#ff8a1a'];
 function hotelSpot(G,S,h){let Rg=null;try{Rg=C39.region(G)}catch(e){}const Wd=G.wd?G.wd.Wd:99,Hd=G.wd?G.wd.Hd:99;

@@ -35,8 +35,8 @@ const SAIL=['#ff4a4a','#ffd02a','#2f7dff','#2ecc71','#ff8a1a','#9b4dff','#00d2d2
 X.init[1017]=(G,S)=>{S.a=10;S.n=0;S.y=null};
 X.step[1017]=(G,S,dt,E,Rg)=>{const bs=live(S,'sboat');
   if(!S.y){S.a+=dt;if(S.a>=12){S.a-=12;const x=rnd(Rg.x0,Rg.x1),y=rnd(Rg.y0,Rg.y1);unit(G,S,{k:'sboat',x,y,hp:200,size:1.2,hr:.7,col:SAIL[S.n++%SAIL.length],ang:Math.random()*6.28,cd:0,born:G.t,wt:Math.random()*6});pop(G,x,y-2,'Thuyền buồm '+(bs.length+1)+'/12','#e8f8ff')}}
-  bs.forEach(u=>{u.cd-=dt;const tg=enemies(G,Rg,6).sort((a,b)=>dist(a,u)-dist(b,u))[0];let ta;if(tg)ta=Math.atan2(tg.y-u.y,tg.x-u.x);else{u.wt+=dt*.5;const tx=S.cx+Math.cos(u.wt)*6,ty=S.cy+Math.sin(u.wt*1.3)*6;ta=Math.atan2(ty-u.y,tx-u.x)}
-    let da=ta-u.ang;while(da>Math.PI)da-=2*Math.PI;while(da<-Math.PI)da+=2*Math.PI;u.ang+=Math.max(-3*dt,Math.min(3*dt,da));u.x+=Math.cos(u.ang)*3.5*dt;u.y+=Math.sin(u.ang)*3.5*dt;u.x=Math.max(Rg.x0-6,Math.min(Rg.x1+6,u.x));u.y=Math.max(Rg.y0-6,Math.min(Rg.y1+6,u.y));
+  bs.forEach(u=>{u.cd-=dt;const tg=enemies(G,null).sort((a,b)=>dist(a,u)-dist(b,u))[0];let ta;if(tg)ta=Math.atan2(tg.y-u.y,tg.x-u.x);else{u.wt+=dt*.5;const tx=S.cx+Math.cos(u.wt)*6,ty=S.cy+Math.sin(u.wt*1.3)*6;ta=Math.atan2(ty-u.y,tx-u.x)}
+    let da=ta-u.ang;while(da>Math.PI)da-=2*Math.PI;while(da<-Math.PI)da+=2*Math.PI;u.ang+=Math.max(-3*dt,Math.min(3*dt,da));u.x+=Math.cos(u.ang)*3.5*dt;u.y+=Math.sin(u.ang)*3.5*dt;{const W=G.wd?G.wd.Wd:200,H=G.wd?G.wd.Hd:200;u.x=Math.max(.5,Math.min(W-.5,u.x));u.y=Math.max(.5,Math.min(H-.5,u.y))}
     if(tg&&u.cd<=0&&Math.hypot(tg.x-u.x,tg.y-u.y)<=reach(tg,1.1)){u.cd=1;hurt(G,tg,10);push(G,tg,Math.cos(u.ang),Math.sin(u.ang),1)}});
   if(!S.y&&bs.length>=12){bs.forEach(u=>{all(G).forEach(e=>{if(Math.hypot(e.x-u.x,e.y-u.y)<=reach(e,3))hurt(G,e,500)});vis(G,{k:'boom',x:u.x,y:u.y,h:.4,max:.7,c:u.col});u.dead=true;u.fx3=1});
     const s=Math.random()<.5?1:-1,y=S.cy;S.y=unit(G,S,{k:'ryacht',x:s>0?Rg.x0-22:Rg.x1+22,y,dx:s,x1:s>0?Rg.x1+22:Rg.x0-22,hp:1200,size:6,hr:4,h:0,ang:s>0?0:Math.PI,born:G.t,hit:new Set()});S.a=0;pop(G,S.cx,S.cy-5,'12 thuyền phát nổ · du thuyền trắng hùng vĩ tiến vào!','#ffffff')}

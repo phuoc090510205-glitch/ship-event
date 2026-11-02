@@ -33,7 +33,7 @@ X.step[1012]=(G,S,dt,E,Rg)=>{const ys=live(S,'myacht').filter(u=>u.c58);S.a+=dt;
   ys.forEach(u=>{const R=Math.max(W,H)+u.rr,w=5/R*u.dir;u.th+=w*dt;const nx=S.cx+Math.cos(u.th)*(W+u.rr),ny=S.cy+Math.sin(u.th)*(H+u.rr);u.ang=Math.atan2(ny-u.y,nx-u.x);u.x=nx;u.y=ny;u.ga=u.ang;
     all(G).forEach(e=>{if(Math.hypot(e.x-u.x,e.y-u.y)>reach(e,1.3))return;const t=u.hs.get(e)||0;if(G.t<t)return;u.hs.set(e,G.t+1.5);hurt(G,e,100);vis(G,{k:'boom',x:e.x,y:e.y,h:.2,max:.35,c:'#bfe8ff'})})});
   if(S.full){S.g+=dt;if(S.g>=8){S.g-=8;const n=live(S,'gull').length;for(let i=0;i<Math.min(5,40-n);i++){const r=rnd(1,Math.max(W,H)+6),th=Math.random()*6.283;unit(G,S,{k:'gull',x:S.cx+Math.cos(th)*r,y:S.cy+Math.sin(th)*r,r,th,w:rnd(.35,.7)*(Math.random()<.5?1:-1),hp:50,size:.8,hr:.5,h:8,cd:rnd(0,1),born:G.t,noT:1})}if(n<40)pop(G,S.cx,S.cy-4,'Đàn hải âu trắng bay tới','#ffffff')}}
-  live(S,'gull').forEach(u=>{u.cd-=dt;u.dv=Math.max(0,(u.dv||0)-dt);const tg=all(G).filter(e=>Math.hypot(e.x-u.x,e.y-u.y)<=8).sort((a,b)=>dist(a,u)-dist(b,u))[0];
+  live(S,'gull').forEach(u=>{u.cd-=dt;u.dv=Math.max(0,(u.dv||0)-dt);const tg=all(G).sort((a,b)=>dist(a,u)-dist(b,u))[0];
     if(tg){const dx=tg.x-u.x,dy=tg.y-u.y,l=Math.hypot(dx,dy)||1;if(l>2){u.x+=dx/l*4*dt;u.y+=dy/l*4*dt}u.ang=Math.atan2(dy,dx);if(u.cd<=0){u.cd=1;hurt(G,tg,40);u.dv=.4;u.tx=tg.x;u.ty=tg.y}}
     else{u.th+=u.w*dt;const nx=S.cx+Math.cos(u.th)*u.r,ny=S.cy+Math.sin(u.th)*u.r;u.ang=Math.atan2(ny-u.y,nx-u.x);u.x+=(nx-u.x)*Math.min(1,dt*2);u.y+=(ny-u.y)*Math.min(1,dt*2)}})};
 /* ============ 1013 · Sân golf hoàng gia ============ */
@@ -48,12 +48,12 @@ const HC=['#3a2414','#8a5a2a','#f2efe8','#1a1a1a','#c8a070','#7a7a80','#b07a40',
 X.init[1014]=(G,S)=>{S.a=9};
 X.step[1014]=(G,S,dt,E,Rg)=>{S.a+=dt;const hs=live(S,'horse');
   if(S.a>=12){S.a-=12;if(hs.length<10){const p={x:rnd(Rg.x0+1,Rg.x1-1),y:Rg.y1+1};unit(G,S,{k:'horse',x:p.x,y:p.y,hp:300,size:1.4,hr:.8,col:HC[Math.floor(Math.random()*HC.length)],jc:JC[Math.floor(Math.random()*JC.length)],cd:0,ang:-Math.PI/2,born:G.t,run:0});pop(G,p.x,p.y-2,'Ngựa đua xuất phát!','#ffe6a8')}}
-  hs.forEach(u=>{u.cd-=dt;u.run+=dt;const tg=enemies(G,Rg,12).sort((a,b)=>dist(a,u)-dist(b,u))[0];let dx,dy;
+  hs.forEach(u=>{u.cd-=dt;u.run+=dt;const tg=enemies(G,null).sort((a,b)=>dist(a,u)-dist(b,u))[0];let dx,dy;
     if(tg&&u.cd<=.4){dx=tg.x-u.x;dy=tg.y-u.y}else{const th=G.t*.6+u.born;dx=S.cx+Math.cos(th)*6-u.x;dy=S.cy+Math.sin(th)*6-u.y;if(u.cd>.4){dx=Math.cos(u.ang);dy=Math.sin(u.ang)}}
     const l=Math.hypot(dx,dy)||1,ta=Math.atan2(dy,dx);let da=ta-u.ang;while(da>Math.PI)da-=2*Math.PI;while(da<-Math.PI)da+=2*Math.PI;u.ang+=Math.max(-5*dt,Math.min(5*dt,da));u.x+=Math.cos(u.ang)*7*dt;u.y+=Math.sin(u.ang)*7*dt;u.mv=1;
     if(tg&&u.cd<=0&&Math.hypot(tg.x-u.x,tg.y-u.y)<=reach(tg,1)){u.cd=1;hurt(G,tg,120);push(G,tg,Math.cos(u.ang),Math.sin(u.ang),2);vis(G,{k:'boom',x:tg.x,y:tg.y,h:.3,max:.35,c:'#ffe6a8'});
       if(tg.dead||tg.hp<=0){unit(G,S,{k:'stick',col:JC[Math.floor(Math.random()*JC.length)],x:tg.x,y:tg.y,hp:50,size:1,hr:.6,cd:.5,hk:1,born:G.t})}}
-    u.x=Math.max(Rg.x0-12,Math.min(Rg.x1+12,u.x));u.y=Math.max(Rg.y0-12,Math.min(Rg.y1+12,u.y))});
+    {const W=G.wd?G.wd.Wd:200,H=G.wd?G.wd.Hd:200;u.x=Math.max(.5,Math.min(W-.5,u.x));u.y=Math.max(.5,Math.min(H-.5,u.y))}});
   live(S,'stick').forEach(u=>{if(u.hk)fight(G,S,u,dt,{scan:12,range:1.1,speed:3,cd:1,dmg:30})})};
 Object.assign(window.C49TXT,{
  1011:'vẽ dần từng đường gỗ (dài 4 ô, 200 máu) quanh thảm cách 5 ô, mỗi 12 giây 1 đường — mỗi kẻ địch bị hạ trong thảm rút ngắn 1 giây; đủ 20 đường gỗ (PvP 50) thì dựng 8 biệt thự nước sáng đèn lấp lánh: ánh sao trên trời làm mọi tàu choáng ngợp 2 giây, rồi 99 ngôi sao (3 sao/giây, từ độ cao 12 ô) giáng xuống mục tiêu, mỗi sao 200 sát thương và choáng 0,5 giây; sau đó mỗi biệt thự gọi 10 lính người que vàng trong 10 giây (400 máu, 50 sát thương/đòn)',
