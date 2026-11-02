@@ -21,12 +21,12 @@ function arm(G){const hs=Math.sqrt((G.pvo&&G.pvo.fr)||1);let pas=0;
     if(f.k==='pas')pas++;
     u.c65={k:f.k,r:f.r||6,l,jam:f.jam,slow:f.slow,pulse:f.pulse,dot:f.dot,a:f.a,v:f.v,cd:0}});
   const m=1+Math.min(.5,pas*.05);if(pas)G.eu.forEach(u=>(u.ws||[]).forEach(w=>w.dmg*=m));G.c65on=1}
-function atk(G,dt){if(G.t-(G.pvT0||0)<120)return;G.c69at=(G.c69at||0)+dt;if(G.c69at<5)return;G.c69at-=5;if((G.c69n||0)>=50)return;const n=G.c69n=(G.c69n||0)+1;
+function atk(G,dt){if(G.t-(G.pvT0||0)<60)return;G.c69at=(G.c69at||0)+dt;if(G.c69at<5)return;G.c69at-=5;if((G.c69n||0)>=50)return;const n=G.c69n=(G.c69n||0)+1;
   (G.eu||[]).forEach(u=>{if(u.dead||!u.ws||!u.ws.length)return;u.ws.forEach(w=>{w.rng=(w.rng||6)+1});try{G.fx.push({x:u.x,y:u.y,r:Math.max(u.w||2,u.h||2)*.9,t:.6,max:.6,col:'#ff5a5a'})}catch(e){}});
   G.pb=G.pb||{dm:1,cdm:1,rm:1};if(G.c69rm0==null)G.c69rm0=G.pb.rm||1;G.pb.rm=G.c69rm0*(1+.125*n);
   (G.bl||[]).forEach(b=>{if(b.hp<=0)return;const gun=(typeof BT!=='undefined'&&BT[b.t])||(b.nb&&(b.nb.k==='tur'||/drone/.test(b.t)));if(gun)try{G.fx.push({x:b.x,y:b.y,r:Math.max(b.w,b.h)*.9,t:.6,max:.6,col:'#ffb04a'})}catch(e){}});
   try{toast('⚔ Mọi công trình vào trạng thái tấn công · tầm đánh +'+n)}catch(e){}}
-function pow(G,dt){if(G.t-(G.pvT0||0)<140)return;G.c69pt=(G.c69pt||0)+dt;if(G.c69pt<5)return;G.c69pt-=5;if((G.c69k||0)>=50)return;const k=G.c69k=(G.c69k||0)+1;G.c69f=100*k;
+function pow(G,dt){if(G.t-(G.pvT0||0)<60)return;G.c69pt=(G.c69pt||0)+dt;if(G.c69pt<6)return;G.c69pt-=6;if((G.c69k||0)>=50)return;const k=G.c69k=(G.c69k||0)+1;G.c69f=100*k;
   (G.eu||[]).forEach(u=>{if(u.dead||!u.ws||!u.ws.length)return;u.ws.forEach(w=>{w.dmg=(w.dmg||0)+100/Math.max(.2,u.dm||1)});try{G.fx.push({x:u.x,y:u.y,r:Math.max(u.w||2,u.h||2)*1.1,t:.7,max:.7,col:'#ff3a8a'})}catch(e){}});
   (G.bl||[]).forEach(b=>{if(b.hp<=0)return;const gun=(typeof BT!=='undefined'&&BT[b.t])||(b.nb&&(b.nb.k==='tur'||/drone/.test(b.t)));if(gun)try{G.fx.push({x:b.x,y:b.y,r:Math.max(b.w,b.h)*1.1,t:.7,max:.7,col:'#ff3a8a'})}catch(e){}});
   try{toast('💥 Công trình hai bên +100 sát thương mỗi viên đạn · tổng +'+G.c69f+' ('+k+'/50)')}catch(e){}}
@@ -41,7 +41,7 @@ function ecarp(G,dt){const F=G.c65cp;if(!F||!window.C39)return;const c=F.c;
   tg.forEach(u=>{hitP(G,u,d);try{G.fx.push({x:u.x,y:u.y,r:2.2,t:.6,max:.6,ex:1,rot:Math.random()*6});G.bm.push({x1:G.eh?G.eh.x:u.x,y1:G.eh?G.eh.y:u.y-6,x2:u.x,y2:u.y,t:.35,col,w:5})}catch(e){}});
   (G.eu||[]).forEach(u=>{if(!u.dead&&u.hp>0&&u.hp<u.max)u.hp=Math.min(u.max,u.hp+F.V*.2/DB())});
   if(tg.length)try{toast('⚡ Sức mạnh thảm đối thủ: −'+Math.round(d)+' máu')}catch(e){}}
-function step(G,dt){try{atk(G,dt);pow(G,dt);ecarp(G,dt)}catch(e){console.error(e)}if(!G.c65on||!G.eu)return;const P=G.pl;let slowK=1;
+function step(G,dt){try{atk(G,dt);pow(G,dt);if(!esum(G,dt))ecarp(G,dt);else if(!G.c65cpOn){G.c65cpOn=1}}catch(e){console.error(e)}if(!G.c65on||!G.eu)return;const P=G.pl;let slowK=1;
   G.eu.forEach(u=>{const c=u.c65;if(!c||u.dead||u.hp<=0)return;c.cd-=dt;const R=c.r,lk=LVK(c.l);
     if(c.k==='aura'){players(G).forEach(s=>{if(!near(u,s,R))return;
         if(c.jam)(s.ws||[]).forEach(w=>{w.t+=dt*Math.min(.6,c.jam)});
@@ -56,11 +56,57 @@ function step(G,dt){try{atk(G,dt);pow(G,dt);ecarp(G,dt)}catch(e){console.error(e
     if(F.K==='rev'&&!F.rv){const d=G.eu.find(u=>u!==G.eh&&(u.dead||u.hp<=0));if(d){F.rv=1;d.dead=false;d.hp=F.V/DB()}}}
   /* làm chậm tàu ta trong vùng công trình địch */
   players(G).forEach(s=>{if(slowK<1&&s===P){if(!s.c65sk){s.c65sk=slowK;s.sp*=slowK}}else if(s.c65sk){s.sp/=s.c65sk;s.c65sk=0}})}
+
+/* ---- 4) thảm đối thủ có quân triệu hồi (người que, khách sạn, trực thăng, kraken…): chạy đúng cơ chế thảm đó cho phe địch ---- */
+let SUMK=null;
+function sumK(){if(SUMK)return SUMK;SUMK=new Set();try{const X=C40.X;Object.keys(X.step).forEach(k=>{const src=String(X.step[k])+String(X.init[k]||'');if(/k:'(stick|hotel|heli)'|krakenUp/.test(src)&&!/save\(|S_\(/.test(src))SUMK.add(+k)})}catch(e){}return SUMK}
+const ckey=c=>c&&c.tier>=2?(c.vk!=null?c.vk:c.tier*10+c.kind):-1;
+function mirror(G){const M=G.c72M||(G.c72M={pvp:true,c72:1});M.en=players(G);M.pl=(G.pvEn&&!G.pvEn.dead)?G.pvEn:{dead:true,x:-99,y:-99,hp:0,max:1};M.al=(G.en||[]).filter(e=>e.pvEsc&&!e.dead);
+  if(!G.c72eh||G.c72eh.o!==G.eh){const o=G.eh;G.c72eh={o,p:new Proxy(o,{get:(t,k)=>k==='t'?'hq':t[k]})}}const EP=G.c72eh.p;M.bl=G.eu.map(u=>u===G.eh?EP:u);M.hq=EP;M.t=G.t;M.fx=G.fx;M.bm=G.bm;M.pr=[];M.dmM=1;M.wd=G.wd;M.c39reg=G.c65reg;M.c39c=G.c65cp&&G.c65cp.c;return M}
+function esum(G,dt){const F=G.c65cp;if(!F||!window.C40||!C40.X||!G.c65reg)return false;const K=ckey(F.c);if(!sumK().has(K)||!C40.X.step[K])return false;
+  const M=mirror(G),H=C40.H;let S=G.c40e;
+  if(!S){const Rg=G.c65reg;S=G.c40e={K,Rg,cx:(Rg.x0+Rg.x1)/2,cy:(Rg.y0+Rg.y1)/2,vis:[],u:[],t:0,cnt:0,cd:50,a:0,b:0,seen:new WeakSet(),shell:new Map(),bul:0,frag:0,met:new Set(),deaths:0,ccPrev:new WeakMap(),c72:1};M.c40=S;
+    try{const f=C40.X.init[K];if(f)f(M,S)}catch(e){console.error(e)}try{toast('Thảm đối thủ «'+F.c.n.replace(/^Thảm /,'')+'» bắt đầu triệu hồi quân!')}catch(e){}}
+  M.c40=S;S.t+=dt;const E=H.enemies(M,S.Rg,0);
+  const _D=dfDmgS;dfDmgS=function(u,d,f){if(u&&u!==G.pl&&(G.al||[]).includes(u)&&typeof dfDmgA==='function')return dfDmgA(u,d);return _D.apply(this,arguments)};
+  try{C40.X.step[K](M,S,dt,E,S.Rg)}catch(e){console.error(e)}finally{dfDmgS=_D}
+  S.u.forEach(u=>{if(u.dead&&!u.gone){u.gone=1;u.dt0=G.t;H.vis(M,{k:'boom',x:u.x,y:u.y,h:u.h||1,max:.6})}});
+  S.vis.forEach(v=>{v.t+=dt;if(v.up){try{v.up(M,S,dt)}catch(e){}}});S.vis=S.vis.filter(v=>v.t<v.max);if(S.u.length>300)S.u=S.u.filter(u=>!u.gone||G.t-u.dt0<3);
+  return true}
+/* phe ta bắn được quân thảm đối thủ */
+window.c72Hit=function(p){const G=DG,S=G&&G.c40e;if(!S||!S.u.length||p.team==='e'||p.dead)return false;for(const u of S.u){if(u.dead||u.noT)continue;if(Math.hypot(u.x-p.x,u.y-p.y)<=(u.hr||.6)+.15){p.dead=true;try{if(p.spl)dfBlast(p.x,p.y,p.spl,p.dmg,'p');dfDmgS(u,p.dmg||0)}catch(e){}return true}}return false};
+{const _B=bmkFor;bmkFor=function(u){const r=_B.apply(this,arguments);if(r)return r;try{const G=DG,S=G&&G.c40e;if(!S||!u||!S.u.length||!G.pvp)return null;const rg=(u.ws&&u.ws.length)?Math.max(...u.ws.map(w=>w.rng||0)):8;let b=null,bd=rg;
+  for(const o of S.u){if(o.dead||o.noT)continue;const q=Math.hypot(o.x-u.x,o.y-u.y);if(q<bd){bd=q;b=o}}if(!b)return null;for(const e of G.en){if(e.dead||e.spawn>G.t)continue;if(Math.hypot(e.x-u.x,e.y-u.y)<bd)return null}return b}catch(e){return null}}}
+{const _B=dfBlast;dfBlast=function(x,y,r,d,team){const out=_B.apply(this,arguments);try{const G=DG,S=G&&G.c40e;if(S&&team==='p')S.u.forEach(u=>{if(!u.dead&&!u.noT&&Math.hypot(u.x-x,u.y-y)<=r+(u.hr||.6))dfDmgS(u,d)})}catch(e){}return out}}
+/* ---- 5) 10 mẫu xây riêng cho căn cứ đối thủ: trụ sở luôn ở hàng cuối cùng (xa phía ta nhất), công trình nằm gọn trong thảm ---- */
+const TPL=[
+ {n:'Hàng ngang',f:(dx,y)=>y*100+Math.abs(dx)},
+ {n:'Cột dọc',f:(dx,y)=>Math.abs(dx)*100+y},
+ {n:'Bán nguyệt',f:(dx,y)=>Math.hypot(dx,y*1.1)},
+ {n:'Mũi tên',f:(dx,y)=>Math.abs(dx)+y*.5},
+ {n:'Hai cánh',f:(dx,y,k,R)=>Math.abs(Math.abs(dx)-R*.28)*2+y*.5},
+ {n:'Kim cương',f:(dx,y,k,R)=>Math.abs(dx)+Math.abs(y-R*.4)},
+ {n:'Tường chắn',f:(dx,y,k,R)=>k==='w'?(R-y)*100+Math.abs(dx):y*100+Math.abs(dx),ord:['f','t','w']},
+ {n:'Bàn cờ',f:(dx,y)=>y*100+Math.abs(dx),gap:1},
+ {n:'Xoắn ốc',f:(dx,y)=>Math.hypot(dx,y)+Math.atan2(y,dx)*1.6},
+ {n:'Pháo đài',f:(dx,y,k,R)=>{const r=Math.hypot(dx,y);return k==='f'?r:k==='t'?Math.abs(r-R*.38):Math.abs(r-R*.6)},ord:['f','t','w']}];
+function layout(B,ti){const items=B.items,hq=items.find(i=>i.hqf);if(!hq)return B;const rest=items.filter(i=>i!==hq),T=TPL[ti!=null?ti:(Math.random()*TPL.length)|0],gap=T.gap||0;
+  const kind=i=>i.t==='wall'?'w':(typeof BT!=='undefined'&&BT[i.t])?'t':'f',ord=T.ord||['t','w','f'];
+  rest.sort((a,b)=>ord.indexOf(kind(a))-ord.indexOf(kind(b))||(b.w*b.h-a.w*a.h));
+  const area=items.reduce((s,i)=>s+(i.w+gap)*(i.h+gap),0);let R=Math.max(hq.w+4,Math.ceil(Math.sqrt(area*1.3)));
+  for(let tr=0;tr<14;tr++,R+=2){const g=new Uint8Array(R*R),put=(x,y,w,h)=>{for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)g[j*R+i]=1},
+      free=(x,y,w,h,m)=>{for(let j=Math.max(0,y-m);j<Math.min(R,y+h+m);j++)for(let i=Math.max(0,x-m);i<Math.min(R,x+w+m);i++)if(g[j*R+i])return false;return true};
+    const hx=Math.floor((R-hq.w)/2);put(hx,0,hq.w,hq.h);const pos=[[hq,hx,0]],cache={};let ok=true;
+    for(const it of rest){const k=kind(it),key=k+it.w+'x'+it.h;let L=cache[key];if(!L){L=[];for(let y=0;y<=R-it.h;y++)for(let x=0;x<=R-it.w;x++)L.push([x,y,T.f(x+it.w/2-R/2,y+it.h/2,k,R)]);L.sort((a,b)=>a[2]-b[2]);cache[key]=L}
+      let q=null;for(const c of L){if(free(c[0],c[1],it.w,it.h,gap)){q=c;break}}if(!q){ok=false;break}put(q[0],q[1],it.w,it.h);pos.push([it,q[0],q[1]])}
+    if(ok){pos.forEach(([it,x,y])=>{it.x=x;it.y=y});B.R=R;B.tpl=T.n;return B}}
+  return B}
+{const _G=pvGenBase;pvGenBase=function(rank){const B=_G.apply(this,arguments);try{layout(B)}catch(e){console.error(e)}return B}}
 /* ---- 3) kỹ năng thuyền trưởng của đối thủ (dùng chung bộ máy kỹ năng boss c54) ---- */
 function skills(G){if(!window.C54||!C54.pool)return;const pool=C54.pool();if(!pool.length)return;
   G.en.filter(e=>!e.dead&&(e.pvE||e.pvEsc)).forEach(e=>{const k=pool[(Math.random()*pool.length)|0];e.c54k=k;try{e.c54s=CSK.style(k,CSK.plan(k))}catch(x){e.c54s={m:'star',c1:'#ff7a5c',c2:'#fff',sd:1}}
     const m=String(((k[6]||[]).find(r=>r[0]==='Hồi chiêu')||[])[1]||'').match(/\d+/);e.c54cd0=Math.max(12,Math.min(30,m?+m[0]:20));e.c54cd=4+Math.random()*4})}
 {const _P=pvSetup;pvSetup=function(G,o){const r=_P.apply(this,arguments);try{G.c69d0={da:S.da,sao:S.sao}}catch(e){}try{carpet(G,o)}catch(e){console.error(e)}try{arm(G)}catch(e){console.error(e)}try{skills(G)}catch(e){console.error(e)}return r}}
 {const _S=dfStep;dfStep=function(dt){const r=_S.apply(this,arguments);try{const G=DG;if(G&&G.pvp&&!G.done)step(G,dt)}catch(e){console.error(e)}return r}}
-window.C65={carpet,arm,skills};
+window.C65={carpet,arm,skills,layout,TPL,esum,sumK};
 })();

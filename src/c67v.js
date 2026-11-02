@@ -48,8 +48,8 @@ function skill3d24(G,dt){if(!G||G!==DG||!(G.c19e||G.c19p||G.c20e||G.c21e||G.c22e
    (G.c22e||[]).forEach(o=>{if(o.k!=='storm')return;const h=6.5;for(let i=0;i<9;i++){const a=i/9*6.283+(o.rot||0),r=1.2+(i%3)*.6;dot17(o.x+Math.cos(a)*r,h+Math.sin(t3*2+i)*.25,o.y+Math.sin(a)*r,2.4,'#7ab8ff',.35)}
      dot17(o.x,h,o.y,6,'#3a6aff',.25);(o.bolts||[]).forEach(b=>{if(b.t<b.max)zap17(V(o.x,o.y,h),V(b.x,b.y,0),'#cfe8ff',.95,b.seed+o.t*30,.45,.07)})});
    /* --- c17: làn khói 3D --- */
-   (G.bl||[]).forEach(b=>{const r=b.smkR;if(!r||b.hp<=0)return;const nx=Math.max(2,Math.round(r.w)),nz=Math.max(2,Math.round(r.h));
-     for(let i=0;i<nx;i++)for(let j=0;j<nz;j++){const m=K.SMK.get(),x=r.cx-r.w/2+(i+.5)*r.w/nx,z=r.cy-r.h/2+(j+.5)*r.h/nz,ph=t3*.8+i*1.7+j*2.3;m.position.set(x+Math.sin(ph)*.15,.5+Math.sin(ph*1.3)*.12,z+Math.cos(ph)*.15);m.scale.set(.75,.55+.1*Math.sin(ph),.75);m.rotation.y=ph*.3}});
+   (G.bl||[]).forEach(b=>{if(!b.smkR||b.hp<=0)return;(b.smkL||[b.smkR]).forEach((r,ri)=>{const nx=Math.max(2,Math.round(r.w/1.3)),nz=Math.max(2,Math.round(r.h/1.3));
+     for(let i=0;i<nx;i++)for(let j=0;j<nz;j++)for(let l=0;l<2;l++){const m=K.SMK.get(),x=r.cx-r.w/2+(i+.5)*r.w/nx,z=r.cy-r.h/2+(j+.5)*r.h/nz,ph=t3*.8+i*1.7+j*2.3+l*2.1+ri;m.position.set(x+Math.sin(ph)*.18,(l?2.2:.85)+Math.sin(ph*1.3)*.15,z+Math.cos(ph)*.18);m.scale.set(.85*r.w/nx*1.15,(l?.95:1.0)+.1*Math.sin(ph),.85*r.h/nz*1.15);m.rotation.y=ph*.3}})});
    /* --- Lò hợp hạch mini: cột sáng 3D chiếu thẳng lên trời, cao tối đa 15 ô --- */
    en8L(G).forEach((b,i)=>{const x=b.x,z=b.y,H=15,p=.5+.5*Math.sin(t3*3+i),w=.55+.12*Math.sin(t3*7+i);
      beam17(V(x,z,.2),V(x,z,H),'#46b4ff',w*1.6,.35+.1*p);beam17(V(x,z,.2),V(x,z,H),'#bff0ff',w*.55,.85);
@@ -58,3 +58,8 @@ function skill3d24(G,dt){if(!G||G!==DG||!(G.c19e||G.c19p||G.c20e||G.c21e||G.c22e
      tor17(x,.15,z,8,'#6ed2ff',.22+.08*p);for(let k=0;k<3;k++){const u=(t3*.45+k/3)%1;tor17(x,.3+u*H,z,.9+.5*(1-u),'#cfefff',(1-u)*.7)}
      if(Math.random()<.5)spark(x+(Math.random()-.5)*.8,.4,z+(Math.random()-.5)*.8,0,4+Math.random()*5,0,'#bfeaff',2.2,.18)});}
   catch(e){console.error(e)}finally{SK17=s17;sk24End()}}
+
+/* quân do thảm đối thủ triệu hồi (PvP): dùng chung bộ vẽ đơn vị thảm */
+if(typeof skill3d18==='function'){const o18=skill3d18;skill3d18=function(G,dt){const E=G&&G.c40e;if(!E||!E.u)return o18(G,dt);const P=G.c40;if(!P){G.c40=E;try{return o18(G,dt)}finally{G.c40=P}}
+  const u0=P.u,v0=P.vis;P.u=u0.concat(E.u);P.vis=v0.concat(E.vis||[]);try{return o18(G,dt)}finally{P.u=u0;P.vis=v0}}}
+if(typeof skill3d21==='function'){const o21=skill3d21,in21=S=>!!(S&&S.K>=1007&&S.K<=1010);skill3d21=function(G,dt){const E=G&&G.c40e;if(in21(E)&&!in21(G.c40)){const P=G.c40;G.c40=E;try{return o21(G,dt)}finally{G.c40=P}}return o21(G,dt)}}
