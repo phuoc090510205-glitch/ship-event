@@ -19,7 +19,9 @@ function skill3d24(G,dt){if(!G||G!==DG||!(G.c19e||G.c19p||G.c20e||G.c21e||G.c22e
    /* --- đạn riêng c19 / c22 --- */
    (G.c19p||[]).forEach(p=>{if(p.dead)return;const c=(p.st&&p.st.col)||(p.b&&p.b.nb&&p.b.nb.col)||'#9fe0ff',r=.16+(p.spl?.1:0);ball(p.x,.9,p.y,r,c);const sp=Math.hypot(p.vx,p.vy)||1;beam17(V(p.x,p.y,.9),V(p.x-p.vx/sp*1.2,p.y-p.vy/sp*1.2,.9),c,r*.6,.5)});
    (G.c22p||[]).forEach(p=>{if(p.dead||p.hide)return;const c=p.col||'#ffd27a',r=Math.max(.12,(p.sz||.3)*.5);let y=.9;if(p.kind==='lob'&&p.dur){const u=Math.min(1,(p.u||0)/p.dur);y=.6+Math.sin(u*Math.PI)*Math.max(2,Math.hypot(p.tx-p.x0,p.ty-p.y0)*.3)}
-     ball(p.x,y,p.y,r,c);const sp=Math.hypot(p.vx,p.vy)||1;if(p.kind==='missile'){beam17(V(p.x,p.y,y),V(p.x-p.vx/sp*1.4,p.y-p.vy/sp*1.4,y),'#ffb070',r*.5,.6);if(Math.random()<.4)spark(p.x,y,p.y,0,.3,0,'#ffcf9a',.3,.2)}
+     const sp=Math.hypot(p.vx,p.vy)||1;if(p.kind==='missile'){const dT=p.tg&&!p.tg.dead?Math.hypot(p.tg.x-p.x,p.tg.y-p.y):3,air=p.tg&&((p.tg.h||0)>1),up=Math.min(1,(p.age||0)/.35),y2=.9+2.1*up*(air?1:Math.min(1,dT/3)),ux=p.vx/sp,uy=p.vy/sp,cl=(y2-(p._y||y2))*8;p._y=y2;
+       const nose=V(p.x+ux*.35,p.y+uy*.35,y2+cl*.05),tail=V(p.x-ux*.55,p.y-uy*.55,y2-cl*.08);beam17(tail,nose,'#e8ecf4',Math.max(.07,r*.55),1);dot17(nose.x,nose.y,nose.z,.35,'#ff5a4a',.9);beam17(V(p.x-ux*.5,p.y-uy*.5,y2-cl*.08),V(p.x-ux*1.9,p.y-uy*1.9,y2-cl*.25),'#ffb070',r*.45,.7);dot17(tail.x,tail.y,tail.z,.6,'#ffcf7a',.8);if(Math.random()<.5)spark(tail.x,tail.y,tail.z,0,.2,0,'#cfd6e0',.5,.25)}
+     else ball(p.x,y,p.y,r,c);if(p.kind==='missile'){}
      else beam17(V(p.x,p.y,y),V(p.x-p.vx/sp*1,p.y-p.vy/sp*1,y),c,r*.5,.45)});
    /* --- hiệu ứng c19 --- */
    (G.c19e||[]).forEach(o=>{const f=o.max?Math.min(1,o.t/o.max):0;switch(o.k){
