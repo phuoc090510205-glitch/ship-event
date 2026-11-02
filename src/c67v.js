@@ -12,7 +12,8 @@ function sk24Init(){if(SK24)return SK24;sk17Init();
      BAR:Pool(()=>{const s=new T.Sprite(new T.SpriteMaterial({map:WHITE,transparent:true,depthTest:false,depthWrite:false,toneMapped:false,fog:false}));s.center.set(0,.5);s.renderOrder=20;scene.add(s);return s})}};return SK24}
 function sk24End(){if(!SK24)return;['SMK','BOX','BALL','WALL'].forEach(k=>SK24[k].end());Object.values(SK24.H).forEach(p=>p.end())}
 window.c67hide=G=>{try{return !!(window.R3D&&R3D.live&&typeof DG!=='undefined'&&DG&&G===DG)}catch(e){return false}};
-function skill3d24(G,dt){if(!G||G!==DG||!(G.c19e||G.c19p||G.c20e||G.c21e||G.c22e||G.c22p||(G.bl||[]).some(b=>b.smkR))){if(SK24)sk24End();return}sk24Init();const s17=SK17;SK17=SK24.H;
+const en8L=G=>(G.bl||[]).concat(G.eu||[]).filter(b=>b.hp>0&&!b.dead&&((b.nb&&b.nb.c17)||(b.bd&&b.bd.nb&&b.bd.nb.c17))==='en8');
+function skill3d24(G,dt){if(!G||G!==DG||!(G.c19e||G.c19p||G.c20e||G.c21e||G.c22e||G.c22p||(G.bl||[]).some(b=>b.smkR)||en8L(G).length)){if(SK24)sk24End();return}sk24Init();const s17=SK17;SK17=SK24.H;
   try{const K=SK24,V=(x,z,y)=>new T.Vector3(x,y,z),hz=u=>Math.max(.6,(u.size||2)*.35);
    const cage=(x,z,w,h,y0,col,o)=>{const m=K.BOX.get();m.position.set(x,y0+h/2,z);m.scale.set(w,h,w);m.material.color.set(col);m.material.opacity=o;m.rotation.y=t3*.6};
    const ball=(x,y,z,r,col)=>{const m=K.BALL.get();m.position.set(x,y,z);m.scale.setScalar(r);m.material.color.set(col);dot17(x,y,z,r*4,col,.6)};
@@ -48,5 +49,12 @@ function skill3d24(G,dt){if(!G||G!==DG||!(G.c19e||G.c19p||G.c20e||G.c21e||G.c22e
      dot17(o.x,h,o.y,6,'#3a6aff',.25);(o.bolts||[]).forEach(b=>{if(b.t<b.max)zap17(V(o.x,o.y,h),V(b.x,b.y,0),'#cfe8ff',.95,b.seed+o.t*30,.45,.07)})});
    /* --- c17: làn khói 3D --- */
    (G.bl||[]).forEach(b=>{const r=b.smkR;if(!r||b.hp<=0)return;const nx=Math.max(2,Math.round(r.w)),nz=Math.max(2,Math.round(r.h));
-     for(let i=0;i<nx;i++)for(let j=0;j<nz;j++){const m=K.SMK.get(),x=r.cx-r.w/2+(i+.5)*r.w/nx,z=r.cy-r.h/2+(j+.5)*r.h/nz,ph=t3*.8+i*1.7+j*2.3;m.position.set(x+Math.sin(ph)*.15,.5+Math.sin(ph*1.3)*.12,z+Math.cos(ph)*.15);m.scale.set(.75,.55+.1*Math.sin(ph),.75);m.rotation.y=ph*.3}});}
+     for(let i=0;i<nx;i++)for(let j=0;j<nz;j++){const m=K.SMK.get(),x=r.cx-r.w/2+(i+.5)*r.w/nx,z=r.cy-r.h/2+(j+.5)*r.h/nz,ph=t3*.8+i*1.7+j*2.3;m.position.set(x+Math.sin(ph)*.15,.5+Math.sin(ph*1.3)*.12,z+Math.cos(ph)*.15);m.scale.set(.75,.55+.1*Math.sin(ph),.75);m.rotation.y=ph*.3}});
+   /* --- Lò hợp hạch mini: cột sáng 3D chiếu thẳng lên trời, cao tối đa 15 ô --- */
+   en8L(G).forEach((b,i)=>{const x=b.x,z=b.y,H=15,p=.5+.5*Math.sin(t3*3+i),w=.55+.12*Math.sin(t3*7+i);
+     beam17(V(x,z,.2),V(x,z,H),'#46b4ff',w*1.6,.35+.1*p);beam17(V(x,z,.2),V(x,z,H),'#bff0ff',w*.55,.85);
+     beam17(V(x,z,H*.55),V(x,z,H),'#2a78ff',w*2.4,.18);
+     dot17(x,.6,z,3.4+p,'#9fe8ff',.75);dot17(x,H,z,2.6+p*.8,'#7fd0ff',.55);
+     tor17(x,.15,z,8,'#6ed2ff',.22+.08*p);for(let k=0;k<3;k++){const u=(t3*.45+k/3)%1;tor17(x,.3+u*H,z,.9+.5*(1-u),'#cfefff',(1-u)*.7)}
+     if(Math.random()<.5)spark(x+(Math.random()-.5)*.8,.4,z+(Math.random()-.5)*.8,0,4+Math.random()*5,0,'#bfeaff',2.2,.18)});}
   catch(e){console.error(e)}finally{SK17=s17;sk24End()}}
