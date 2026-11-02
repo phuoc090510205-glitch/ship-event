@@ -1031,7 +1031,7 @@ h3{margin:4px 0 4px;font-size:13px}
       <h1>TRỤ SỞ</h1><span class="sp"></span>
       <span class="lch1 d">Đá: <b id="bda"></b></span>
       <span class="lch1 s">Sao: <b id="bsa"></b></span>
-      <button class="bz" id="bzin" aria-label="Phóng to">+</button><button class="bz" id="bzout" aria-label="Thu nhỏ">−</button><button class="brs" id="brot" style="background:#0c2a70;border-color:#1c4fc9">Xoay tường</button><button class="brs" id="brst">Đặt lại</button><button class="brs" id="bcat" style="background:#0c2a70;border-color:#1c4fc9">Cất kho</button><button class="brs" id="bstw" style="background:#0c2a70;border-color:#1c4fc9">Kho 0</button>
+      <button class="bz" id="bzin" aria-label="Phóng to">+</button><button class="bz" id="bzout" aria-label="Thu nhỏ">−</button><button class="brs" id="brot" style="background:#0c2a70;border-color:#1c4fc9">Xoay tường</button><button class="brs" id="brst">Đặt lại</button><button class="brs" id="btpl" style="background:#6a4a00;border-color:#ffc53d;color:#ffe08a">Tự xây theo mẫu</button><button class="brs" id="bcat" style="background:#0c2a70;border-color:#1c4fc9">Cất kho</button><button class="brs" id="bstw" style="background:#0c2a70;border-color:#1c4fc9">Kho 0</button>
     </div>
     <div class="bscroll"><div class="bboard" id="bboard"></div></div>
     <div class="bhint"><span id="bnote"></span><span id="blk"></span><span>Kéo để di chuyển – ô xanh: đặt được, ô đỏ: bị chặn</span></div>
@@ -1851,10 +1851,10 @@ addEventListener('resize',placeTsf);setInterval(placeTsf,300);
 
 
 /* ===== Căn cứ Trụ sở (kéo thả như Clash of Clans) ===== */
-const BN=36,BOFF=10,BSHIFT=6;
+const BN=56,BOFF=20,BSHIFT=16;
 const BDEF=[
  {t:'hq',n:'Trụ sở chính',w:4,h:4,ch:1,c:1,hl:[1],pos:[8,8],note:'Căn cứ trung tâm dùng chung cho mọi tàu.'},
- {t:'wall',n:'Tường thành',w:2,h:1,ch:1,c:10,hl:[1,1,1,1,5,10,15,20,30,40],pos:[[8,6],[10,6],[8,13],[10,13]],note:'Chặn đường đạn địch. Chọn tường rồi bấm Xoay (phím R) để đổi ngang/dọc.'},
+ {t:'wall',n:'Tường thành',w:2,h:1,ch:1,c:50,hl:[1,1,1,1,5,10,15,20,30,40,42,43,44,46,48,49,50,52,54,55,56,58,60,61,62,64,66,67,68,70,72,73,74,76,78,79,80,82,84,85,86,88,90,91,92,94,96,97,98,100],pos:[[8,6],[10,6],[8,13],[10,13]],note:'Chặn đường đạn địch. Chọn tường rồi bấm Xoay (phím R) để đổi ngang/dọc.'},
  {t:'cannon',n:'Đại bác',w:2,h:2,ch:1,c:3,hl:[1,15,40],pos:[[5,6]],note:'Pháo phòng thủ, bắn đạn nổ tầm xa.'},
  {t:'laser',n:'Tháp Laser',w:2,h:2,ch:1,c:3,hl:[1,20,50],pos:[[13,6]],note:'Chiếu tia laser đỏ liên tục vào mục tiêu, 70 sát thương/giây.'},
  {t:'bigcannon',n:'Đại pháo',w:2,h:2,ch:1,c:2,hl:[10,45],pos:[[5,13]],note:'Pháo hạng nặng, nòng lớn, sát thương nổ diện rộng.'},
@@ -1894,10 +1894,10 @@ function bArt(t,w,h){
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${frame}${a}</svg>`;
 }
 const bState={sel:null,drag:null};
-function bPos(){const B=S.base=S.base||{pos:{},z:0};B.pos=B.pos||{};if(B.g!==2){B.g=2;for(const k in B.pos){const p=B.pos[k];if(p&&p.length>=2){p[0]+=BSHIFT;p[1]+=BSHIFT}}if(Array.isArray(B.trp))B.trp.forEach(p=>{if(p&&p.length>=2){p[0]+=BSHIFT;p[1]+=BSHIFT}})}return B.pos}
-function bReg(){const k=Math.min(BOFF,Math.floor(bLv('hq')/10)),a=BOFF-k;return {x0:a,y0:a,x1:BN-a,y1:BN-a,k}}
+function bPos(){const B=S.base=S.base||{pos:{},z:0};B.pos=B.pos||{};if(B.g===2){B.g=3;const sh=p=>{if(p&&p.length>=2){p[0]+=10;p[1]+=10}};for(const k in B.pos)sh(B.pos[k]);if(Array.isArray(B.trp))B.trp.forEach(sh);try{if(S.pvb&&S.pvb.pos)for(const k in S.pvb.pos)sh(S.pvb.pos[k])}catch(e){}}if(B.g!==3){B.g=3;for(const k in B.pos){const p=B.pos[k];if(p&&p.length>=2){p[0]+=BSHIFT;p[1]+=BSHIFT}}if(Array.isArray(B.trp))B.trp.forEach(p=>{if(p&&p.length>=2){p[0]+=BSHIFT;p[1]+=BSHIFT}})}return B.pos}
+function bReg(){const k=Math.min(BOFF,Math.floor(bLv('hq')/5)),a=BOFF-k;return {x0:a,y0:a,x1:BN-a,y1:BN-a,k}}
 function bIn(a,x,y){const R=bReg();return x>=R.x0&&y>=R.y0&&x+a.w<=R.x1&&y+a.h<=R.y1}
-function bUnl(b){return chOpen(b.ch)&&bLv('hq')>=b.hl}
+function bUnl(b){return b.t!=='shield'&&chOpen(b.ch)&&bLv('hq')>=b.hl}
 function bAvail(){return BLD.filter(bUnl)}
 function bOverlap(a,x,y,id){if(!bIn(a,x,y))return true;return bAvail().some(o=>o.id!==id&&(()=>{const p=bPos()[o.id];return p&&x<p[0]+o.w&&x+a.w>p[0]&&y<p[1]+o.h&&y+a.h>p[1]})())}
 function bFree(a){const R=bReg();for(let y=R.y0;y<=R.y1-a.h;y++)for(let x=R.x0;x<=R.x1-a.w;x++)if(!bOverlap(a,x,y,a.id))return [x,y];return null}
@@ -1924,8 +1924,8 @@ function bRender(){
   const s=BLD.find(b=>b.id===bState.sel);
   const rb=$('brot');if(rb)rb.disabled=!(s&&s.t==='wall');
   $('bnote').innerHTML=s?`<b>${s.n}</b> · Cấp ${bLv(s.t)}${bHP(s.t)?' · Máu '+bHP(s.t).toLocaleString():''} · ${s.w}×${s.h} ô · ${s.note}`:'Bấm một công trình để chọn.';
-  const nx=R.k<BOFF?`Mở rộng bản đồ thêm 1 ô mỗi phía ở Trụ sở cấp ${(R.k+1)*10}. `:'Bản đồ đã mở rộng tối đa. ';
-  const nl=lk.filter(b=>chOpen(b.ch)),nc=lk.filter(b=>!chOpen(b.ch));
+  const nx=R.k<BOFF?`Mở rộng bản đồ thêm 1 ô mỗi phía ở Trụ sở cấp ${(R.k+1)*5}. `:'Bản đồ đã mở rộng tối đa. ';
+  const nl=lk.filter(b=>chOpen(b.ch)&&b.t!=='shield'),nc=lk.filter(b=>!chOpen(b.ch)&&b.t!=='shield');
   $('blk').textContent=`Căn cứ ${R.x1-R.x0}×${R.y1-R.y0}. ${nx}`+(bAvail().some(b=>!P[b.id])?`Kho: ${bAvail().filter(b=>!P[b.id]).length} công trình đang cất (hết chỗ hoặc bạn đã cất, không hoạt động) — bấm "Kho" để bày ra. `:'')+(nl.length?`Sắp mở: ${[...new Set(nl.map(b=>b.n.replace(/ \d+$/,'')))].slice(0,5).join(', ')}… (nâng Trụ sở). `:'')+(nc.length?`Mở theo chương: ${nc.map(b=>b.n).join(', ')}.`:'');
   try{window.c17BaseUI&&window.c17BaseUI(s)}catch(e){console.error(e)}
   try{window.c19BaseUI&&window.c19BaseUI(s)}catch(e){console.error(e)}
@@ -7339,7 +7339,7 @@ function pvFind(){
   if(MODE===1&&fmReady()<fmMax()){toast('Đấu đội 3 vs 3 cần đủ tàu phụ + thuyền trưởng (Hạm đội)');return}
   if(!S.caps.length){toast('Cần ít nhất 1 thuyền trưởng để thi đấu');return}
   busy=true;
-  const sh=curShip(),r=rankNow(),pool=KSH.filter(x=>shipOpen(x.id));
+  const sh=curShip(),r=rankNow(),pool=KSH.concat(Math.random()<.2&&typeof BSH!=='undefined'?BSH:[]);
   const os=pool[(Math.random()*pool.length)|0]||KSH[0];
   const sp=pvStr(sh),so=pvStr(os,Math.min(10,2+Math.floor(r/1.5)));
   const orank=Math.max(1,Math.min(15,r+((Math.random()*3)|0)-1));
@@ -7450,7 +7450,7 @@ function pvSetup(G,o){
   const ex0=G.eh.x,ey0=G.eh.y+G.eh.h/2+3;
   G.pvEn=pvMkEnemy(G,o,ex0,ey0);G.en.push(G.pvEn);G.pvRs=0;G.pvT0=G.t;
   {const seen=new Set([o.os.id,o.os.n]),sh=a=>{for(let i=a.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[a[i],a[j]]=[a[j],a[i]]}return a};
-   const op=sh(KSH.filter(x=>shipOpen(x.id))),cl=sh(KSH.filter(x=>!shipOpen(x.id))),uq=[];
+   const op=sh(KSH.concat(typeof BSH!=='undefined'?BSH:[])),cl=[],uq=[];
    op.concat(cl).forEach(x=>{if(!seen.has(x.id)&&!seen.has(x.n)){seen.add(x.id);seen.add(x.n);uq.push(x)}});
    const ne=Math.min(o.esc||0,uq.length);o.esc=ne;
    for(let i=0;i<ne;i++){const e=pvMkEnemy(G,o,ex0+((i%10)-(Math.min(ne,10)-1)/2)*3,ey0+2.5+Math.floor(i/10)*2.5,.55,uq[i]);e.name='Tàu phụ '+o.n2;G.en.push(e)}}
@@ -7458,6 +7458,53 @@ function pvSetup(G,o){
   $('pvhm').textContent=(o.rk?'XẾP HẠNG':o.tab===2?'GIAO HỮU':'ĐẤU NHANH');hud.style.display='block';
   toast('Đối thủ: «'+o.base.ar+'» · trụ sở Lv.'+o.base.hqLv+' · '+(o.esc?o.esc+' tàu phụ':'không tàu phụ')+' · phá trụ sở địch trước khi trụ sở bạn bị phá!');
 }
+/* ===== c65: PvP — công trình đối thủ có hiệu ứng thật như công trình của ta; đối thủ dùng thảm, mọi tàu/boss và kỹ năng thuyền trưởng (không phụ thuộc mở khóa của người chơi) ===== */
+(function(){
+const DB=()=>typeof DFB!=='undefined'?DFB:50;
+const players=G=>[G.pl].concat(G.al||[]).filter(u=>u&&!u.dead);
+const hitP=(G,u,d)=>{try{if(u===G.pl)dfDmgS(u,d);else dfDmgA(u,d)}catch(e){}};
+const near=(a,b,r)=>Math.hypot(a.x-b.x,a.y-b.y)<=r+(b.size||2)*.3;
+const LVK=l=>1+.1*((l||1)-1);
+/* ---- 1) thảm của đối thủ: chọn ngẫu nhiên 1 thảm bất kỳ, áp chỉ số lên công trình địch ---- */
+function carpet(G,o){if(!window.C39||!C39.CP||!C39.TIERS||!C39.KINDS)return;const r=o.rank||1;
+  const L=C39.CP.filter(c=>c.tier>=0&&c.tier<=Math.min(5,Math.floor(r/3)+1));const c=(L.length?L:C39.CP)[(Math.random()*(L.length||C39.CP.length))|0];if(!c)return;
+  const t=C39.TIERS[c.tier],K=(C39.KINDS[c.kind]||{}).k,V=t.V;G.c65cp={c,K,V};
+  G.eu.forEach(u=>{if(u.dead)return;const add=V+(K==='hp'||K==='rev'?V:0)+(K==='hq'&&u===G.eh?V*3:0);u.max+=add/DB();u.hp+=add/DB();
+    const sh=(t.arm||0)+(K==='shd'?V:0);if(sh>0){const v=sh/DB();u.shd={v:(u.shd&&u.shd.v||0)+v,max:(u.shd&&u.shd.max||0)+v,t:1e9}}
+    if(K==='red')u.red=Math.min(.6,(u.red||0)+Math.min(50,V*.03)/100);
+    (u.ws||[]).forEach(w=>{if(K==='dmg'||K==='rage')w.dmg*=1+V*.06/100;if(K==='rof')w.cd/=1+V*.04/100;if(K==='rng')w.rng*=1+V*.02/100})});
+  setTimeout(()=>{try{toast('Đối thủ trải '+c.n)}catch(e){}},1600)}
+/* ---- 2) hiệu ứng công trình đối thủ theo loại công trình ---- */
+function arm(G){const hs=Math.sqrt((G.pvo&&G.pvo.fr)||1);let pas=0;
+  G.eu.forEach(u=>{const bd=u.bd||{},f=bd.nb;if(!f)return;const l=bd.lv||1;
+    if(f.k==='tur'&&f.dmg&&!(u.ws&&u.ws.length)){u.ws=[{w:null,sp:{k:f.t||'gun',sp:f.sp||14,spl:f.spl,col:f.col||'#ff8a6a'},dmg:f.dmg*LVK(l)*hs,cd:f.cd||1,t:Math.random()*(f.cd||1),rng:f.rng||8,mx:0,my:0}]}
+    if(f.k==='pas')pas++;
+    u.c65={k:f.k,r:f.r||6,l,jam:f.jam,slow:f.slow,pulse:f.pulse,dot:f.dot,a:f.a,v:f.v,cd:0}});
+  const m=1+Math.min(.5,pas*.05);if(pas)G.eu.forEach(u=>(u.ws||[]).forEach(w=>w.dmg*=m));G.c65on=1}
+function step(G,dt){if(!G.c65on||!G.eu)return;const P=G.pl;let slowK=1;
+  G.eu.forEach(u=>{const c=u.c65;if(!c||u.dead||u.hp<=0)return;c.cd-=dt;const R=c.r,lk=LVK(c.l);
+    if(c.k==='aura'){players(G).forEach(s=>{if(!near(u,s,R))return;
+        if(c.jam)(s.ws||[]).forEach(w=>{w.t+=dt*Math.min(.6,c.jam)});
+        if(c.slow||!(c.jam||c.pulse||c.dot))slowK=Math.min(slowK,1-Math.min(.5,(c.slow||.2)));
+        if(c.dot)hitP(G,s,(typeof c.dot==='number'?c.dot:20)*lk*dt*.5)});
+      if(c.pulse&&c.cd<=0){c.cd=4;players(G).forEach(s=>{if(near(u,s,R))hitP(G,s,(typeof c.pulse==='number'?c.pulse:200)*lk/4)});try{G.fx.push({x:u.x,y:u.y,r:R,t:.4,max:.4,col:'#8fe8ff'})}catch(e){}}}
+    else if(c.k==='heal'&&c.cd<=0){c.cd=1;const a=(c.a||30)*lk/DB();G.eu.forEach(v=>{if(!v.dead&&v.hp>0&&v.hp<v.max&&Math.hypot(v.x-u.x,v.y-u.y)<=R+3)v.hp=Math.min(v.max,v.hp+a)})}
+    else if(c.k==='dome'&&!c.done){c.done=1;G.eu.forEach(v=>{if(Math.hypot(v.x-u.x,v.y-u.y)<=R)v.red=Math.min(.6,(v.red||0)+Math.min(.4,(c.v||20)/100))})}
+    else if(c.k==='trap'&&c.cd<=0){const hit=players(G).filter(s=>near(u,s,R));if(hit.length){c.cd=6;hit.forEach(s=>hitP(G,s,300*lk));try{G.fx.push({x:u.x,y:u.y,r:R,t:.5,max:.5,ex:1,rot:0})}catch(e){}}}
+    else if(c.k==='rev'&&!c.used){const d=G.eu.find(v=>v!==u&&(v.dead||v.hp<=0)&&!v.c65rv&&v!==G.eh);if(d){c.used=1;d.c65rv=1;d.dead=false;d.hp=d.max*.5;try{G.fx.push({x:d.x,y:d.y,r:2,t:.6,max:.6,col:'#9ff0b8'})}catch(e){}}}});
+  const F=G.c65cp;if(F){if(F.K==='reg')G.eu.forEach(u=>{if(!u.dead&&u.hp>0&&u.hp<u.max)u.hp=Math.min(u.max,u.hp+F.V/50/DB()*dt)});
+    if(F.K==='rev'&&!F.rv){const d=G.eu.find(u=>u!==G.eh&&(u.dead||u.hp<=0));if(d){F.rv=1;d.dead=false;d.hp=F.V/DB()}}}
+  /* làm chậm tàu ta trong vùng công trình địch */
+  players(G).forEach(s=>{if(slowK<1&&s===P){if(!s.c65sk){s.c65sk=slowK;s.sp*=slowK}}else if(s.c65sk){s.sp/=s.c65sk;s.c65sk=0}})}
+/* ---- 3) kỹ năng thuyền trưởng của đối thủ (dùng chung bộ máy kỹ năng boss c54) ---- */
+function skills(G){if(!window.C54||!C54.pool)return;const pool=C54.pool();if(!pool.length)return;
+  G.en.filter(e=>!e.dead&&(e.pvE||e.pvEsc)).forEach(e=>{const k=pool[(Math.random()*pool.length)|0];e.c54k=k;try{e.c54s=CSK.style(k,CSK.plan(k))}catch(x){e.c54s={m:'star',c1:'#ff7a5c',c2:'#fff',sd:1}}
+    const m=String(((k[6]||[]).find(r=>r[0]==='Hồi chiêu')||[])[1]||'').match(/\d+/);e.c54cd0=Math.max(12,Math.min(30,m?+m[0]:20));e.c54cd=4+Math.random()*4})}
+{const _P=pvSetup;pvSetup=function(G,o){const r=_P.apply(this,arguments);try{carpet(G,o)}catch(e){console.error(e)}try{arm(G)}catch(e){console.error(e)}try{skills(G)}catch(e){console.error(e)}return r}}
+{const _S=dfStep;dfStep=function(dt){const r=_S.apply(this,arguments);try{const G=DG;if(G&&G.pvp&&!G.done)step(G,dt)}catch(e){console.error(e)}return r}}
+window.C65={carpet,arm,skills};
+})();
+
 /* không xuyên qua công trình chưa bị phá hủy */
 function pvCollide(G){
   const R=[];
@@ -19118,7 +19165,7 @@ function players(G){return [G.pl].concat(G.al||[]).filter(u=>u&&!u.dead)}
 function hit(G,u,d){if(u===G.pl)dfDmgS(u,d);else dfDmgA(u,d)}
 function cast(G,e){const k=e.c54k,s=e.c54s,P=G.pl;const tg=players(G).sort((a,b)=>Math.hypot(a.x-e.x,a.y-e.y)-Math.hypot(b.x-e.x,b.y-e.y))[0];if(!tg)return;
   const R=Math.max(3,Math.min(9,(CSK.plan(k).R||5))),ty=kind(k),dur=Math.max(2,Math.min(8,num(row(k,'Thời gian'))||num(row(k,'Thời gian tác dụng'))||4));
-  const col=s.c1||'#ff7a5c';toast('Boss dùng kỹ năng: '+k[0]);
+  const col=s.c1||'#ff7a5c';toast((e.boss?'Boss':(e.pvE||e.pvEsc)?'Đối thủ':'Địch')+' dùng kỹ năng: '+k[0]);
   if(ty==='atk'||ty==='ult'||ty==='cc'){const d=refDps(e)*(ty==='ult'?8:ty==='cc'?2:5);
     G.bm.push({x1:e.x,y1:e.y,x2:tg.x,y2:tg.y,t:.35,col,w:5});fx(G,s,tg.x,tg.y,R);ring(G,tg.x,tg.y,.4,R,.7,col,5);
     G.fx.push({x:tg.x,y:tg.y,r:R*.7,t:.6,max:.6,ex:1,rot:Math.random()*6});
@@ -19382,6 +19429,48 @@ fuIdx=function(){return plan().idx};
 {const _fr=flReady;flReady=function(i){if(plan().bad.has(i))return false;return _fr(i)}}
 })();
 
+/* ===== c64: Tự xây căn cứ theo mẫu (theo cấp Trụ sở) — 5.000 Đá mỗi lần ===== */
+(function(){
+const COST=5000;let armT=0;
+function build(){
+  const R=bReg(),P0=bPos(),off=bOff(),rot=bRotMap();
+  const L=bAvail().slice();const P={},RT={};const occ=[];
+  const fits=(x,y,w,h)=>x>=R.x0&&y>=R.y0&&x+w<=R.x1&&y+h<=R.y1&&!occ.some(o=>x<o[0]+o[2]&&x+w>o[0]&&y<o[1]+o[3]&&y+h>o[1]);
+  const put=(b,x,y,w,h)=>{P[b.id]=[x,y];occ.push([x,y,w,h])};
+  const cx=(R.x0+R.x1)/2,cy=(R.y0+R.y1)/2;
+  const cells=[];for(let y=R.y0;y<R.y1;y++)for(let x=R.x0;x<R.x1;x++)cells.push([x,y]);
+  const spiral=(b,w,h,gap)=>{const C=cells.map(c=>[c[0],c[1],Math.hypot(c[0]+w/2-cx,c[1]+h/2-cy)]).sort((a,b)=>a[2]-b[2]);
+    for(const c of C){if(gap){if(!fits(c[0]-1,c[1]-1,w+2,h+2)&&!fits(c[0],c[1],w,h))continue}if(fits(c[0],c[1],w,h)){put(b,c[0],c[1],w,h);return true}}return false};
+  const hq=L.find(b=>b.t==='hq');
+  if(hq){const x=Math.round(cx-hq.w/2),y=Math.round(cy-hq.h/2);if(fits(x,y,hq.w,hq.h))put(hq,x,y,hq.w,hq.h);else spiral(hq,hq.w,hq.h)}
+  const walls=L.filter(b=>b.t==='wall'),tur=L.filter(b=>b.t!=='hq'&&b.t!=='wall'&&typeof BT!=='undefined'&&BT[b.t]),oth=L.filter(b=>b.t!=='hq'&&b.t!=='wall'&&!(typeof BT!=='undefined'&&BT[b.t]));
+  const big=a=>a.sort((p,q)=>q.w*q.h-p.w*p.h);
+  /* lõi: công trình hỗ trợ sát trụ sở, pháo phòng thủ bao bên ngoài */
+  big(oth).forEach(b=>spiral(b,b.w,b.h));big(tur).forEach(b=>spiral(b,b.w,b.h));
+  /* tường bao quanh lõi */
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;occ.forEach(o=>{x0=Math.min(x0,o[0]);y0=Math.min(y0,o[1]);x1=Math.max(x1,o[0]+o[2]);y1=Math.max(y1,o[1]+o[3])});
+  let wi=0;const W=walls;
+  for(let ring=1;ring<=3&&wi<W.length;ring++){const a=x0-ring*2+1,b=y0-ring*2+1,c=x1+ring*2-1,d=y1+ring*2-1;
+    for(let x=a;x+2<=c&&wi<W.length;x+=2){if(fits(x,b-1,2,1)){RT[W[wi].id]=false;put(W[wi++],x,b-1,2,1)}}
+    for(let x=a;x+2<=c&&wi<W.length;x+=2){if(fits(x,d,2,1)){RT[W[wi].id]=false;put(W[wi++],x,d,2,1)}}
+    for(let y=b;y+2<=d&&wi<W.length;y+=2){if(fits(a-1,y,1,2)){RT[W[wi].id]=true;put(W[wi++],a-1,y,1,2)}}
+    for(let y=b;y+2<=d&&wi<W.length;y+=2){if(fits(c,y,1,2)){RT[W[wi].id]=true;put(W[wi++],c,y,1,2)}}}
+  for(;wi<W.length;wi++){RT[W[wi].id]=false;spiral(W[wi],2,1)}
+  Object.keys(P0).forEach(k=>delete P0[k]);let put0=0,kho=0;
+  L.forEach(b=>{if(P[b.id]){P0[b.id]=P[b.id];delete off[b.id];put0++}else{off[b.id]=true;kho++}});
+  BLD.forEach(b=>{if(b.t==='wall'&&RT[b.id]!==undefined)rot[b.id]=RT[b.id]});
+  try{bApplyRot()}catch(e){}return [put0,kho]}
+function click(btn){
+  if(Date.now()-armT>4000){armT=Date.now();btn.textContent='Bấm lần nữa: xây (5.000 Đá)';setTimeout(()=>{if(Date.now()-armT>=3900)btn.textContent='Tự xây theo mẫu'},4000);return}
+  armT=0;btn.textContent='Tự xây theo mẫu';
+  if((S.da||0)<COST){toast('Cần 5.000 Đá để tự xây căn cứ theo mẫu');return}
+  S.da-=COST;const r=build();try{save()}catch(e){}try{bRender()}catch(e){}try{refresh()}catch(e){}
+  toast('Đã xây căn cứ theo mẫu Trụ sở cấp '+bLv('hq')+' · '+r[0]+' công trình'+(r[1]?' · '+r[1]+' vào kho (hết chỗ)':'')+' · −5.000 Đá')}
+window.C64={build};
+function hook(){const b=document.getElementById('btpl');if(b&&!b.c64){b.c64=1;b.onclick=()=>click(b)}}
+hook();setInterval(hook,1500);
+})();
+
 /* gộp pháo công trình hạng nặng vào pháo hạng nặng */
 WP.forEach(w=>{if(w.cat===5){w.cat=4;w.tag='PHÁO HẠNG NẶNG'}});
 /* ===== Sở hữu vật phẩm bán ở Shop khuyến mãi ===== */
@@ -19634,7 +19723,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL=(window.SE_CFG&&SE_CFG.fb)||'';
-  const VER='v243';
+  const VER='v245';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`
