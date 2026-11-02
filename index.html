@@ -1782,7 +1782,9 @@ const powNow=()=>window.PWR?PWR.total():0;
 const SDEF={gun:80,music:60,fx:70,q:'Cao',blur:'Bật',fps:'60 FPS',shake:true,light:true,part:true,lang:'Tiếng Việt',notif:true,auto:true,pvp:true,batt:false,gp:true};
 S.set=Object.assign({},SDEF,S.set||{});
 const PT={'Thông tin':['pp-in','Thông tin người chơi'],'Cấp độ':['pp-lv','CẤP ĐỘ'],'Danh hiệu':['pp-ti','DANH HIỆU'],'Thành tích':['pp-ac','THÀNH TÍCH'],'Cài đặt':['pp-se','CÀI ĐẶT']};
-const NPC=[["StarLord",30,"Đế Vương Vũ Trụ",200,25.6,0],["GalaxyQueen",29,"Thiên Đế",198,21.3,1],["NovaDragon",28,"Chúa Tể Tinh Hà",195,19.8,2],["VoidKnight",27,"Vương Giả",193,18.6,3],["LunaSky",26,"Thống Soái",190,17.2,4],["Eclipse",24,"Truyền Thuyết",185,14.7,6],["Astral",23,"Cao Thủ",182,13.1,7],["Nebula",22,"Tinh Anh",178,12.4,8],["StellarWind",21,"Anh Hùng",175,11.6,9]];
+const NPC=(()=>{const pw=(r,k)=>{const hq=Math.min(100,8+r*6),lv=Math.max(1,hq*.8),nb=20+r*6,bld=nb*50*4*(1+.1*(lv-1))+50*16*(1+.1*(hq-1)),n=3+2*Math.floor((r-1)/2),c=4+r*2,sl=Math.min(100,1+r*2);let sh=0;for(let i=0;i<n;i++)sh+=(50+5*i+10*c)*(1+.1*(sl-1));return (bld+sh)*k/1000};
+  const L=[["StarLord",15,200,1.06,0],["GalaxyQueen",15,198,1.0,1],["NovaDragon",14,195,1.03,2],["VoidKnight",14,193,.97,3],["LunaSky",13,190,1.02,4],["Eclipse",12,185,1.04,6],["Astral",11,182,.98,7],["Nebula",10,178,1.01,8],["StellarWind",9,175,.99,9]];
+  return L.map(x=>[x[0],x[1],RN[x[1]-1],x[2],Math.round(pw(x[1],x[3])*10)/10,x[4]])})();
 let lbTab=0;
 function renderLv(){
   const rk=Math.min(rankNow(),15);
@@ -7569,7 +7571,7 @@ function layout(B,ti){const items=B.items,hq=items.find(i=>i.hqf);if(!hq)return 
 function skills(G){if(!window.C54||!C54.pool)return;const pool=C54.pool();if(!pool.length)return;
   G.en.filter(e=>!e.dead&&(e.pvE||e.pvEsc)).forEach(e=>{const k=pool[(Math.random()*pool.length)|0];e.c54k=k;try{e.c54s=CSK.style(k,CSK.plan(k))}catch(x){e.c54s={m:'star',c1:'#ff7a5c',c2:'#fff',sd:1}}
     const m=String(((k[6]||[]).find(r=>r[0]==='Hồi chiêu')||[])[1]||'').match(/\d+/);e.c54cd0=Math.max(12,Math.min(30,m?+m[0]:20));e.c54cd=4+Math.random()*4})}
-{const _P=pvSetup;pvSetup=function(G,o){const r=_P.apply(this,arguments);try{G.c69d0={da:S.da,sao:S.sao}}catch(e){}try{carpet(G,o)}catch(e){console.error(e)}try{arm(G)}catch(e){console.error(e)}try{skills(G)}catch(e){console.error(e)}return r}}
+{const _P=pvSetup;pvSetup=function(G,o){const r=_P.apply(this,arguments);try{G.c69d0={da:S.da,sao:S.sao}}catch(e){}try{carpet(G,o)}catch(e){console.error(e)}try{arm(G)}catch(e){console.error(e)}try{skills(G)}catch(e){console.error(e)}try{if(!(o&&o.human))G.eu.forEach(u=>{u.max*=1.5;u.hp=Math.min(u.max,u.hp*1.5);(u.ws||[]).forEach(w=>{w.dmg*=1.5})})}catch(e){console.error(e)}return r}}
 {const _S=dfStep;dfStep=function(dt){const r=_S.apply(this,arguments);try{const G=DG;if(G&&G.pvp&&!G.done)step(G,dt)}catch(e){console.error(e)}return r}}
 window.C65={carpet,arm,skills,layout,TPL,esum,ckey};
 })();
@@ -19743,9 +19745,27 @@ document.body.appendChild(bar);
 bar.onclick=e=>{const b=e.target.closest('button[data-m]');if(!b)return;S.c69m=b.dataset.m;if(typeof DG!=='undefined'&&DG)DG.c69m=S.c69m;try{save()}catch(_){}paint();
   try{toast(S.c69m==='atk'?'Tàu phụ: 100% cùng lao vào tấn công, không rút lui cho tới khi bị hạ':S.c69m==='def'?'Tàu phụ: chạy quanh ngoài thảm bảo vệ trụ sở':'Tàu phụ: đi theo tàu chính')}catch(_){}};
 function paint(){const m=mode();bar.querySelectorAll('button').forEach(b=>{const on=b.dataset.m===m;b.style.background=on?'linear-gradient(#ffd766,#f0a500)':'#0b1a44';b.style.color=on?'#1a1200':'#cfe0ff';b.style.borderColor=on?'#ffc53d':'#2b5ac9'})}
-setInterval(()=>{const G=typeof DG!=='undefined'?DG:null,on=!!(G&&!G.done&&(G.al||[]).some(a=>!a.dead)&&document.getElementById('def')&&document.getElementById('def').style.display!=='none');const v=on?'flex':'none';if(bar.style.display!==v){bar.style.display=v;if(on)paint()}},400);
+setInterval(()=>{const G=typeof DG!=='undefined'?DG:null,on=!!(G&&!G.done&&!G.pvp&&(G.al||[]).some(a=>!a.dead)&&document.getElementById('def')&&document.getElementById('def').style.display!=='none');const v=on?'flex':'none';if(bar.style.display!==v){bar.style.display=v;if(on)paint()}},400);
 window.C69={mode,patrol};
 })();
+/* ===== c80: PvP — sắp lại HUD (máu trụ sở đối thủ, bảng điểm) tránh chồng lên ô tàu phụ; ẩn thông báo kỹ năng; chế độ tàu phụ chọn trước ở phần chuẩn bị hạm đội ===== */
+(function(){
+const st=document.createElement('style');st.textContent=`
+body.c80pv #pvhud{left:max(16px,env(safe-area-inset-left,0px));top:calc(130px + env(safe-area-inset-top,0px));transform:none;width:min(36vw,230px);text-align:left;background:rgba(6,12,32,.55);border:1px solid #ff6a7a66;border-radius:8px;padding:3px 8px;box-sizing:border-box}
+body.c80pv #c36sc{left:max(16px,env(safe-area-inset-left,0px))!important;right:auto!important;top:calc(176px + env(safe-area-inset-top,0px))!important;transform:none!important}
+body.c80pv #skbn{display:none!important}
+.c80m{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 10px;border:1.5px solid #1f4a8a;border-radius:12px;background:linear-gradient(#071a3c,#050f2a);color:#dfe9ff;font:700 13px system-ui,sans-serif}
+.c80m b{margin-right:4px;color:#bfe3ff}.c80m button{padding:5px 10px;border-radius:8px;border:1.5px solid #2b5ac9;background:#0b1a44;color:#cfe0ff;font:800 12px system-ui,sans-serif;cursor:pointer}
+.c80m button.on{background:linear-gradient(#ffd766,#f0a500);color:#1a1200;border-color:#ffc53d}.c80m small{flex-basis:100%;color:#8fa6d8;font-weight:600}`;document.head.appendChild(st);
+const M=[['fol','🚀 Theo tàu chính','Tàu phụ bay theo bảo vệ tàu chính'],['atk','⚔ Tấn công','100% tàu phụ cùng lao vào tấn công, không rút lui'],['def','🛡 Phòng thủ','Tàu phụ chạy quanh thảm bảo vệ trụ sở']];
+function box(){const m=S.c69m||'fol',d=document.createElement('div');d.className='c80m';d.innerHTML='<b>Chế độ tàu phụ:</b>'+M.map(x=>`<button data-c80="${x[0]}" class="${x[0]===m?'on':''}">${x[1]}</button>`).join('')+'<small>'+(M.find(x=>x[0]===m)||M[0])[2]+'</small>';
+  d.onclick=e=>{const b=e.target.closest('button[data-c80]');if(!b)return;S.c69m=b.dataset.c80;try{save()}catch(_){}document.querySelectorAll('.c80m').forEach(x=>x.replaceWith(box()))};return d}
+function inject(){try{const fb=document.getElementById('flbody'),pre=document.getElementById('dfpre');if(fb&&pre&&pre.style.display!=='none'&&fb.childElementCount&&!fb.querySelector('.c80m'))fb.insertBefore(box(),fb.children[1]||null);
+  const f=document.querySelector('#lvpane .pvfm');if(f&&f.offsetParent&&!(f.previousElementSibling&&f.previousElementSibling.classList.contains('c80m')))f.insertAdjacentElement('beforebegin',box())}catch(e){}
+  try{const G=typeof DG!=='undefined'?DG:null;document.body.classList.toggle('c80pv',!!(G&&G.pvp&&!G.done))}catch(e){}}
+setInterval(inject,300);
+})();
+
 
 {const _F=dfFire;dfFire=function(src,wp,tg,team){try{const G=DG;if(G&&G.pvp&&G.c69f&&team==='p'&&src&&!src.o&&!src.ws&&src!==G.pl&&wp)wp=Object.assign({},wp,{dmg:(wp.dmg||0)+G.c69f/((src&&src.dm)||1)})}catch(e){}return _F.call(this,src,wp,tg,team)}}
 /* ===== c71: bấm giữ nút nâng cấp để lên cấp liên tục · bản đồ chiến thuật hình chữ nhật thay radar tròn ===== */
@@ -20023,7 +20043,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL=(window.SE_CFG&&SE_CFG.fb)||'';
-  const VER='v260';
+  const VER='v261';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`

@@ -107,7 +107,7 @@ function layout(B,ti){const items=B.items,hq=items.find(i=>i.hqf);if(!hq)return 
 function skills(G){if(!window.C54||!C54.pool)return;const pool=C54.pool();if(!pool.length)return;
   G.en.filter(e=>!e.dead&&(e.pvE||e.pvEsc)).forEach(e=>{const k=pool[(Math.random()*pool.length)|0];e.c54k=k;try{e.c54s=CSK.style(k,CSK.plan(k))}catch(x){e.c54s={m:'star',c1:'#ff7a5c',c2:'#fff',sd:1}}
     const m=String(((k[6]||[]).find(r=>r[0]==='Hồi chiêu')||[])[1]||'').match(/\d+/);e.c54cd0=Math.max(12,Math.min(30,m?+m[0]:20));e.c54cd=4+Math.random()*4})}
-{const _P=pvSetup;pvSetup=function(G,o){const r=_P.apply(this,arguments);try{G.c69d0={da:S.da,sao:S.sao}}catch(e){}try{carpet(G,o)}catch(e){console.error(e)}try{arm(G)}catch(e){console.error(e)}try{skills(G)}catch(e){console.error(e)}return r}}
+{const _P=pvSetup;pvSetup=function(G,o){const r=_P.apply(this,arguments);try{G.c69d0={da:S.da,sao:S.sao}}catch(e){}try{carpet(G,o)}catch(e){console.error(e)}try{arm(G)}catch(e){console.error(e)}try{skills(G)}catch(e){console.error(e)}try{if(!(o&&o.human))G.eu.forEach(u=>{u.max*=1.5;u.hp=Math.min(u.max,u.hp*1.5);(u.ws||[]).forEach(w=>{w.dmg*=1.5})})}catch(e){console.error(e)}return r}}
 {const _S=dfStep;dfStep=function(dt){const r=_S.apply(this,arguments);try{const G=DG;if(G&&G.pvp&&!G.done)step(G,dt)}catch(e){console.error(e)}return r}}
 window.C65={carpet,arm,skills,layout,TPL,esum,ckey};
 })();
