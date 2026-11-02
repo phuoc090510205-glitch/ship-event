@@ -3591,22 +3591,22 @@ function flRender(){
   const K=khS(),F=flS(),o=CUR;if(!dfShip||!shAny(dfShip))dfShip=K.sel;
   const sh=shAny(dfShip),lvl=o.daily?'BOSS HÀNG NGÀY':`LEVEL ${o.c}-${o.l}`,rd=fuIdx().filter(flReady).length;
   const slot=i=>{const e=F.e[i]||{},es=shAny(e.s),ec=CAP.findIndex(c=>c[0]===e.c),ok=flReady(i);
-    return `<div class="fp ec"><div class="sl">${es?`<img src="${es.img}" alt="">`:'<div class="pl">+</div>'}${es?es.n:'CHƯA CHỌN TÀU'}</div><div class="bd"><div class="tp"><b>VỊ TRÍ HỘ TỐNG ${String(i+1).padStart(2,'0')}</b><span class="st ${ok?'ok':''}">${ok?'SẴN SÀNG':'CHƯA SẴN SÀNG'}</span></div>`+
+    return `<div class="fp ec"><div class="sl">${es?`<img src="${es.img}" alt="">`:'<div class="pl">+</div>'}${es?es.n:'CHƯA CHỌN TÀU'}</div><div class="bd"><div class="tp"><b>VỊ TRÍ HỘ TỐNG ${String(i+1).padStart(2,'0')}${e.s&&shBk(e.s)?' · BOSS CHIẾM '+C63.cost(e.s)+' VỊ TRÍ':''}${C63.plan().bad.has(i)?' · KHÔNG ĐỦ VỊ TRÍ':''}</b><span class="st ${ok?'ok':''}">${ok?'SẴN SÀNG':'CHƯA SẴN SÀNG'}</span></div>`+
      `<div class="sg"><div><label>TÀU PHỤ</label><button class="sel ${es?'':'em'}" data-a="pe" data-i="${i}">${es?es.n:'Chọn tàu phụ'}<i>›</i></button></div><div><label>THUYỀN TRƯỞNG</label><button class="sel ${e.c?'':'em'}" data-a="pc" data-i="${i}">${e.c?e.c+' · Lv.'+clv(e.c):'Chọn thuyền trưởng'}<i>›</i></button></div></div>`+
      `<div class="nt">${ok?'Tàu phụ xuất trận cùng bạn, tự động chiến đấu. Chỉ số theo thuyền trưởng.':'Tàu chỉ xuất trận khi có người lái được phân công.'}</div></div></div>`};
-  const all=rd===fuN();
+  const all=rd===fuIdx().length;
   $('flbody').innerHTML=
    `<div class="fp flh"><button class="bk" data-a="bk" aria-label="Quay lại">‹</button><div class="hx"><i>✦</i></div><div><h1>HẠM ĐỘI</h1><small>BIÊN CHẾ CHIẾN TRƯỜNG · MÀN ${lvl}</small></div><span class="sp"></span><div class="fb"><small>ĐÁ</small><b>${S.da}</b></div><div class="fb"><small>SAO</small><b>${S.sao}</b></div><div class="fb w">${lvl} · ${flDiff()}</div></div>`+
    `<div class="fp ftb"><button class="t on">ĐỘI HÌNH</button><span class="sp"></span><small>HẠM ĐỘI / ĐIỀU PHỐI</small></div>`+
    `<div class="fp mc"><div class="im"><em>TÀU CHÍNH · NGƯỜI CHƠI</em><img src="${sh.img}" alt=""></div><div class="tx"><span class="tg">TÀU CHỈ HUY</span><h2>${sh.n}</h2><div class="ds">Tàu chính do bạn trực tiếp điều khiển xuyên suốt trận Level.</div><span class="tg" style="color:#8fb4e8;margin-top:4px">CHỌN TÀU CHÍNH</span><button class="sel" data-a="pm" style="max-width:640px">${sh.n} · ${sh.hull}<i>›</i></button><div class="chips"><span>NGƯỜI CHƠI ĐIỀU KHIỂN</span><span>${sh.hull.toUpperCase()}</span><span>SẴN SÀNG XUẤT TRẬN</span></div></div></div>`+
-   `<div class="eh"><div><h3>TÀU PHỤ HỘ TỐNG</h3><small>Cần chọn tàu phụ và phân công một thuyền trưởng để triển khai.</small></div><span class="cnt">${rd} / ${fuN()} SẴN SÀNG</span></div>`+
+   `<div class="eh"><div><h3>TÀU PHỤ HỘ TỐNG</h3><small>Cần chọn tàu phụ và phân công một thuyền trưởng để triển khai.</small></div><span class="cnt">${rd} / ${fuIdx().length} SẴN SÀNG · DÙNG ${C63.plan().used}/${fuN()} VỊ TRÍ</span></div>`+
    `<div class="eg">${fuIdx().map(slot).join('')}</div>`+
    `<div class="fp ft"><div><small>ĐIỀU KIỆN TRIỂN KHAI</small><b>${all?'Tàu phụ đã đủ tàu + thuyền trưởng sẽ cùng xuất trận.':'Tàu phụ chưa đủ tàu + thuyền trưởng sẽ ở lại bến!'}</b><p>Mở đầu: 1 tàu chính + ${fuN()} slot phụ</p></div><button class="bt" data-a="rc">TUYỂN THUYỀN TRƯỞNG</button><button class="bt pr" data-a="go">TIẾP TỤC CHUẨN BỊ</button></div>`;
 }
 function flPick(kind,i){
   const F=flS(),e=F.e[i]||(F.e[i]={});let items='',title='';
   if(kind==='pm'){title='Chọn tàu chính';items=KSH.concat(bkOwned()).map(x=>`<button data-v="${x.id}" class="${x.id===dfShip?'on':''}" ${shipOpen(x.id)?'':'disabled'}><img src="${x.img}" alt=""><b>${x.n}</b><small>${shipOpen(x.id)?x.hull:shLkT(x.id)}</small></button>`).join('')}
-  else if(kind==='pe'){title='Chọn tàu phụ';const used=[dfShip,...F.e.filter((_,j)=>j!==i).map(z=>z&&z.s)];items=KSH.concat(bkOwned()).map(x=>`<button data-v="${x.id}" class="${x.id===e.s?'on':''}" ${shipOpen(x.id)&&!used.includes(x.id)?'':'disabled'}><img src="${x.img}" alt=""><b>${x.n}</b><small>${shipOpen(x.id)?(used.includes(x.id)?'Đang dùng':x.hull):shLkT(x.id)}</small></button>`).join('')}
+  else if(kind==='pe'){title='Chọn tàu phụ';const used=[dfShip,...F.e.filter((_,j)=>j!==i).map(z=>z&&z.s)];items=KSH.concat(bkOwned()).map(x=>`<button data-v="${x.id}" class="${x.id===e.s?'on':''}" ${shipOpen(x.id)&&!used.includes(x.id)&&C63.fit(x.id,i)?'':'disabled'}><img src="${x.img}" alt=""><b>${x.n}</b><small>${shipOpen(x.id)?(used.includes(x.id)?'Đang dùng':!C63.fit(x.id,i)?'Không đủ vị trí (cần '+C63.cost(x.id)+')':(shBk(x.id)?'Boss · chiếm '+C63.cost(x.id)+' vị trí':x.hull)):shLkT(x.id)}</small></button>`).join('')}
   else{title='Chọn thuyền trưởng';const used=F.e.filter((_,j)=>j!==i).map(z=>z&&z.c);
     items=S.caps.length?S.caps.map(n=>{const k=CAP.findIndex(c=>c[0]===n);return `<button data-v="${n}" class="${n===e.c?'on':''}" ${used.includes(n)?'disabled':''}><img class="cp" src="${pic(k)}" alt=""><b>${n}</b><small>Lv.${clv(n)} · ${CAP[k][4]}</small></button>`}).join(''):'<p style="grid-column:1/-1;color:#9fb4d8">Bạn chưa có thuyền trưởng. Bấm "Tuyển thuyền trưởng" để mua ở Shop.</p>'}
   const pk=document.createElement('div');pk.className='flpk';
@@ -3625,7 +3625,7 @@ $('shx').addEventListener('click',()=>{$('shop').style.zIndex='';if($('dfpre').s
 dfPreRender=function(){flRender()};
 function flAllies(){
   const G=DG,K=khS(),out=[];
-  flS().e.forEach((e,i)=>{if(i>=fuN()||!flReady(i))return;const sh=shAny(e.s),k=CAP.findIndex(c=>c[0]===e.c),c=CAP[k];
+  flS().e.forEach((e,i)=>{if(!fuIdx().includes(i)||!flReady(i))return;const sh=shAny(e.s),k=CAP.findIndex(c=>c[0]===e.c),c=CAP[k];
     const wm=JSON.parse(JSON.stringify(khWpMap(sh)));if(!Object.keys(wm).length)Object.assign(wm,dfLoadout(sh,3));
     const x=G.hq.x+(i-(fuN()-1)/2)*3,y=G.hq.y+G.hq.h/2+2.2;
     const a=sh.bk?bkBuild(sh,x,y,0):dfMakeShip(sh,'p',wm,K.fit[sh.id]||{},x,y,{dmgDiv:12,size:2.2,arm:khArmor(sh),eng:khEngines(sh),nuc:khReactors(sh),tnk:khTanks(sh),mrd:khMassMods(sh),sks:[],lvl:1,inf:1});
@@ -4084,7 +4084,7 @@ function bkStat(sh,l){
   let dps=0;Object.keys(q.wm).forEach(i=>q.wm[i].forEach(it=>{const w=wpGet(it.id);if(w)dps+=wNum(w)/12/wSec(w)}));
   return {hp:Math.round(st.hp*em*3*.8*BOSS_HP*m),dps:Math.round(dps*(1+.3*(em-1))*m*10)/10,sp:Math.round(st.speed*10)/10};
 }
-function bkList(){return bkOwned().map(b=>({id:b.id,n:b.n,img:b.img,w:5,h:6,mass:90,bk:1,ship:1,d:'Boss chương '+(b.k+1)+' · khung ô 5×6 · chiếm 7 đơn vị vị trí, tính 1 slot.'}))}
+function bkList(){return bkOwned().map(b=>({id:b.id,n:b.n,img:b.img,w:5,h:6,mass:90,bk:1,ship:1,d:'Boss chương '+(b.k+1)+' · khung ô 5×6 · làm tàu phụ hộ tống chiếm 7 vị trí (6 vị trí khi boss đạt cấp 100).'}))}
 function bkRows(it,l){const sh=BSH.find(x=>x.id===it.id),a=bkStat(sh,l),b=bkStat(sh,Math.min(GMAX,l+1)),f=n=>n.toLocaleString('vi-VN');
   return [['Máu boss',f(a.hp),f(b.hp)],['Sát thương / giây',String(a.dps).replace('.',','),String(b.dps).replace('.',',')],['Tốc chạy',String(a.sp).replace('.',','),String(b.sp).replace('.',',')],['Vị trí','7 đơn vị',null],['Cấp boss',l+'/'+GMAX,null]]}
 {const _g=gCost;gCost=function(k,it){const r=_g.apply(this,arguments);return it&&it.bk?{da:r.da*7,sao:r.sao*7}:r}}
@@ -19370,6 +19370,18 @@ window.c61Spawn=spawnFix;
 })();
 
 window.c62Hide=()=>{try{return !!DG&&!DG.done}catch(e){return false}};
+/* ===== c63: boss làm tàu phụ hộ tống chiếm 7 vị trí (6 khi boss đạt cấp 100) trong số vị trí hộ tống (tối đa 101) ===== */
+(function(){
+const cost=id=>{try{return id&&shBk(id)?(aLv(id)>=100?6:7):1}catch(e){return 1}};
+function plan(){const C=fuN(),F=flS();let used=0;const idx=[],bad=new Set();
+  for(let i=0;used<C&&i<600;i++){const e=F.e[i]||{};let c=cost(e.s);if(used+c>C){bad.add(i);c=1}idx.push(i);used+=c}
+  let real=0;idx.forEach(i=>{const e=F.e[i]||{};if(!bad.has(i)&&e.s)real+=cost(e.s)});return {idx,bad,used:Math.min(C,real),C}}
+function fit(id,i){const F=flS(),e=F.e[i]||(F.e[i]={}),old=e.s;e.s=id;const p=plan();e.s=old;return p.idx.includes(i)&&!p.bad.has(i)}
+window.C63={cost,plan,fit};
+fuIdx=function(){return plan().idx};
+{const _fr=flReady;flReady=function(i){if(plan().bad.has(i))return false;return _fr(i)}}
+})();
+
 /* gộp pháo công trình hạng nặng vào pháo hạng nặng */
 WP.forEach(w=>{if(w.cat===5){w.cat=4;w.tag='PHÁO HẠNG NẶNG'}});
 /* ===== Sở hữu vật phẩm bán ở Shop khuyến mãi ===== */
@@ -19622,7 +19634,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL=(window.SE_CFG&&SE_CFG.fb)||'';
-  const VER='v242';
+  const VER='v243';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`
