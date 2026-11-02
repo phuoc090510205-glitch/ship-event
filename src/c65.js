@@ -41,7 +41,7 @@ function ecarp(G,dt){const F=G.c65cp;if(!F||!window.C39)return;const c=F.c;
   tg.forEach(u=>{hitP(G,u,d);try{G.fx.push({x:u.x,y:u.y,r:2.2,t:.6,max:.6,ex:1,rot:Math.random()*6});G.bm.push({x1:G.eh?G.eh.x:u.x,y1:G.eh?G.eh.y:u.y-6,x2:u.x,y2:u.y,t:.35,col,w:5})}catch(e){}});
   (G.eu||[]).forEach(u=>{if(!u.dead&&u.hp>0&&u.hp<u.max)u.hp=Math.min(u.max,u.hp+F.V*.2/DB())});
   if(tg.length)try{toast('⚡ Sức mạnh thảm đối thủ: −'+Math.round(d)+' máu')}catch(e){}}
-function step(G,dt){try{atk(G,dt);pow(G,dt);if(!esum(G,dt))ecarp(G,dt);else if(!G.c65cpOn){G.c65cpOn=1}}catch(e){console.error(e)}if(!G.c65on||!G.eu)return;const P=G.pl;let slowK=1;
+function step(G,dt){try{esup(G,dt)}catch(e){console.error(e)}try{atk(G,dt);pow(G,dt);if(!esum(G,dt))ecarp(G,dt);else if(!G.c65cpOn){G.c65cpOn=1}}catch(e){console.error(e)}if(!G.c65on||!G.eu)return;const P=G.pl;let slowK=1;
   G.eu.forEach(u=>{const c=u.c65;if(!c||u.dead||u.hp<=0)return;c.cd-=dt;const R=c.r,lk=LVK(c.l);
     if(c.k==='aura'){players(G).forEach(s=>{if(!near(u,s,R))return;
         if(c.jam)(s.ws||[]).forEach(w=>{w.t+=dt*Math.min(.6,c.jam)});
@@ -106,11 +106,30 @@ function layout(B,ti){const items=B.items,hq=items.find(i=>i.hqf);if(!hq)return 
     if(ok){pos.forEach(([it,x,y])=>{it.x=x;it.y=y});B.R=R;B.tpl=T.n;return B}}
   return B}
 {const _G=pvGenBase;pvGenBase=function(rank){const B=_G.apply(this,arguments);try{layout(B)}catch(e){console.error(e)}try{lvRank(B,rank)}catch(e){console.error(e)}return B}}
+
+/* ---- 6) công trình hỗ trợ của địch chạy ĐÚNG cơ chế như công trình của ta (tạo giáp, hồi máu, dựng lại công trình, hồi sinh tàu) ---- */
+const SUP=new Set(['mt1','mt2','mt3','mt4','mt5','mt6','mt8','mt9','cm9','en7','en8','en9','en10']);
+const ety=u=>u&&u.bd?u.bd.t:u&&u.t;
+function eprox(u,i){if(!u.c81p){const nb=u.bd&&u.bd.nb,lv=(u.bd&&u.bd.lv)||1,id='e81_'+ety(u)+'_'+i;u.c81p=new Proxy(u,{get:(t,k)=>k==='nb'?nb:k==='t'?ety(t):k==='lv'?lv:k==='id'?id:k==='hq'?(t===DG.eh):t[k]})}return u.c81p}
+function sworld(G){const M=G.c81M||(G.c81M={pvp:true,c81:1,pb:{dm:1,cdm:1,rm:1},respawn:0});const ours=players(G);ours.forEach(u=>{if(u.spawn==null)u.spawn=0});
+  M.pl=(G.pvEn&&!G.pvEn.dead)?G.pvEn:{dead:true,x:-99,y:-99,hp:0,max:1,ws:[],sk:[]};M.al=(G.en||[]).filter(e=>e.pvEsc&&!e.dead);M.en=ours;
+  M.bl=(G.eu||[]).map((u,i)=>eprox(u,i));M.hq=G.eh&&G.eh.c81p;M.t=G.t;M.fx=G.fx;M.bm=G.bm;M.wd=G.wd;M.pr=G.pr;return M}
+function esup(G,dt){const L=(G.eu||[]).map((u,i)=>[u,i]).filter(([u])=>SUP.has(ety(u)));if(!L.length)return;const M=sworld(G);
+  const _D=dfDmgS;dfDmgS=function(u,d,f){if(u&&u!==G.pl&&(G.al||[]).includes(u)&&typeof dfDmgA==='function')return dfDmgA(u,d);return _D.apply(this,arguments)};
+  try{L.forEach(([u,i])=>{if(u.dead||u.hp<=0)return;const b=eprox(u,i),nb=b.nb;if(!nb)return;
+      try{if(nb.c16&&window.c16Tick&&c16Tick(b,dt,M))return;if(nb.c17&&window.c17Tick&&c17Tick(b,dt,M))return;if(nb.k&&nb.k!=='tur'&&typeof dfNb==='function')dfNb(b,dt,M)}catch(e){}})}
+  finally{dfDmgS=_D}
+  /* công trình địch được dựng lại -> đưa trở lại trận */
+  (G.eu||[]).forEach(u=>{if(u.hp>0&&u.dead){u.dead=false;u.hit=0;if(!G.en.includes(u))G.en.push(u)}});
+  /* mô-đun hồi sinh của địch: tàu chính địch bị hạ thì hồi sinh ngay trên thảm địch */
+  const E=G.pvEn;if(E&&E.dead&&!G.done&&!(G.eh&&G.eh.dead)){const m=L.map(([u])=>u).find(u=>ety(u)==='mt8'&&!u.dead&&u.hp>0&&!(u.c81rv>G.t));
+    if(m){const R=G.c65reg||{x0:m.x-3,x1:m.x+3,y0:m.y-3,y1:m.y+3};E.dead=false;E.hp=E.max;if(E.nrgMax)E.nrg=E.nrgMax;E.x=R.x0+(R.x1-R.x0)*(.2+Math.random()*.6);E.y=R.y1+1.2;E.tx=E.x;E.ty=E.y;E.vx=0;E.vy=0;
+      if(!G.en.includes(E))G.en.push(E);G.pvRs=0;m.c81rv=G.t+180;try{G.fx.push({x:m.x,y:m.y,r:2.2,t:.7,max:.7,col:'#7dffa0'});G.fx.push({x:E.x,y:E.y,r:1.8,t:.6,max:.6,col:'#ffffff'});toast('Mô-đun hồi sinh của đối thủ: tàu chính địch hồi sinh ngay!')}catch(e){}}}}
 /* ---- 3) kỹ năng thuyền trưởng của đối thủ (dùng chung bộ máy kỹ năng boss c54) ---- */
 function skills(G){if(!window.C54||!C54.pool)return;const pool=C54.pool();if(!pool.length)return;
   G.en.filter(e=>!e.dead&&(e.pvE||e.pvEsc)).forEach(e=>{const k=pool[(Math.random()*pool.length)|0];e.c54k=k;try{e.c54s=CSK.style(k,CSK.plan(k))}catch(x){e.c54s={m:'star',c1:'#ff7a5c',c2:'#fff',sd:1}}
     const m=String(((k[6]||[]).find(r=>r[0]==='Hồi chiêu')||[])[1]||'').match(/\d+/);e.c54cd0=Math.max(12,Math.min(30,m?+m[0]:20));e.c54cd=4+Math.random()*4})}
-{const _P=pvSetup;pvSetup=function(G,o){const r=_P.apply(this,arguments);try{G.c69d0={da:S.da,sao:S.sao}}catch(e){}try{carpet(G,o)}catch(e){console.error(e)}try{arm(G)}catch(e){console.error(e)}try{skills(G)}catch(e){console.error(e)}try{if(!(o&&o.human))G.eu.forEach(u=>{u.max*=1.5;u.hp=Math.min(u.max,u.hp*1.5);(u.ws||[]).forEach(w=>{w.dmg*=1.5})})}catch(e){console.error(e)}return r}}
+{const _P=pvSetup;pvSetup=function(G,o){const r=_P.apply(this,arguments);try{G.c69d0={da:S.da,sao:S.sao}}catch(e){}try{carpet(G,o)}catch(e){console.error(e)}try{arm(G)}catch(e){console.error(e)}try{skills(G)}catch(e){console.error(e)}try{(G.eu||[]).forEach(u=>{if(SUP.has(ety(u)))u.c65=null})}catch(e){}try{if(!(o&&o.human))G.eu.forEach(u=>{u.max*=1.5;u.hp=Math.min(u.max,u.hp*1.5);(u.ws||[]).forEach(w=>{w.dmg*=1.5})})}catch(e){console.error(e)}return r}}
 {const _S=dfStep;dfStep=function(dt){const r=_S.apply(this,arguments);try{const G=DG;if(G&&G.pvp&&!G.done)step(G,dt)}catch(e){console.error(e)}return r}}
-window.C65={carpet,arm,skills,layout,TPL,esum,ckey,lvRank};
+window.C65={carpet,arm,skills,layout,TPL,esum,ckey,lvRank,esup,SUP};
 })();

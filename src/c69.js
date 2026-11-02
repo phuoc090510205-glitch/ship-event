@@ -30,7 +30,23 @@ function box(){const m=S.c69m||'fol',d=document.createElement('div');d.className
   d.onclick=e=>{const b=e.target.closest('button[data-c80]');if(!b)return;S.c69m=b.dataset.c80;try{save()}catch(_){}document.querySelectorAll('.c80m').forEach(x=>x.replaceWith(box()))};return d}
 function inject(){try{const fb=document.getElementById('flbody'),pre=document.getElementById('dfpre');if(fb&&pre&&pre.style.display!=='none'&&fb.childElementCount&&!fb.querySelector('.c80m'))fb.insertBefore(box(),fb.children[1]||null);
   const f=document.querySelector('#lvpane .pvfm');if(f&&f.offsetParent&&!(f.previousElementSibling&&f.previousElementSibling.classList.contains('c80m')))f.insertAdjacentElement('beforebegin',box())}catch(e){}
-  try{const G=typeof DG!=='undefined'?DG:null;document.body.classList.toggle('c80pv',!!(G&&G.pvp&&!G.done))}catch(e){}}
+  try{const G=typeof DG!=='undefined'?DG:null,on=!!(G&&G.pvp&&!G.done);document.body.classList.toggle('c80pv',on);const h=document.getElementById('pvhud'),sc=document.getElementById('c36sc');if(sc){if(on&&h&&getComputedStyle(h).display!=='none'){const r=h.getBoundingClientRect();sc.style.setProperty('top',Math.round(r.bottom+6)+'px','important')}else sc.style.removeProperty('top')}}catch(e){}}
 setInterval(inject,300);
+})();
+/* ===== c81: PvP — thanh máu tàu phụ của địch, đặt ngay dưới hàng tàu phụ của ta ===== */
+(function(){
+const st=document.createElement('style');st.textContent=`#c81el{position:fixed;top:calc(66px + env(safe-area-inset-top,0px));right:calc(max(16px,env(safe-area-inset-right,0px)) + clamp(92px,17vh,124px));display:none;gap:6px;z-index:6;pointer-events:none;flex-wrap:nowrap;max-width:46vw;overflow:hidden;align-items:flex-end}
+#c81el .t{font:800 10px system-ui,sans-serif;color:#ff9aa6;text-shadow:0 1px 2px #000;align-self:center;margin-right:2px}
+#c81el .al{width:46px;display:flex;flex-direction:column;align-items:center;gap:2px}
+#c81el .av{width:34px;height:34px;border-radius:50%;border:2px solid #ff4f6a;background:#2a0812 center/80% no-repeat;box-shadow:0 0 8px rgba(255,79,106,.45)}
+#c81el .hp{width:40px;height:5px;border-radius:3px;background:#2a0812;border:1px solid #7a1d2a;overflow:hidden}
+#c81el .hp i{display:block;height:100%;background:linear-gradient(90deg,#ff3a4a,#ff9a6a)}
+#c81el .al.dead .av{filter:grayscale(1) brightness(.45);border-color:#555}
+@media (max-width:600px){#c81el{top:calc(56px + env(safe-area-inset-top,0px))}#c81el .al{width:38px}#c81el .av{width:28px;height:28px}#c81el .hp{width:34px}}`;document.head.appendChild(st);
+const EL=document.createElement('div');EL.id='c81el';document.body.appendChild(EL);let key='';
+setInterval(()=>{try{const G=typeof DG!=='undefined'?DG:null,def=document.getElementById('def');if(!G||!G.pvp||G.done||!def||def.style.display==='none'){EL.style.display='none';key='';return}
+  const cur=(G.en||[]).filter(e=>e.pvEsc);G.c81L=G.c81L||[];cur.forEach(e=>{if(!G.c81L.includes(e))G.c81L.push(e)});const L=G.c81L;
+  if(!L.length){EL.style.display='none';return}const k=L.length+'';if(k!==key){key=k;EL.innerHTML='<span class="t">ĐỊCH</span>'+L.map(e=>`<div class="al"><div class="av" style="background-image:url('${(e.sh&&e.sh.img)||''}')"></div><div class="hp"><i></i></div></div>`).join('')}
+  EL.style.display='flex';[...EL.querySelectorAll('.al')].forEach((el,i)=>{const e=L[i];if(!e)return;const f=e.dead?0:Math.max(0,e.hp/e.max);el.classList.toggle('dead',!!e.dead||f<=0);el.querySelector('.hp i').style.width=(f*100)+'%'})}catch(e){}},200);
 })();
 
