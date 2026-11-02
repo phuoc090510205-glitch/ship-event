@@ -3635,7 +3635,7 @@ function flAllies(){
 function dfAllies(dt){const G=DG;(G.al||[]).forEach(a=>{if(a.dead)return;a.hit=Math.max(0,a.hit-dt);
   /* AI tàu phụ: giữ cự ly, ưu tiên mục tiêu nguy hiểm, rút lui khi yếu, không lao ra xa */
   const A=a.ai=a.ai||{ph:Math.random()*6.28,dir:Math.random()<.5?1:-1,ret:0};
-  const P=G.pl,hq=G.hq,anc=(P&&!P.dead)?P:(hq||a),LEASH=15;
+  const P=G.pl,hq=G.hq,MODE=G.c69m||'fol',anc=MODE==='atk'?a:MODE==='def'?(a.c69pt||hq||a):((P&&!P.dead)?P:(hq||a)),LEASH=MODE==='atk'?30:MODE==='def'?9:15;
   const rmin=a.ws.length?Math.min(...a.ws.map(w=>w.rng)):6,rmax=a.ws.length?Math.max(...a.ws.map(w=>w.rng)):6;
   let rs=Math.max(2.5,rmin*.85),ideal=Math.max(3,(rmin+Math.min(rmax,rmin*1.3))/2*.8);const aDps=a.ws.reduce((s,w)=>s+w.dmg*(a.dm||1)/Math.max(.1,w.cd||1),0);
   const MK=(G.csk&&G.csk.mk&&G.csk.mk.t>0&&G.eh&&!G.eh.dead)?G.csk.mk:null;
@@ -3665,6 +3665,7 @@ function dfAllies(dt){const G=DG;(G.al||[]).forEach(a=>{if(a.dead)return;a.hit=M
       if(Math.sin(A.ph*1.7)>.98)A.dir*=-1}
     /* không rời quá xa tàu chính / trụ sở */
     const da=Math.hypot(a.x-anc.x,a.y-anc.y);if(da>LEASH)mv(anc.x,anc.y,.9)}
+  else if(MODE==='def'&&a.c69pt){mv(a.c69pt.x,a.c69pt.y);a.ang=Math.atan2(a.c69pt.y-a.y,a.c69pt.x-a.x)}
   else{const gx=a.sx+Math.sin(A.ph)*.6,gy=a.sy+Math.cos(A.ph*.8)*.4,q=Math.hypot(gx-a.x,gy-a.y);
     if(q>.2){mv(gx,gy);a.ang=Math.atan2(gy-a.y,gx-a.x)}else if(near)a.ang=Math.atan2(near.y-a.y,near.x-a.x)}
   /* né đạn đang bay tới, tránh đá */
@@ -7481,7 +7482,12 @@ function arm(G){const hs=Math.sqrt((G.pvo&&G.pvo.fr)||1);let pas=0;
     if(f.k==='pas')pas++;
     u.c65={k:f.k,r:f.r||6,l,jam:f.jam,slow:f.slow,pulse:f.pulse,dot:f.dot,a:f.a,v:f.v,cd:0}});
   const m=1+Math.min(.5,pas*.05);if(pas)G.eu.forEach(u=>(u.ws||[]).forEach(w=>w.dmg*=m));G.c65on=1}
-function step(G,dt){if(!G.c65on||!G.eu)return;const P=G.pl;let slowK=1;
+function atk(G,dt){G.c69at=(G.c69at||0)+dt;if(G.c69at<15)return;G.c69at-=15;if((G.c69n||0)>=20)return;const n=G.c69n=(G.c69n||0)+1;
+  (G.eu||[]).forEach(u=>{if(u.dead||!u.ws||!u.ws.length)return;u.ws.forEach(w=>{w.rng=(w.rng||6)+1});try{G.fx.push({x:u.x,y:u.y,r:Math.max(u.w||2,u.h||2)*.9,t:.6,max:.6,col:'#ff5a5a'})}catch(e){}});
+  G.pb=G.pb||{dm:1,cdm:1,rm:1};if(G.c69rm0==null)G.c69rm0=G.pb.rm||1;G.pb.rm=G.c69rm0*(1+.125*n);
+  (G.bl||[]).forEach(b=>{if(b.hp<=0)return;const gun=(typeof BT!=='undefined'&&BT[b.t])||(b.nb&&(b.nb.k==='tur'||/drone/.test(b.t)));if(gun)try{G.fx.push({x:b.x,y:b.y,r:Math.max(b.w,b.h)*.9,t:.6,max:.6,col:'#ffb04a'})}catch(e){}});
+  try{toast('⚔ Mọi công trình vào trạng thái tấn công · tầm đánh +'+n)}catch(e){}}
+function step(G,dt){try{atk(G,dt)}catch(e){console.error(e)}if(!G.c65on||!G.eu)return;const P=G.pl;let slowK=1;
   G.eu.forEach(u=>{const c=u.c65;if(!c||u.dead||u.hp<=0)return;c.cd-=dt;const R=c.r,lk=LVK(c.l);
     if(c.k==='aura'){players(G).forEach(s=>{if(!near(u,s,R))return;
         if(c.jam)(s.ws||[]).forEach(w=>{w.t+=dt*Math.min(.6,c.jam)});
@@ -7500,7 +7506,7 @@ function step(G,dt){if(!G.c65on||!G.eu)return;const P=G.pl;let slowK=1;
 function skills(G){if(!window.C54||!C54.pool)return;const pool=C54.pool();if(!pool.length)return;
   G.en.filter(e=>!e.dead&&(e.pvE||e.pvEsc)).forEach(e=>{const k=pool[(Math.random()*pool.length)|0];e.c54k=k;try{e.c54s=CSK.style(k,CSK.plan(k))}catch(x){e.c54s={m:'star',c1:'#ff7a5c',c2:'#fff',sd:1}}
     const m=String(((k[6]||[]).find(r=>r[0]==='Hồi chiêu')||[])[1]||'').match(/\d+/);e.c54cd0=Math.max(12,Math.min(30,m?+m[0]:20));e.c54cd=4+Math.random()*4})}
-{const _P=pvSetup;pvSetup=function(G,o){const r=_P.apply(this,arguments);try{carpet(G,o)}catch(e){console.error(e)}try{arm(G)}catch(e){console.error(e)}try{skills(G)}catch(e){console.error(e)}return r}}
+{const _P=pvSetup;pvSetup=function(G,o){const r=_P.apply(this,arguments);try{G.c69d0={da:S.da,sao:S.sao}}catch(e){}try{carpet(G,o)}catch(e){console.error(e)}try{arm(G)}catch(e){console.error(e)}try{skills(G)}catch(e){console.error(e)}return r}}
 {const _S=dfStep;dfStep=function(dt){const r=_S.apply(this,arguments);try{const G=DG;if(G&&G.pvp&&!G.done)step(G,dt)}catch(e){console.error(e)}return r}}
 window.C65={carpet,arm,skills};
 })();
@@ -7535,7 +7541,7 @@ function pvCollide(G){
   // tàu địch hồi sinh
   if(G.pvEn&&G.pvEn.dead){G.pvRs+=dt;if(G.pvRs>=(window.c36RS?c36RS(G.pvEn):8)&&!G.eh.dead){const e=pvMkEnemy(G,G.pvo,G.eh.x,G.eh.y+G.eh.h/2+3);G.pvEn=e;G.en.push(e);G.pvRs=0}}
   if(G.eh.dead){dfFinish(true);return}
-  if(G.t-G.pvT0>=300){dfFinish(G.eh.hp/G.eh.max<G.hq.hp/G.hq.max,'Hết giờ')}
+  
 }}
 /* camera theo tàu chính */
 {const _C=dfCam;dfCam=function(){
@@ -7567,7 +7573,7 @@ function pvCollide(G){
   const G=DG;if(G&&G.pvp&&!G.done){G.done=true;pvEnd(false,'Bỏ cuộc');return}
   hud.style.display='none';return _E.apply(this,arguments)}}
 function pvEnd(win,why){
-  const o=PVO,rk=o.rk;const rk0=Math.min(15,Math.max(1,rankNow()));
+  const o=PVO,rk=o.rk;const rk0=Math.min(15,Math.max(1,rankNow())),p0=S.rpts||0;
   S.pvw=(S.pvw||0)+(win?1:0);S.pvl=(S.pvl||0)+(win?0:1);
   let txt='';
   if(rk){
@@ -7579,12 +7585,39 @@ function pvEnd(win,why){
   const da=win?500*rk0:(rk?3:1),sa=win?5*rk0:0;S.da+=da;S.sao+=sa;
   try{qAdd('pvp',1)}catch(e){}
   save();try{refresh()}catch(e){}
-  setTimeout(()=>{
-    res.style.display='flex';
-    res.innerHTML=`<h1 class="${win?'w':'l'}">${win?'CHIẾN THẮNG':'THẤT BẠI'}</h1><div>${why||(win?'Trụ sở đối thủ đã bị phá hủy':'Trụ sở của bạn đã bị phá hủy')}</div><div>${txt}</div><div>Nhận +${da.toLocaleString('vi-VN')} Đá${sa?' · +'+sa+' Sao':''}</div><button id="pvok">TIẾP TỤC</button>`;
-    $('pvok').onclick=()=>{res.style.display='none';hud.style.display='none';busy=false;PVO=null;dfExit();lvTab('pvp')};
-  },win?500:900);
+  {const G=DG,quit=/Bỏ cuộc|đầu hàng/i.test(why||''),H=win?G.eh:G.hq,r1=rankNow(),p1=S.rpts||0,d0=G.c69d0||{da:S.da-da,sao:S.sao-sa};
+   hud.style.display='none';
+   const B='<button id="pvn" style="margin-top:10px">TIẾP TỤC</button>';
+   const show3=()=>{const dDa=S.da-d0.da,dSa=S.sao-d0.sao;
+     res.innerHTML=`<h1 style="color:#ffe08a;text-shadow:0 0 18px #ffb21a">TỔNG KẾT TRẬN ĐẤU</h1><div style="display:grid;grid-template-columns:auto auto;gap:6px 18px;font-size:clamp(13px,2.8vh,18px);text-align:left;margin:6px 0">
+       <span>Kết quả</span><b style="color:${win?'#4cf59a':'#ff7a88'}">${win?'Chiến thắng':'Thất bại'}</b>
+       <span>Đá nhận được</span><b style="color:#8fd8ff">${dDa>=0?'+':''}${dDa.toLocaleString('vi-VN')}</b>
+       <span>Sao nhận được</span><b style="color:#ffd700">${dSa>=0?'+':''}${dSa.toLocaleString('vi-VN')}</b>
+       <span>Tàu địch bị hạ</span><b>${G.kills||0}</b>
+       <span>Thời gian</span><b>${Math.round(G.t-(G.pvT0||0))} giây</b></div><button id="pvok">VỀ SẢNH PvP</button>`;
+     $('pvok').onclick=()=>{res.style.display='none';hud.style.display='none';busy=false;PVO=null;dfExit();lvTab('pvp')}};
+   const show2=()=>{let h,c,sub;
+     if(!rk){h='GIAO HỮU';c='#bfe3ff';sub='Trận này không tính điểm hạng'}
+     else if(r1>rk0){h='THĂNG HẠNG!';c='#4cf59a';sub='Bậc '+rk0+' · '+RN[rk0-1]+'  ➜  Bậc '+r1+' · '+RN[r1-1]}
+     else if(r1<rk0){h='GIÁNG HẠNG';c='#ff7a88';sub='Bậc '+rk0+' · '+RN[rk0-1]+'  ➜  Bậc '+r1+' · '+RN[r1-1]}
+     else{h=win?'+1 ĐIỂM HẠNG':(p1<p0?'−1 ĐIỂM HẠNG':'GIỮ HẠNG');c=win?'#4cf59a':'#ffb0a0';sub='Bậc '+r1+' · '+RN[r1-1]}
+     const pips=rk?'<div style="display:flex;gap:6px;margin:6px 0">'+[0,1,2,3].map(i=>`<i style="width:22px;height:10px;border-radius:5px;background:${i<p1?'#4fd8ff':'#1b2a52'};box-shadow:${i<p1?'0 0 8px #4fd8ff':'none'}"></i>`).join('')+'</div>':'';
+     res.innerHTML=`<h1 style="color:${c};text-shadow:0 0 20px ${c}">${h}</h1><div style="font-size:clamp(14px,3vh,20px)">${sub}</div>${pips}<div style="opacity:.8">${txt}</div>${B}`;$('pvn').onclick=show3};
+   const show1=()=>{res.style.display='flex';res.innerHTML=`<h1 class="${win?'w':'l'}">${win?'CHIẾN THẮNG':'THẤT BẠI'}</h1><div>${why||(win?'Trụ sở đối thủ đã bị phá hủy':'Trụ sở của bạn đã bị phá hủy')}</div>${B}`;$('pvn').onclick=show2};
+   if(quit||!H||!window.R3D){setTimeout(show1,400)}
+   else{const P=G.pl,fx0=P.x,fy0=P.y,tx=H.x,ty=H.y,cd0=R3D.cd;G.camF={x:fx0,y:fy0};let t0=performance.now(),last=t0;
+     try{toast(win?'Trụ sở đối thủ sụp đổ!':'Trụ sở của bạn bị phá hủy!')}catch(e){}
+     const step=now=>{if(DG!==G)return;const t=(now-t0)/1000,dt=Math.min(.05,(now-last)/1000);last=now;
+       if(t<5){const k=t/5,e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;G.camF.x=fx0+(tx-fx0)*e;G.camF.y=fy0+(ty-fy0)*e;R3D.cd=cd0+(14-cd0)*e}
+       else{G.camF.x=tx;G.camF.y=ty;const u=Math.min(1,(t-5)/4),w=(H.w||4),h=(H.h||4);
+         if(Math.random()<.35+u*.4)G.fx.push({x:tx+(Math.random()-.5)*w*1.3,y:ty+(Math.random()-.5)*h*1.3,r:.8+Math.random()*(1.2+2.5*u),t:.7,max:.7,ex:1,rot:Math.random()*6.28});
+         R3D.shake=Math.max(R3D.shake||0,.12+u*.35);
+         if(t>8.2&&!G.c69big){G.c69big=1;G.fx.push({x:tx,y:ty,r:Math.max(w,h)*2.6,t:1.3,max:1.3,ex:1,rot:0});H.hp=0;if(H.sb)H.dead=true}}
+       (G.fx||[]).forEach(f=>{f.t-=dt});G.fx=(G.fx||[]).filter(f=>f.t>0);try{dfDraw()}catch(e){}
+       if(t<9.3)requestAnimationFrame(step);else{R3D.cd=cd0;show1()}};
+     requestAnimationFrame(step)}}
 }
+
 /* ===== Đầu hàng PvP ===== */
 {const st=document.createElement('style');st.textContent=`#pvsb{pointer-events:auto;padding:3px 12px;border-radius:8px;border:1.5px solid #ff7a88;background:linear-gradient(#5a1424,#2a0812);color:#ffd0d6;font-weight:800;font-size:clamp(10px,2vh,13px);cursor:pointer}
 #pvsur{position:fixed;inset:0;z-index:75;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:rgba(3,6,20,.82);color:#fff;text-align:center;padding:16px}
@@ -14394,7 +14427,7 @@ function mkInst(it){const g=new T.Group(),body=new T.Group();g.add(body);const U
   scene.add(g);return g}
 function drop(g){scene.remove(g);const U=g.userData;if(U.hull)U.hull.material.dispose();if(U.shield)U.shield.material.dispose();if(U.sb)U.sb.g.traverse(o=>{if(o.geometry&&o.isMesh)o.geometry.dispose()})}
 /* ---------- camera bám sát phía sau tàu chính ---------- */
-function camFollow(G,dt){const P=G.pl,dead=P.dead,f=dead?{x:G.hq.x,y:G.hq.y}:P;
+function camFollow(G,dt){const P=G.pl,dead=P.dead&&!G.camF,f=G.camF?G.camF:(P.dead?{x:G.hq.x,y:G.hq.y}:P);
   /* góc nhìn luôn hướng về phía trước mũi tàu chính; tàu xoay thì camera xoay theo */
   if(!dead&&isFinite(P.ang))R3.yawT=Math.atan2(-Math.cos(P.ang),-Math.sin(P.ang));if(R3.yawT==null)R3.yawT=R3.yaw;R3.yaw+=angDiff(R3.yaw,R3.yawT)*Math.min(1,dt*3);
   const a=R3.yaw,D=R3.cd,fy=dead?1:HOV,cp=new T.Vector3(f.x+Math.sin(a)*D,fy+D*.62,f.y+Math.cos(a)*D),lk=new T.Vector3(f.x-Math.sin(a)*3.75,fy,f.y-Math.cos(a)*3.75);
@@ -19589,6 +19622,25 @@ hookBoard();setInterval(hookBoard,1500);
 window.C66={gens,wpt};
 })();
 
+/* ===== c69: tàu phụ hộ tống — chế độ Theo tàu chính / Tấn công / Phòng thủ ===== */
+(function(){
+const MODES=[['fol','Theo tàu chính','🚀'],['atk','Tấn công','⚔'],['def','Phòng thủ','🛡']];
+const mode=()=>S.c69m||'fol';
+function patrol(G){const A=(G.al||[]).filter(a=>!a.dead);if(!A.length)return;let Rg=null;try{Rg=C39.region(G)}catch(e){}if(!Rg&&G.hq)Rg={x0:G.hq.x-6,y0:G.hq.y-6,x1:G.hq.x+6,y1:G.hq.y+6};if(!Rg)return;
+  const o=3,x0=Rg.x0-o,y0=Rg.y0-o,W=Rg.x1-Rg.x0+2*o,H=Rg.y1-Rg.y0+2*o,P=2*(W+H);
+  A.forEach((a,i)=>{let s=((G.t*2.2+i*P/A.length)%P+P)%P,x,y;if(s<W){x=x0+s;y=y0}else if((s-=W)<H){x=x0+W;y=y0+s}else if((s-=H)<W){x=x0+W-s;y=y0+H}else{s-=W;x=x0;y=y0+H-s}a.c69pt={x,y}})}
+{const _A=dfAllies;dfAllies=function(dt){try{const G=DG;if(G){G.c69m=mode();if(G.c69m==='def')patrol(G)}}catch(e){}return _A.apply(this,arguments)}}
+/* nút chọn chế độ trong trận */
+const bar=document.createElement('div');bar.id='c69bar';bar.style.cssText='position:fixed;left:10px;top:calc(150px + env(safe-area-inset-top,0px));z-index:8;display:none;flex-direction:column;gap:4px;font:800 11px system-ui,sans-serif';
+bar.innerHTML='<div style="color:#bfe3ff;text-shadow:0 1px 2px #000">TÀU PHỤ</div>'+MODES.map(m=>`<button data-m="${m[0]}" style="pointer-events:auto;padding:4px 8px;border-radius:8px;border:1.5px solid #2b5ac9;background:#0b1a44;color:#cfe0ff;text-align:left;cursor:pointer">${m[2]} ${m[1]}</button>`).join('');
+document.body.appendChild(bar);
+bar.onclick=e=>{const b=e.target.closest('button[data-m]');if(!b)return;S.c69m=b.dataset.m;if(typeof DG!=='undefined'&&DG)DG.c69m=S.c69m;try{save()}catch(_){}paint();
+  try{toast(S.c69m==='atk'?'Tàu phụ: tấn công mọi mục tiêu trong 30 ô':S.c69m==='def'?'Tàu phụ: chạy quanh ngoài thảm bảo vệ trụ sở':'Tàu phụ: đi theo tàu chính')}catch(_){}};
+function paint(){const m=mode();bar.querySelectorAll('button').forEach(b=>{const on=b.dataset.m===m;b.style.background=on?'linear-gradient(#ffd766,#f0a500)':'#0b1a44';b.style.color=on?'#1a1200':'#cfe0ff';b.style.borderColor=on?'#ffc53d':'#2b5ac9'})}
+setInterval(()=>{const G=typeof DG!=='undefined'?DG:null,on=!!(G&&!G.done&&(G.al||[]).some(a=>!a.dead)&&document.getElementById('def')&&document.getElementById('def').style.display!=='none');const v=on?'flex':'none';if(bar.style.display!==v){bar.style.display=v;if(on)paint()}},400);
+window.C69={mode,patrol};
+})();
+
 /* gộp pháo công trình hạng nặng vào pháo hạng nặng */
 WP.forEach(w=>{if(w.cat===5){w.cat=4;w.tag='PHÁO HẠNG NẶNG'}});
 /* ===== Sở hữu vật phẩm bán ở Shop khuyến mãi ===== */
@@ -19841,7 +19893,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL=(window.SE_CFG&&SE_CFG.fb)||'';
-  const VER='v249';
+  const VER='v250';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`
