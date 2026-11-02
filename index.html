@@ -9752,7 +9752,7 @@ function global(G,dt){
 /* dãy ắc quy trụ: kỹ năng thuyền trưởng +1 ô */
 
 /* ---------- vẽ ---------- */
-const lab=(q,x,y,t,col)=>{q.save();q.font='bold 11px sans-serif';q.textAlign='center';q.lineWidth=3;q.strokeStyle='rgba(0,0,0,.7)';q.strokeText(t,x,y);q.fillStyle=col||'#fff';q.fillText(t,x,y);q.restore()};
+const lab=(...a)=>{if(window.c62Hide&&c62Hide())return;return lab0(...a)},lab0=(q,x,y,t,col)=>{q.save();q.font='bold 11px sans-serif';q.textAlign='center';q.lineWidth=3;q.strokeStyle='rgba(0,0,0,.7)';q.strokeText(t,x,y);q.fillStyle=col||'#fff';q.fillText(t,x,y);q.restore()};
 function drawSmoke(q,G,X,Y,s,T,b){const r=b.smkR||smokeRect(b,G),x0=X(r.cx-r.w/2),y0=Y(r.cy-r.h/2),w=r.w*s,h=r.h*s;
   q.save();q.beginPath();RR(q,x0,y0,w,h,s*.4);q.clip();q.fillStyle='rgba(175,195,220,.30)';q.fillRect(x0,y0,w,h);
   const N=Math.round(r.w*r.h*3.2);for(let i=0;i<N;i++){const u=(T*.05*(1+hz(i)*.8)+hz(i+9))%1,px=x0+hz(i+3)*w+Math.sin(T*.7+i)*s*.25,py=y0+h*u,rad=s*(.55+hz(i+5)*.7),g=q.createRadialGradient(px,py,0,px,py,rad);
@@ -10414,7 +10414,7 @@ window.c18TRN=function(b,im,q,x,y,w,h){const k=b.nb&&b.nb.c18;if(!k||!ROT[k])ret
   q.save();q.translate(x+w/2,y+h/2);q.rotate(b.c18ra+Math.PI/2);q.drawImage(im,-dw/2,-dh/2,dw,dh);q.restore();return true};
 
 /* ---------- vẽ ---------- */
-const lab=(q,x,y,t,col,sz)=>{q.save();q.font='bold '+(sz||11)+'px sans-serif';q.textAlign='center';q.lineWidth=3;q.strokeStyle='rgba(0,0,0,.7)';q.strokeText(t,x,y);q.fillStyle=col||'#fff';q.fillText(t,x,y);q.restore()};
+const lab=(...a)=>{if(window.c62Hide&&c62Hide())return;return lab0(...a)},lab0=(q,x,y,t,col,sz)=>{q.save();q.font='bold '+(sz||11)+'px sans-serif';q.textAlign='center';q.lineWidth=3;q.strokeStyle='rgba(0,0,0,.7)';q.strokeText(t,x,y);q.fillStyle=col||'#fff';q.fillText(t,x,y);q.restore()};
 const dashRing=(q,x,y,r,col,w)=>{q.save();q.setLineDash([4,6]);q.strokeStyle=col;q.lineWidth=w||1.4;q.beginPath();q.arc(x,y,r,0,7);q.stroke();q.restore()};
 function drawProj(q,p,X,Y,s,T){const x=X(p.x),y=Y(p.y),a=Math.atan2(p.vy,p.vx);
   const trail=(col,w,al)=>{const n=p.tr.length;if(n<2)return;q.save();q.lineCap='round';for(let i=1;i<n;i++){q.globalAlpha=(i/n)*al;q.strokeStyle=col;q.lineWidth=Math.max(1,w*i/n);q.beginPath();q.moveTo(X(p.tr[i-1][0]),Y(p.tr[i-1][1]));q.lineTo(X(p.tr[i][0]),Y(p.tr[i][1]));q.stroke()}q.restore()};
@@ -10976,7 +10976,7 @@ window.c19BaseUI=function(sel){const rot=document.getElementById('brot');if(!rot
     const n=document.getElementById('bnote');if(n)n.innerHTML+=' · <b>Hướng: '+nm+'</b> (bấm “Xoay hướng” để đổi; ra chiến trường không thể quay)'}};
 
 /* ---------- vẽ ---------- */
-const lab=(q,x,y,t,col,sz)=>{q.save();q.font='bold '+(sz||11)+'px sans-serif';q.textAlign='center';q.lineWidth=3;q.strokeStyle='rgba(0,0,0,.7)';q.strokeText(t,x,y);q.fillStyle=col||'#fff';q.fillText(t,x,y);q.restore()};
+const lab=(...a)=>{if(window.c62Hide&&c62Hide())return;return lab0(...a)},lab0=(q,x,y,t,col,sz)=>{q.save();q.font='bold '+(sz||11)+'px sans-serif';q.textAlign='center';q.lineWidth=3;q.strokeStyle='rgba(0,0,0,.7)';q.strokeText(t,x,y);q.fillStyle=col||'#fff';q.fillText(t,x,y);q.restore()};
 const dashRing=(q,x,y,r,col,w)=>{q.save();q.setLineDash([4,6]);q.strokeStyle=col;q.lineWidth=w||1.4;q.beginPath();q.arc(x,y,r,0,7);q.stroke();q.restore()};
 function drawProj(q,p,X,Y,s,T){const x=X(p.x),y=Y(p.y),a=Math.atan2(p.vy,p.vx);
   const trail=(col,w,al)=>{const n=p.tr.length;if(n<2)return;q.save();q.lineCap='round';for(let i=1;i<n;i++){q.globalAlpha=(i/n)*al;q.strokeStyle=col;q.lineWidth=Math.max(1,w*i/n);q.beginPath();q.moveTo(X(p.tr[i-1][0]),Y(p.tr[i-1][1]));q.lineTo(X(p.tr[i][0]),Y(p.tr[i][1]));q.stroke()}q.restore()};
@@ -11474,7 +11474,7 @@ function pre(G,dt){
 })();
 
 /* ---------- vẽ ---------- */
-const lab=(q,x,y,t,col,sz)=>{q.save();q.font='bold '+(sz||11)+'px sans-serif';q.textAlign='center';q.lineWidth=3;q.strokeStyle='rgba(0,0,0,.7)';q.strokeText(t,x,y);q.fillStyle=col||'#fff';q.fillText(t,x,y);q.restore()};
+const lab=(...a)=>{if(window.c62Hide&&c62Hide())return;return lab0(...a)},lab0=(q,x,y,t,col,sz)=>{q.save();q.font='bold '+(sz||11)+'px sans-serif';q.textAlign='center';q.lineWidth=3;q.strokeStyle='rgba(0,0,0,.7)';q.strokeText(t,x,y);q.fillStyle=col||'#fff';q.fillText(t,x,y);q.restore()};
 const dashRing=(q,x,y,r,col,w)=>{q.save();q.setLineDash([4,6]);q.strokeStyle=col;q.lineWidth=w||1.4;q.beginPath();q.arc(x,y,r,0,7);q.stroke();q.restore()};
 const WC={purple:'170,80,255',red:'255,70,70',quake:'255,170,60',blue:'70,160,255'};
 function drawWave(q,o,X,Y,s,T){const px=X(o.x),py=Y(o.y),r=o.r*s,f=Math.max(0,1-o.t/o.max),al=Math.min(1,f*1.7),C=WC[o.sty]||'255,255,255';if(r<=1)return;
@@ -11807,7 +11807,7 @@ function pre(G,dt){
 {const _H=window.c14Hit;window.c14Hit=function(p){const G=DG;try{if(G&&G.bl&&p&&p.team==='e'&&!p.dead&&barHit(G,p.x,p.y,p.dmg||0)){p.dead=true;return true}}catch(e){console.error(e)}return _H?_H.apply(this,arguments):false}}
 {const _H=window.c14BeamHit;window.c14BeamHit=function(x,y,d){const G=DG;try{if(G&&G.bl&&barHit(G,x,y,d||0))return true}catch(e){console.error(e)}return _H?_H.apply(this,arguments):false}}
 /* ---------- vẽ ---------- */
-const lab=(q,x,y,t,col,sz)=>{q.save();q.font='bold '+(sz||11)+'px sans-serif';q.textAlign='center';q.lineWidth=3;q.strokeStyle='rgba(0,0,0,.7)';q.strokeText(t,x,y);q.fillStyle=col||'#fff';q.fillText(t,x,y);q.restore()};
+const lab=(...a)=>{if(window.c62Hide&&c62Hide())return;return lab0(...a)},lab0=(q,x,y,t,col,sz)=>{q.save();q.font='bold '+(sz||11)+'px sans-serif';q.textAlign='center';q.lineWidth=3;q.strokeStyle='rgba(0,0,0,.7)';q.strokeText(t,x,y);q.fillStyle=col||'#fff';q.fillText(t,x,y);q.restore()};
 const dashRing=(q,x,y,r,col,w)=>{q.save();q.setLineDash([4,6]);q.strokeStyle=col;q.lineWidth=w||1.4;q.beginPath();q.arc(x,y,r,0,7);q.stroke();q.restore()};
 const cdArc=(q,px,py,r,f,col)=>{q.save();q.strokeStyle=col;q.lineWidth=3;q.beginPath();q.arc(px,py,r,-Math.PI/2,-Math.PI/2+Math.PI*2*Math.max(0,Math.min(1,f)));q.stroke();q.restore()};
 function info(b,G){const c=b.nb.c21,t=Math.ceil;
@@ -12269,7 +12269,7 @@ const oldMis=b=>!!b&&!(b.nb&&b.nb.c22)&&(MISOLD.includes(b.t)||!!(b.spec&&b.spec
     try{return _T.apply(this,arguments)}finally{if(had)had.dm=o;else G.pb=had}}});
 {const _F=dfFire;dfFire=function(src,wp,tg,team){try{if(team==='p'&&wp&&wp.sp&&wp.sp.k==='missile'&&src&&!src.o&&stationOn(DG))wp=Object.assign({},wp,{dmg:wp.dmg*1.05})}catch(e){}return _F.call(this,src,wp,tg,team)}}
 /* ================= vẽ ================= */
-const lab=(q,x,y,t,col,sz)=>{q.save();q.font='bold '+(sz||11)+'px sans-serif';q.textAlign='center';q.lineWidth=3;q.strokeStyle='rgba(0,0,0,.7)';q.strokeText(t,x,y);q.fillStyle=col||'#fff';q.fillText(t,x,y);q.restore()};
+const lab=(...a)=>{if(window.c62Hide&&c62Hide())return;return lab0(...a)},lab0=(q,x,y,t,col,sz)=>{q.save();q.font='bold '+(sz||11)+'px sans-serif';q.textAlign='center';q.lineWidth=3;q.strokeStyle='rgba(0,0,0,.7)';q.strokeText(t,x,y);q.fillStyle=col||'#fff';q.fillText(t,x,y);q.restore()};
 const dashRing=(q,x,y,r,col,w)=>{q.save();q.setLineDash([4,6]);q.strokeStyle=col;q.lineWidth=w||1.4;q.beginPath();q.arc(x,y,r,0,7);q.stroke();q.restore()};
 const cdArc=(q,px,py,r,f,col)=>{q.save();q.strokeStyle=col;q.lineWidth=3;q.beginPath();q.arc(px,py,r,-Math.PI/2,-Math.PI/2+Math.PI*2*Math.max(0,Math.min(1,f)));q.stroke();q.restore()};
 /* xoay pháo 360° (công trình hạng nặng) và làm mờ hầm tàng hình */
@@ -19369,6 +19369,7 @@ window.c61Spawn=spawnFix;
 {const _St=dfStep;dfStep=function(){const G=DG;if(G&&!G._c61&&G.pl&&G.hq){G._c61=1;try{spawnFix(G)}catch(e){console.error(e)}}return _St.apply(this,arguments)}}
 })();
 
+window.c62Hide=()=>{try{return !!DG&&!DG.done}catch(e){return false}};
 /* gộp pháo công trình hạng nặng vào pháo hạng nặng */
 WP.forEach(w=>{if(w.cat===5){w.cat=4;w.tag='PHÁO HẠNG NẶNG'}});
 /* ===== Sở hữu vật phẩm bán ở Shop khuyến mãi ===== */
@@ -19621,7 +19622,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL=(window.SE_CFG&&SE_CFG.fb)||'';
-  const VER='v241';
+  const VER='v242';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`
