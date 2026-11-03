@@ -1819,7 +1819,7 @@ function renderSe(){
   const tg=(k,lb)=>`<div class="srow"><label>${lb}</label><span class="tg"><input type="checkbox" data-s="${k}" ${t[k]?'checked':''}><i></i></span></div>`;
   $('pp-se').innerHTML=`<div class="pfr"><h4>Lưu tiến trình</h4><div class="gpr"><img src="${PR.gp}" alt=""><p>Đăng nhập Google Play để lưu và đồng bộ tiến trình trò chơi trên nhiều thiết bị.</p>${t.gp?'<button class="gok" id="gpa">✔ Đã kết nối</button><button class="gout" id="gpb">Đăng xuất</button>':'<button class="gok" id="gpa">Đăng nhập</button>'}</div></div>
   <div class="sg"><div class="pfr"><h4>Âm thanh</h4>${sl('gun','🔊 Âm lượng súng')}${sl('music','♪ Nhạc nền')}${sl('fx','🔔 Hiệu ứng')}</div>
-  <div class="pfr"><h4>Đồ họa</h4>${sel('q','Chất lượng đồ họa',['Thấp','Trung bình','Cao'])}${sel('blur','Hiệu ứng',['Bật','Tắt'])}${sel('fps','FPS giới hạn',['30 FPS','60 FPS','90 FPS'])}${tg('shake','Chế độ rung (Level · PvP · Boss)')}${tg('nobar','Ẩn thanh máu · giáp · năng lượng (công trình, tàu, quân triệu hồi)')}${tg('light','Hiệu ứng ánh sáng')}${tg('part','Hiệu ứng hạt')}</div></div>
+  <div class="pfr"><h4>Đồ họa</h4>${sel('q','Chất lượng đồ họa',['Thấp','Trung bình','Cao'])}${sel('blur','Hiệu ứng',['Bật','Tắt'])}${sel('fps','FPS giới hạn',['30 FPS','60 FPS','90 FPS'])}${tg('shake','Chế độ rung (Level · PvP · Boss)')}${tg('notrail','Ẩn đuôi đạn (đạn tàu · đạn công trình)')}${tg('nobar','Ẩn thanh máu · giáp · năng lượng (công trình, tàu, quân triệu hồi)')}${tg('light','Hiệu ứng ánh sáng')}${tg('part','Hiệu ứng hạt')}</div></div>
   <div class="pfr"><h4>Khác</h4><div class="sg"><div>${sel('lang','Ngôn ngữ',['Tiếng Việt','English'])}${tg('notif','Thông báo')}${tg('auto','Tự động dùng kỹ năng')}</div><div>${tg('pvp','Ẩn/hiện hiệu ứng PvP')}${tg('batt','Chế độ tiết kiệm pin')}<div class="srow"><label>Xóa bộ nhớ đệm</label><button class="xbtn" id="clr">Xóa</button></div><div class="srow"><button class="rbtn" id="rst">⟲ Đặt lại mặc định</button></div></div></div></div>`;
   const P=$('pp-se');
   P.querySelectorAll('input[type=range]').forEach(i=>i.oninput=()=>{S.set[i.dataset.s]=+i.value;i.nextElementSibling.textContent=i.value+'%';save()});
@@ -9689,9 +9689,9 @@ window.c16Draw=function(q,G,X,Y,s,T){if(!G||!G.bl)return;
       const bw=Math.max(w*.9,s*1.6),bx=x+w/2-bw/2,by=y-s*.3;q.fillStyle='#000a';q.fillRect(bx,by,bw,s*.17);q.fillStyle='#ffd23a';q.fillRect(bx,by,bw*o.rb,s*.17);
       q.globalCompositeOperation='lighter';for(let i=0;i<7;i++){const u=(T*3+i*.37)%1,sx=X(o.x)+(hz(i+Math.floor(T*3))*2-1)*w*.35,sy=Y(o.y)+(hz(i*3+Math.floor(T*3))*2-1)*h*.35;q.globalAlpha=1-u;q.fillStyle='#ffe38a';q.beginPath();q.arc(sx,sy,Math.max(1.2,s*.05*(1-u)),0,7);q.fill()}
       q.restore()}
-    if(o.hp>0&&o.shdC&&o.shd&&o.shd.t>0&&o.shd.v>0){const a0=Math.min(1,.6+.4*o.shd.v/Math.max(1e-9,o.shd.max)),pu=Math.max(0,1-(G.t-(o.shdAt||-9))/.6),x=X(o.x-o.w/2)-3,y=Y(o.y-o.h/2)-3,w=o.w*s+6,h=o.h*s+6;
+    if(o.hp>0&&o.shdC&&o.shd&&o.shd.t>0&&o.shd.v>0&&!(window.R3D&&R3D.live)){const a0=Math.min(1,.6+.4*o.shd.v/Math.max(1e-9,o.shd.max)),pu=Math.max(0,1-(G.t-(o.shdAt||-9))/.6),x=X(o.x-o.w/2)-3,y=Y(o.y-o.h/2)-3,w=o.w*s+6,h=o.h*s+6;
       q.save();q.shadowColor='#7fd0ff';q.shadowBlur=8+10*pu;q.fillStyle='rgba(100,190,255,'+(.08*a0+.12*pu)+')';q.strokeStyle='rgba(150,220,255,'+Math.min(1,a0*.7+.3*pu)+')';q.lineWidth=2+2*pu;
-      q.beginPath();RR(q,x,y,w,h,Math.min(10,s*.3));q.fill();q.stroke();q.restore()}
+      q.beginPath();q.arc(x+w/2,y+h/2,Math.max(w,h)*.62,0,7);q.fill();q.stroke();q.restore()}
     const v=o.gv;if(v&&v.m!=='idle'&&o.hp>0)window.c16Veh(q,X(v.x),Y(v.y),v.ang,s*.95,T,v.m==='work')})};
 {const _D=dfDraw;dfDraw=function(){_D.apply(this,arguments);try{const G=DG;if(G&&G.bl){dq.setTransform(dfV.dpr,0,0,dfV.dpr,0,0);window.c16Draw(dq,G,dsx,dsy,dfV.s,G.t)}}catch(e){}}}
 
@@ -11396,7 +11396,7 @@ function info(b,G){const c=b.nb.c19,t=Math.ceil;
   case'tj1':return b.c19n?['Nhiễu '+b.c19n+' mục tiêu','#bfe6ff']:['Đang quét radar','#8fa6d8'];
   case'tj2':return b.c19cd>0?['Hồi '+t(b.c19cd)+'s','#c8b6ff']:['Sẵn sàng','#c8b6ff'];
   case'tj3':return ['Xung EMP · '+(b.c19dn||0)+' mục tiêu','#8fe8ff'];
-  case'tj4':return ['Mạng điện từ · +'+fmt(CFG.tj4.sh*LV(b))+' giáp/2s','#8fe8ff'];
+  case'tj4':return null;
   default:return null}}
 function drawMir(q,b,G,X,Y,s,T){const m=b.c19m;if(!m||(window.R3D&&R3D.live))return;const g=mirGeo(b),P=g.P.map(p=>[X(p[0]),Y(p[1])]),hit=m.hitT!=null?Math.max(0,1-(G.t-m.hitT)/.35):0,up=Math.min(1,(G.t-(m.up||0))/.6);
   if(m.hp<=0){q.save();q.setLineDash([5,7]);q.strokeStyle='rgba(190,215,255,.2)';q.lineWidth=2;q.beginPath();P.forEach((p,i)=>i?q.lineTo(p[0],p[1]):q.moveTo(p[0],p[1]));q.stroke();q.restore();return}
@@ -11435,7 +11435,7 @@ window.c19Geo={mirGeo,matCorners};window.c19Draw=function(q,G,X,Y,s,T){if(!G||!G
     else if(c==='tj1'){const R=CFG.tj1.R*s,a=b.c19sw||0;dashRing(q,px,py,R,'rgba(130,210,255,.25)');q.save();q.globalCompositeOperation='lighter';const g=q.createRadialGradient(px,py,0,px,py,R);g.addColorStop(0,'rgba(120,220,255,.3)');g.addColorStop(1,'rgba(120,220,255,0)');q.fillStyle=g;q.beginPath();q.moveTo(px,py);q.arc(px,py,R,a-.55,a);q.closePath();q.fill();q.strokeStyle='rgba(190,245,255,.7)';q.lineWidth=1.6;q.beginPath();q.moveTo(px,py);q.lineTo(px+Math.cos(a)*R,py+Math.sin(a)*R);q.stroke();q.restore()}
     else if(c==='tj2'){dashRing(q,px,py,CFG.tj2.R*s,'rgba(180,150,255,.2)')}
     else if(c==='tj3'){const R=CFG.tj3.R*s,u=b.c19pt!=null?(G.t-b.c19pt)/.7:2;dashRing(q,px,py,R,'rgba(130,230,255,.2)');if(u<1){q.save();q.globalCompositeOperation='lighter';q.strokeStyle='rgba(150,235,255,'+(.85*(1-u))+')';q.lineWidth=4*(1-u)+1.5;q.shadowColor='#7fe8ff';q.shadowBlur=10;q.beginPath();q.arc(px,py,R*u,0,7);q.stroke();q.restore()}}
-    else if(c==='tj4'){const u=b.c19pt!=null?(G.t-b.c19pt)/.8:2;if(u<1){q.save();q.globalCompositeOperation='lighter';G.bl.forEach(o=>{if(o.hp<=0||o.t==='mine'||o.aux||o.u||o===b)return;const x2=X(o.x),y2=Y(o.y);q.strokeStyle='rgba(130,230,255,'+(.5*(1-u))+')';q.lineWidth=1.6;q.beginPath();q.moveTo(px,py);
+    else if(c==='tj4'){const u=2;if(u<1){q.save();q.globalCompositeOperation='lighter';G.bl.forEach(o=>{if(o.hp<=0||o.t==='mine'||o.aux||o.u||o===b)return;const x2=X(o.x),y2=Y(o.y);q.strokeStyle='rgba(130,230,255,'+(.5*(1-u))+')';q.lineWidth=1.6;q.beginPath();q.moveTo(px,py);
         const N=6,nx=-(y2-py),ny=x2-px,l=Math.hypot(nx,ny)||1;for(let k=1;k<N;k++){const t=k/N,j=(hz(k*7+Math.floor(T*14)+o.x*3)-.5)*s*.5;q.lineTo(px+(x2-px)*t+nx/l*j,py+(y2-py)*t+ny/l*j)}q.lineTo(x2,y2);q.stroke()});q.restore()}}
     const L=info(b,G);if(L)lab(q,px,top,L[0],L[1],10)});
   if(!(window.c67hide&&c67hide(G))){(G.c19e||[]).forEach(o=>{try{drawE(q,o,G,X,Y,s,T)}catch(e){}});
@@ -14768,7 +14768,7 @@ function pools(){if(BUL)return;
   MS=Pool(()=>{const g=new T.Group(),a=new T.Mesh(mb,MT.gray),b=new T.Mesh(mc,MT.red),f=new T.Sprite(ADDM(glowT()));f.material.color.set(0xff7a3c);f.position.z=.21;f.scale.set(.66,.66,1);g.add(a,b,f);scene.add(g);return g});
   const rg=new T.RingGeometry(.7,1,48);RG=Pool(()=>{const m=new T.Mesh(rg,new T.MeshBasicMaterial({color:0xffffff,transparent:true,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide,toneMapped:false,fog:false}));m.rotation.x=-Math.PI/2;scene.add(m);return m})}
 function bar(x,y,z,w,f,c,o,th){if(f<=0||window.__nb())return;const s=BAR.get();s.position.set(x-w/2,y,z);s.scale.set(Math.max(.001,w*Math.min(1,f)),th||.14,1);s.material.color.copy(col(c));s.material.opacity=o==null?1:o}
-function beam(pool,a,b,r,c,o){const m=pool.get(),d=new T.Vector3().subVectors(b,a),L=d.length()||.001;m.position.copy(a).addScaledVector(d,.5);m.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),d.multiplyScalar(1/L));m.scale.set(r,L,r);m.material.color.copy(col(c));m.material.opacity=o}
+function beam(pool,a,b,r,c,o){if(pool===TRL&&window.__nt())return;const m=pool.get(),d=new T.Vector3().subVectors(b,a),L=d.length()||.001;m.position.copy(a).addScaledVector(d,.5);m.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),d.multiplyScalar(1/L));m.scale.set(r,L,r);m.material.color.copy(col(c));m.material.opacity=o}
 /* ---------- nổ xanh dương + cam, khói, mảnh vỡ, chớp sáng ---------- */
 const parts=[],smokes=[],chunks=[],rings=[];let seenFx=new WeakSet(),flashL=null;
 const freeP=[],freeS=[];
@@ -20383,7 +20383,7 @@ function lobbyBtn(){const t=document.getElementById('tsf');if(!t||!t.parentEleme
 setInterval(lobbyBtn,700);lobbyBtn();
 })();
 
-window.__nb=function(){try{return !!(S.set&&S.set.nobar)}catch(e){return false}};
+window.__nt=function(){try{return !!(S.set&&S.set.notrail)}catch(e){return false}};window.__nb=function(){try{return !!(S.set&&S.set.nobar)}catch(e){return false}};
 /* gộp pháo công trình hạng nặng vào pháo hạng nặng */
 WP.forEach(w=>{if(w.cat===5){w.cat=4;w.tag='PHÁO HẠNG NẶNG'}});
 /* ===== Sở hữu vật phẩm bán ở Shop khuyến mãi ===== */
@@ -20636,7 +20636,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL=(window.SE_CFG&&SE_CFG.fb)||'';
-  const VER='v274';
+  const VER='v275';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`
