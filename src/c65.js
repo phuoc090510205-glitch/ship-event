@@ -22,14 +22,14 @@ function arm(G){const hs=Math.sqrt((G.pvo&&G.pvo.fr)||1);let pas=0;
     u.c65={k:f.k,r:f.r||6,l,jam:f.jam,slow:f.slow,pulse:f.pulse,dot:f.dot,a:f.a,v:f.v,cd:0}});
   const m=1+Math.min(.5,pas*.05);if(pas)G.eu.forEach(u=>(u.ws||[]).forEach(w=>w.dmg*=m));G.c65on=1}
 function atk(G,dt){if(G.t-(G.pvT0||0)<60)return;G.c69at=(G.c69at||0)+dt;if(G.c69at<5)return;G.c69at-=5;if((G.c69n||0)>=50)return;const n=G.c69n=(G.c69n||0)+1;
-  (G.eu||[]).forEach(u=>{if(u.dead||!u.ws||!u.ws.length)return;u.ws.forEach(w=>{w.rng=(w.rng||6)+(n===1?8:1)});try{G.fx.push({x:u.x,y:u.y,r:Math.max(u.w||2,u.h||2)*.9,t:.6,max:.6,ns:1,col:'#ff5a5a'})}catch(e){}});
+  (G.eu||[]).forEach(u=>{if(u.dead||!u.ws||!u.ws.length)return;u.ws.forEach(w=>{if(w.c85b==null)w.c85b=w.rng||6;w.rng=w.c85b*(1+.125*n)+7});try{G.fx.push({x:u.x,y:u.y,r:Math.max(u.w||2,u.h||2)*.9,t:.6,max:.6,ns:1,col:'#ff5a5a'})}catch(e){}});
   G.pb=G.pb||{dm:1,cdm:1,rm:1};if(G.c69rm0==null)G.c69rm0=G.pb.rm||1;G.pb.rm=G.c69rm0*(1+.125*n);
   (G.bl||[]).forEach(b=>{if(b.hp<=0)return;const gun=(typeof BT!=='undefined'&&BT[b.t])||(b.nb&&(b.nb.k==='tur'||/drone/.test(b.t)));if(gun)try{G.fx.push({x:b.x,y:b.y,r:Math.max(b.w,b.h)*.9,t:.6,max:.6,ns:1,col:'#ffb04a'})}catch(e){}});
-  try{toast(n===1?'⚔ Công trình địch +8 tầm đánh · công trình ta +1':'⚔ Mọi công trình vào trạng thái tấn công · tầm đánh +'+n)}catch(e){}}
+  try{toast(n===1?'⚔ Tăng tầm đánh: công trình địch luôn dẫn trước 7 ô':'⚔ Mọi công trình vào trạng thái tấn công · tầm đánh +'+n)}catch(e){}}
 function pow(G,dt){if(G.t-(G.pvT0||0)<60)return;G.c69pt=(G.c69pt||0)+dt;if(G.c69pt<6)return;G.c69pt-=6;if((G.c69k||0)>=50)return;const k=G.c69k=(G.c69k||0)+1;G.c69f=100*k;
   (G.eu||[]).forEach(u=>{if(u.dead||!u.ws||!u.ws.length)return;u.ws.forEach(w=>{w.dmg=(w.dmg||0)+(k===1?600:100)/Math.max(.2,u.dm||1)});try{G.fx.push({x:u.x,y:u.y,r:Math.max(u.w||2,u.h||2)*1.1,t:.7,max:.7,ns:1,col:'#ff3a8a'})}catch(e){}});
   (G.bl||[]).forEach(b=>{if(b.hp<=0)return;const gun=(typeof BT!=='undefined'&&BT[b.t])||(b.nb&&(b.nb.k==='tur'||/drone/.test(b.t)));if(gun)try{G.fx.push({x:b.x,y:b.y,r:Math.max(b.w,b.h)*1.1,t:.7,max:.7,ns:1,col:'#ff3a8a'})}catch(e){}});
-  try{toast(k===1?'💥 Công trình địch +600 sát thương mỗi viên · công trình ta +100':'💥 Công trình hai bên +100 sát thương mỗi viên đạn ('+k+'/50)')}catch(e){}}
+  try{toast(k===1?'💥 Tăng sát thương: công trình địch luôn dẫn trước 500 mỗi viên':'💥 Công trình hai bên +100 sát thương mỗi viên đạn ('+k+'/50)')}catch(e){}}
 function ecarp(G,dt){const F=G.c65cp;if(!F||!window.C39)return;const c=F.c;
   if(!G.c65reg){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;(G.eu||[]).forEach(u=>{if(!u.w)return;x0=Math.min(x0,u.x-u.w/2);y0=Math.min(y0,u.y-u.h/2);x1=Math.max(x1,u.x+u.w/2);y1=Math.max(y1,u.y+u.h/2)});G.c65reg={x0:x0-1,y0:y0-1,x1:x1+1,y1:y1+1}}
   const R=G.c65reg,mine=[G.pl].concat(G.al||[]).filter(u=>u&&!u.dead);
