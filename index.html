@@ -7505,7 +7505,7 @@ function ecarp(G,dt){const F=G.c65cp;if(!F||!window.C39)return;const c=F.c;
   tg.forEach(u=>{hitP(G,u,d);try{G.fx.push({x:u.x,y:u.y,r:2.2,t:.6,max:.6,ex:1,rot:Math.random()*6});G.bm.push({x1:G.eh?G.eh.x:u.x,y1:G.eh?G.eh.y:u.y-6,x2:u.x,y2:u.y,t:.35,col,w:5})}catch(e){}});
   (G.eu||[]).forEach(u=>{if(!u.dead&&u.hp>0&&u.hp<u.max)u.hp=Math.min(u.max,u.hp+F.V*.2/DB())});
   if(tg.length)try{toast('⚡ Sức mạnh thảm đối thủ: −'+Math.round(d)+' máu')}catch(e){}}
-function step(G,dt){try{esup(G,dt)}catch(e){console.error(e)}try{ecast(G,dt)}catch(e){console.error(e)}try{atk(G,dt);pow(G,dt);if(!esum(G,dt))ecarp(G,dt);else if(!G.c65cpOn){G.c65cpOn=1}}catch(e){console.error(e)}if(!G.c65on||!G.eu)return;const P=G.pl;let slowK=1;
+function step(G,dt){try{const E=G.pvEn;if(E&&!E.dead&&(G.c88E!==E||E.c88d)){G.c88E=E;E.c88d=0;espawn(G,[E])}if(E&&E.dead)E.c88d=1}catch(e){console.error(e)}try{esup(G,dt)}catch(e){console.error(e)}try{ecast(G,dt)}catch(e){console.error(e)}try{atk(G,dt);pow(G,dt);if(!esum(G,dt))ecarp(G,dt);else if(!G.c65cpOn){G.c65cpOn=1}}catch(e){console.error(e)}if(!G.c65on||!G.eu)return;const P=G.pl;let slowK=1;
   G.eu.forEach(u=>{const c=u.c65;if(!c||u.dead||u.hp<=0)return;c.cd-=dt;const R=c.r,lk=LVK(c.l);
     if(c.k==='aura'){players(G).forEach(s=>{if(!near(u,s,R))return;
         if(c.jam)(s.ws||[]).forEach(w=>{w.t+=dt*Math.min(.6,c.jam)});
@@ -7610,9 +7610,15 @@ function sep(G){const box=L=>{let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;L.forEach(b=>{if
   const E=(G.eu||[]).concat((G.en||[]).filter(e=>!(G.eu||[]).includes(e)));E.forEach(e=>{e.y-=d;if(e.sy!=null)e.sy-=d;if(e.ty!=null)e.ty-=d});
   const minY=Math.min(...E.map(e=>e.y-(e.h||e.size||1)/2));if(minY<1){const k=1-minY;E.concat(G.bl||[],[G.pl],G.al||[]).forEach(e=>{if(!e)return;e.y+=k;if(e.sy!=null)e.sy+=k;if(e.ty!=null)e.ty+=k});G.wd.Hd+=k}
   return d}
-{const _P=pvSetup;pvSetup=function(G,o){const r=_P.apply(this,arguments);try{G.c87sep=sep(G)}catch(e){console.error(e)}try{G.c69d0={da:S.da,sao:S.sao}}catch(e){}try{carpet(G,o)}catch(e){console.error(e)}try{arm(G)}catch(e){console.error(e)}try{skills(G)}catch(e){console.error(e)}try{(G.eu||[]).forEach(u=>{if(SPEC(u)){u.c65=null;const nb=u.bd.nb;if(nb.c16||nb.c17||nb.c18||nb.c19||nb.c20||nb.c21||nb.c22)u.ws=[]}})}catch(e){}try{if(!(o&&o.human))G.eu.forEach(u=>{u.max*=1.5;u.hp=Math.min(u.max,u.hp*1.5);(u.ws||[]).forEach(w=>{w.dmg*=1.5})})}catch(e){console.error(e)}return r}}
+/* tàu địch luôn xuất hiện ở ô trống trên thảm địch, gần phía ta nhất */
+function ebox(G){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;(G.eu||[]).forEach(b=>{if(!b||!b.w)return;x0=Math.min(x0,b.x-b.w/2);y0=Math.min(y0,b.y-b.h/2);x1=Math.max(x1,b.x+b.w/2);y1=Math.max(y1,b.y+b.h/2)});return x0<1e9?{x0:x0-1,y0:y0-1,x1:x1+1,y1:y1+1}:null}
+function espawn(G,L){const R=ebox(G);if(!R||!L||!L.length)return;const P=G.pl||{x:(R.x0+R.x1)/2,y:R.y1+10},used=[];
+  const free=(x,y,r)=>!(G.eu||[]).some(b=>!b.dead&&b.hp>0&&Math.abs(b.x-x)<b.w/2+r&&Math.abs(b.y-y)<b.h/2+r)&&!used.some(u=>Math.hypot(u[0]-x,u[1]-y)<u[2]+r);
+  const C=[];for(let y=R.y0+.5;y<=R.y1-.5;y+=1)for(let x=R.x0+.5;x<=R.x1-.5;x+=1)C.push([x,y,Math.hypot(x-P.x,y-P.y)]);C.sort((a,b)=>a[2]-b[2]);
+  L.forEach(e=>{const r=.45;let p=C.find(c=>free(c[0],c[1],r));if(!p)p=[(R.x0+R.x1)/2+(Math.random()-.5)*4,R.y1+r+.3];used.push([p[0],p[1],r]);e.x=p[0];e.y=p[1];e.sx=e.x;e.sy=e.y;e.tx=e.x;e.ty=e.y;e.vx=0;e.vy=0;e._px=e.x;e._py=e.y;e.ang=Math.PI/2})}
+{const _P=pvSetup;pvSetup=function(G,o){const r=_P.apply(this,arguments);try{G.c87sep=sep(G)}catch(e){console.error(e)}try{espawn(G,(G.en||[]).filter(e=>(e.pvE||e.pvEsc)&&!e.dead));G.c88E=G.pvEn}catch(e){console.error(e)}try{G.c69d0={da:S.da,sao:S.sao}}catch(e){}try{carpet(G,o)}catch(e){console.error(e)}try{arm(G)}catch(e){console.error(e)}try{skills(G)}catch(e){console.error(e)}try{(G.eu||[]).forEach(u=>{if(SPEC(u)){u.c65=null;const nb=u.bd.nb;if(nb.c16||nb.c17||nb.c18||nb.c19||nb.c20||nb.c21||nb.c22)u.ws=[]}})}catch(e){}try{if(!(o&&o.human))G.eu.forEach(u=>{u.max*=1.5;u.hp=Math.min(u.max,u.hp*1.5);(u.ws||[]).forEach(w=>{w.dmg*=1.5})})}catch(e){console.error(e)}return r}}
 {const _S=dfStep;dfStep=function(dt){const r=_S.apply(this,arguments);try{const G=DG;if(G&&G.pvp&&!G.done)step(G,dt)}catch(e){console.error(e)}return r}}
-window.C65={carpet,arm,skills,layout,TPL,esum,ckey,lvRank,esup,SPEC,ecap,ecast,sep};
+window.C65={carpet,arm,skills,layout,TPL,esum,ckey,lvRank,esup,SPEC,ecap,ecast,sep,espawn};
 (function hk(){if(!window.PWR||!PWR.boost){setTimeout(hk,300);return}if(PWR.boost.c82)return;const _b=PWR.boost;PWR.boost=function(o){const r=_b.apply(this,arguments);try{const mine=Math.max(0,PWR.fleet().length-1);o.esc=Math.min(101,mine+3)}catch(e){}return r};PWR.boost.c82=1})();
 })();
 
@@ -8431,7 +8437,7 @@ window.PWR=(function(){
       a.fl-=dt;if(a.fl<=0){a.dir*=-1;a.fl=1.2+Math.random()*2.2}
       let vx=0,vy=0;
       if(a.ret){const k=d>6?1:0;vx=ux*k;vy=uy*k}
-      else{const ex=d-want;const rad=Math.max(.15,Math.min(1,ex/2));const lat=ex>0?.7:.45;vx=ux*rad+px*a.dir*lat;vy=uy*rad+py*a.dir*lat}
+      else{const ex=d-Math.max(3,Math.min(want,3+((tg.w||tg.size||2)*.4)));const rad=Math.max(0,Math.min(1,ex/2));const lat=ex>0?.7:.35;vx=ux*rad+px*a.dir*lat;vy=uy*rad+py*a.dir*lat}
       // né đạn người chơi
       let dgx=0,dgy=0;
       G.pr.forEach(p=>{if(p.team!=='p'||p.dead)return;const rx=e.x-p.x,ry=e.y-p.y,dd2=Math.hypot(rx,ry);if(dd2>3.2||dd2<.01)return;
@@ -8442,7 +8448,7 @@ window.PWR=(function(){
       let nx=e.x+vx/l*sp*dt*Math.min(1,l),ny=e.y+vy/l*sp*dt*Math.min(1,l);
       // phát hiện kẹt (bị công trình chắn): đổi hướng lượn
       a.st+=dt;if(a.st>.6){if(Math.hypot(e.x-a.mx,e.y-a.my)<sp*.6*.6){a.dir*=-1;a.fl=1.5}a.mx=e.x;a.my=e.y;a.st=0}
-      e.x=Math.max(.5,Math.min(G.wd.Wd-.5,nx));e.y=Math.max(.5,Math.min(G.wd.Hd-.5,ny));
+      e.x=Math.max(.5,Math.min(G.wd.Wd-.5,nx));e.y=Math.max(.5,Math.min(G.wd.Hd-.5,ny));if(tg&&!tg.sb&&tg.w==null){const qx=e.x-tg.x,qy=e.y-tg.y,qd=Math.hypot(qx,qy)||.01;if(qd<3){e.x=tg.x+qx/qd*3;e.y=tg.y+qy/qd*3}}
       // tách khỏi tàu địch khác
       G.en.forEach(o=>{if(o===e||o.dead||!o.size||o.sb)return;const q=dist(e,o);if(q<(e.size+o.size)*.4&&q>.001){const f=(e.size+o.size)*.4-q;e.x+=(e.x-o.x)/q*f*.5;e.y+=(e.y-o.y)/q*f*.5}});
       // bắn thêm vào tàu đồng minh của người chơi (mặc định chỉ bắn người chơi / công trình)
@@ -20297,7 +20303,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL=(window.SE_CFG&&SE_CFG.fb)||'';
-  const VER='v269';
+  const VER='v270';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`
