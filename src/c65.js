@@ -7,7 +7,7 @@ const near=(a,b,r)=>Math.hypot(a.x-b.x,a.y-b.y)<=r+(b.size||2)*.3;
 const LVK=l=>1+.1*((l||1)-1);
 /* ---- 1) thảm của đối thủ: chọn ngẫu nhiên 1 thảm bất kỳ, áp chỉ số lên công trình địch ---- */
 function carpet(G,o){if(!window.C39||!C39.CP||!C39.TIERS||!C39.KINDS)return;const r=o.rank||1;
-  const tr=2+((Math.random()*4)|0);let L=C39.CP.filter(c=>c.tier===tr);if(!L.length)L=C39.CP.filter(c=>c.tier>=2);const c=L[(Math.random()*L.length)|0];if(!c)return;
+  const tr=2+((Math.random()*4)|0);let L=C39.CP.filter(c=>c.tier===tr);if(!L.length)L=C39.CP.filter(c=>c.tier>=2);let c=L[(Math.random()*L.length)|0];if(o&&o.human){c=o.cp?C39.CP.find(x=>x.id===o.cp):null;if(!c||!(c.tier>=1))return}if(!c)return;
   const t=C39.TIERS[c.tier],K=(C39.KINDS[c.kind]||{}).k,V=t.V;G.c65cp={c,K,V};
   G.eu.forEach(u=>{if(u.dead)return;const add=V+(K==='hp'||K==='rev'?V:0)+(K==='hq'&&u===G.eh?V*3:0);u.max+=add/DB();u.hp+=add/DB();
     const sh=(t.arm||0)+(K==='shd'?V:0);if(sh>0){const v=sh/DB();u.shd={v:(u.shd&&u.shd.v||0)+v,max:(u.shd&&u.shd.max||0)+v,t:1e9}}
@@ -128,7 +128,7 @@ function esup(G,dt){const L=(G.eu||[]).map((u,i)=>[u,i]).filter(([u])=>SPEC(u));
     if(m){const R=G.c65reg||{x0:m.x-3,x1:m.x+3,y0:m.y-3,y1:m.y+3};E.dead=false;E.hp=E.max;if(E.nrgMax)E.nrg=E.nrgMax;E.x=R.x0+(R.x1-R.x0)*(.2+Math.random()*.6);E.y=R.y1+1.2;E.tx=E.x;E.ty=E.y;E.vx=0;E.vy=0;
       if(!G.en.includes(E))G.en.push(E);G.pvRs=0;m.c81rv=G.t+180;try{G.fx.push({x:m.x,y:m.y,r:2.2,t:.7,max:.7,col:'#7dffa0'});G.fx.push({x:E.x,y:E.y,r:1.8,t:.6,max:.6,col:'#ffffff'});toast('Mô-đun hồi sinh của đối thủ: tàu chính địch hồi sinh ngay!')}catch(e){}}}}
 /* ---- 7) thuyền trưởng của tàu địch: mỗi tàu địch có 1 thuyền trưởng, cấp theo bậc, tự dùng đúng các kỹ năng của thuyền trưởng đó (drone, robot, ong lửa, đẩy lùi…) ---- */
-function ecap(G,e){if(e.c82sk)return;const r=Math.max(1,Math.min(15,(G.pvo&&G.pvo.rank)||1)),lv=Math.min(100,Math.round(1+99*Math.pow((r-1)/14,1.2))),C=(typeof CAP!=='undefined'?CAP:[]);
+function ecap(G,e){if(e.c82sk)return;if(G.pvo&&G.pvo.human&&e.pvE&&Array.isArray(G.pvo.csk)){e.c82sk=[];e.capn=CAP[G.pvo.ci]?CAP[G.pvo.ci][0]:'Thuyền trưởng';G.pvo.csk.forEach(n=>{const ix=KI.findIndex(k=>k&&k[0]===n);if(ix<0)return;const k=KI[ix],cd=parseFloat(String(((k[6]||[]).find(x=>x[0]==='Hồi chiêu')||[0,'20'])[1]).replace(',','.'))||20;const ent={m:{n:k[0],img:KP[ix],t:'cap',id:'cs'+ix},q:{pw:0,dur:0,cd,ec:0},cd:4+Math.random()*4,cd0:Math.max(6,cd),cap:k,src:e,cn:e.capn};try{ent.sty=CSK.style(k,CSK.plan(k))}catch(x){}e.c82sk.push(ent)});return}const r=Math.max(1,Math.min(15,(G.pvo&&G.pvo.rank)||1)),lv=Math.min(100,Math.round(1+99*Math.pow((r-1)/14,1.2))),C=(typeof CAP!=='undefined'?CAP:[]);
   const c=C[(Math.random()*C.length)|0];e.capn=c?c[0]:'Thuyền trưởng';e.c82lv=lv;e.c54k=null;e.c82sk=[];const n=(typeof CSL!=='undefined'?CSL:[5,30,60,90]).filter(u=>lv>=u).length,R=(typeof SLR!=='undefined'?SLR:[3,0,1,2]);
   for(let j=0;j<n;j++){const L=[];KI.forEach((k,ix)=>{if(k&&k[2]===R[j]&&!(typeof KDEL!=='undefined'&&KDEL[k[0]])&&(typeof KC==='undefined'||KC.includes(k[1])))L.push(ix)});if(!L.length)continue;const ix=L[(Math.random()*L.length)|0],k=KI[ix];
     const cd=parseFloat(String(((k[6]||[]).find(x=>x[0]==='Hồi chiêu')||[0,'20'])[1]).replace(',','.'))||20;const ent={m:{n:k[0],img:(typeof KP!=='undefined'?KP[ix]:''),t:'cap',id:'cs'+ix},q:{pw:0,dur:0,cd,ec:0},cd:4+Math.random()*6,cd0:Math.max(6,cd),cap:k,src:e,cn:e.capn};
@@ -138,6 +138,15 @@ function sworld(G){let W=G.c82W;if(!W||W.host!==G){W=G.c82W={host:G,c82:1,pvp:fa
 function ecast(G,dt){if(!window.CSK||!CSK.cast)return;const W=sworld(G),ours=players(G);
   (G.en||[]).forEach(e=>{if(e.dead||!(e.pvE||e.pvEsc))return;ecap(G,e);if(!e.c82sk.length||e.silT>0||e.stun>0||e.spawn>G.t)return;const near=ours.some(u=>Math.hypot(u.x-e.x,u.y-e.y)<16);
     e.c82sk.forEach(k=>{k.cd-=dt;if(k.cd>0||!near)return;k.cd=k.cd0;const tm=e.team;window.__mwRun([W],()=>{e.team='p';e.cs=e.cs||{};try{CSK.cast(e,k,1)}finally{e.team=tm}})})})}
+
+/* ---- 8) phòng PvP theo mã (c90): đánh căn cứ + hạm đội thật của người chơi khác (giao hữu, không cộng sức mạnh AI) ---- */
+function roomO(sn,cb){const items=(sn.items||[]).map(it=>{const def=BLD.find(b=>b.id===it.id)||BLD.find(b=>b.t===it.t)||BLD.find(b=>b.t==='wall');return Object.assign({},it,{w:it.w||def.w,h:it.h||def.h,def,lv:Math.max(1,Math.min(100,it.lv|0||1))})}).filter(it=>it.def);
+  if(!items.some(i=>i.hqf)){const hq=BLD.find(b=>b.t==='hq');items.unshift({id:hq.id,t:'hq',x:0,y:0,w:hq.w,h:hq.h,lv:sn.hqLv||1,hqf:1,def:hq})}
+  let R=0;items.forEach(i=>{R=Math.max(R,i.x+i.w,i.y+i.h)});const os=KSH.concat(typeof BSH!=='undefined'?BSH:[]).find(x=>x.id===sn.ship)||KSH[0],ci=Math.max(0,CAP.findIndex(c=>c[0]===sn.cap));
+  return {os,g:1,fr:1,esc:Math.max(0,Math.min(101,sn.esc|0)),pw:1,base:{ar:'Đội hình của '+(sn.n||'người chơi'),hqLv:sn.hqLv||1,R,items},rank:Math.max(1,Math.min(15,sn.rank||1)),pts:0,ci,lv:sn.clv||1,n2:sn.n||'Người chơi',rk:false,tab:2,mode:0,human:true,room:sn.code,cp:sn.cp,csk:sn.sk||[],cb}}
+window.SEROOM={start(sn,cb){if(busy||DG){toast('Đang trong trận khác');return false}PVO=roomO(sn,cb);busy=true;vs.dataset.b='';vs.style.display='block';pvVS('s',PVO,0,0);
+  const t0=performance.now(),T1=1500,T2=3000,tick=()=>{const el=performance.now()-t0;if(el<T1){pvVS('s',PVO,0,el/T1);setTimeout(tick,120);return}const e2=el-T1;if(e2<T2){pvVS('f',PVO,3-Math.floor(e2/1000),e2/T2);setTimeout(tick,120);return}pvBattle()};setTimeout(tick,100);return true}};
+{const _E=pvEnd;pvEnd=function(win,why){const o=PVO,r=_E.apply(this,arguments);try{if(o&&o.room&&o.cb)o.cb(!!win)}catch(e){console.error(e)}return r}}
 /* ---- 3) kỹ năng thuyền trưởng của đối thủ (dùng chung bộ máy kỹ năng boss c54) ---- */
 function skills(G){(G.en||[]).forEach(e=>{if(!e.dead&&(e.pvE||e.pvEsc))ecap(G,e)})}
 /* hai phe không chồng công trình: luôn giữ khoảng cách giữa hai thảm (≥1 ô) */
