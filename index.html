@@ -7777,7 +7777,7 @@ return {gen,setup2,keepAtk,cstat};
 })();
 window.C91=C91;
 
-{const _P=pvSetup;pvSetup=function(G,o){const r=_P.apply(this,arguments);try{G.c87sep=sep(G)}catch(e){console.error(e)}try{espawn(G,(G.en||[]).filter(e=>(e.pvE||e.pvEsc)&&!e.dead));G.c88E=G.pvEn}catch(e){console.error(e)}try{G.c69d0={da:S.da,sao:S.sao}}catch(e){}try{carpet(G,o)}catch(e){console.error(e)}try{arm(G)}catch(e){console.error(e)}try{skills(G)}catch(e){console.error(e)}try{(G.eu||[]).forEach(u=>{if(SPEC(u)){u.c65=null;const nb=u.bd.nb;if(nb.c16||nb.c17||nb.c18||nb.c19||nb.c20||nb.c21||nb.c22)u.ws=[]}})}catch(e){}try{if(!(o&&o.human))G.eu.forEach(u=>{u.max*=1.5;u.hp=Math.min(u.max,u.hp*1.5);(u.ws||[]).forEach(w=>{w.dmg*=1.5})})}catch(e){console.error(e)}return r}}
+{const _P=pvSetup;pvSetup=function(G,o){const r=_P.apply(this,arguments);try{G.c87sep=sep(G)}catch(e){console.error(e)}try{espawn(G,(G.en||[]).filter(e=>(e.pvE||e.pvEsc)&&!e.dead));G.c88E=G.pvEn}catch(e){console.error(e)}try{G.c69d0={da:S.da,sao:S.sao}}catch(e){}try{carpet(G,o)}catch(e){console.error(e)}try{arm(G)}catch(e){console.error(e)}try{skills(G)}catch(e){console.error(e)}try{(G.eu||[]).forEach(u=>{if(SPEC(u)){u.c65=null;const nb=u.bd.nb;if(nb.c16||nb.c17||nb.c18||nb.c19||nb.c20||nb.c21||nb.c22)u.ws=[]}})}catch(e){}return r}}
 {const _S=dfStep;dfStep=function(dt){const r=_S.apply(this,arguments);try{const G=DG;if(G&&G.pvp&&!G.done)step(G,dt)}catch(e){console.error(e)}return r}}
 window.C65={carpet,arm,skills,layout,TPL,esum,ckey,lvRank,esup,SPEC,ecap,ecast,sep,espawn};
 (function hk(){if(!window.PWR||!PWR.boost){setTimeout(hk,300);return}if(PWR.boost.c82)return;const _b=PWR.boost;PWR.boost=function(o){const r=_b.apply(this,arguments);try{const mine=Math.max(0,PWR.fleet().length-1);o.esc=Math.min(101,mine+3)}catch(e){}return r};PWR.boost.c82=1})();
@@ -20788,7 +20788,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL=(window.SE_CFG&&SE_CFG.fb)||'';
-  const VER='v278';
+  const VER='v279';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`
