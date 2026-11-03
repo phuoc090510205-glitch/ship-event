@@ -7,9 +7,9 @@ const near=(a,b,r)=>Math.hypot(a.x-b.x,a.y-b.y)<=r+(b.size||2)*.3;
 const LVK=l=>1+.1*((l||1)-1);
 /* ---- 1) thảm của đối thủ: chọn ngẫu nhiên 1 thảm bất kỳ, áp chỉ số lên công trình địch ---- */
 function carpet(G,o){if(!window.C39||!C39.CP||!C39.TIERS||!C39.KINDS)return;const r=o.rank||1;
-  const tr=2+((Math.random()*4)|0);let L=C39.CP.filter(c=>c.tier===tr);if(!L.length)L=C39.CP.filter(c=>c.tier>=2);let c=L[(Math.random()*L.length)|0];if(o&&o.human){c=o.cp?C39.CP.find(x=>x.id===o.cp):null;if(!c||!(c.tier>=1))return}if(!c)return;
+  const tr=2+((Math.random()*4)|0);let L=C39.CP.filter(c=>c.tier===tr);if(!L.length)L=C39.CP.filter(c=>c.tier>=2);let c=L[(Math.random()*L.length)|0];if(o&&o.c91cp1){c=C39.CP.find(x=>x.id===o.c91cp1)||c}if(o&&o.human){c=o.cp?C39.CP.find(x=>x.id===o.cp):null;if(!c||!(c.tier>=1))return}if(!c)return;
   const t=C39.TIERS[c.tier],K=(C39.KINDS[c.kind]||{}).k,V=t.V;G.c65cp={c,K,V};
-  G.eu.forEach(u=>{if(u.dead)return;const add=V+(K==='hp'||K==='rev'?V:0)+(K==='hq'&&u===G.eh?V*3:0);u.max+=add/DB();u.hp+=add/DB();
+  (G.c91?G.eu.filter(u=>u.c91g!=='e2'):G.eu).forEach(u=>{if(u.dead)return;const add=V+(K==='hp'||K==='rev'?V:0)+(K==='hq'&&u===G.eh?V*3:0);u.max+=add/DB();u.hp+=add/DB();
     const sh=(t.arm||0)+(K==='shd'?V:0);if(sh>0){const v=sh/DB();u.shd={v:(u.shd&&u.shd.v||0)+v,max:(u.shd&&u.shd.max||0)+v,t:1e9}}
     if(K==='red')u.red=Math.min(.6,(u.red||0)+Math.min(50,V*.03)/100);
     (u.ws||[]).forEach(w=>{if(K==='dmg'||K==='rage')w.dmg*=1+V*.06/100;if(K==='rof')w.cd/=1+V*.04/100;if(K==='rng')w.rng*=1+V*.02/100})});
@@ -150,7 +150,7 @@ window.SEROOM={start(sn,cb){if(busy||DG){toast('Đang trong trận khác');retur
 /* ---- 3) kỹ năng thuyền trưởng của đối thủ (dùng chung bộ máy kỹ năng boss c54) ---- */
 function skills(G){(G.en||[]).forEach(e=>{if(!e.dead&&(e.pvE||e.pvEsc))ecap(G,e)})}
 /* hai phe không chồng công trình: luôn giữ khoảng cách giữa hai thảm (≥1 ô) */
-function sep(G){const box=L=>{let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;L.forEach(b=>{if(!b||!b.w)return;x0=Math.min(x0,b.x-b.w/2);y0=Math.min(y0,b.y-b.h/2);x1=Math.max(x1,b.x+b.w/2);y1=Math.max(y1,b.y+b.h/2)});return x0<1e9?{x0:x0-1,y0:y0-1,x1:x1+1,y1:y1+1}:null};
+function sep(G){if(G.c91)return 0;const box=L=>{let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;L.forEach(b=>{if(!b||!b.w)return;x0=Math.min(x0,b.x-b.w/2);y0=Math.min(y0,b.y-b.h/2);x1=Math.max(x1,b.x+b.w/2);y1=Math.max(y1,b.y+b.h/2)});return x0<1e9?{x0:x0-1,y0:y0-1,x1:x1+1,y1:y1+1}:null};
   const rp=box((G.bl||[]).filter(b=>!b.c39tmp)),re=box(G.eu||[]);if(!rp||!re)return 0;if(!(re.x0<rp.x1+1&&re.x1+1>rp.x0))return 0;const gap=rp.y0-re.y1;if(gap>=1)return 0;const d=1-gap+.01;
   const E=(G.eu||[]).concat((G.en||[]).filter(e=>!(G.eu||[]).includes(e)));E.forEach(e=>{e.y-=d;if(e.sy!=null)e.sy-=d;if(e.ty!=null)e.ty-=d});
   const minY=Math.min(...E.map(e=>e.y-(e.h||e.size||1)/2));if(minY<1){const k=1-minY;E.concat(G.bl||[],[G.pl],G.al||[]).forEach(e=>{if(!e)return;e.y+=k;if(e.sy!=null)e.sy+=k;if(e.ty!=null)e.ty+=k});G.wd.Hd+=k}
