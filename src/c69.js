@@ -22,12 +22,13 @@ const st=document.createElement('style');st.textContent=`
 body.c80pv #pvhud{left:max(16px,env(safe-area-inset-left,0px));top:calc(130px + env(safe-area-inset-top,0px));transform:none;width:min(36vw,230px);text-align:left;background:rgba(6,12,32,.55);border:1px solid #ff6a7a66;border-radius:8px;padding:3px 8px;box-sizing:border-box}
 body.c80pv #c36sc{left:max(16px,env(safe-area-inset-left,0px))!important;right:auto!important;top:calc(176px + env(safe-area-inset-top,0px))!important;transform:none!important}
 body.c80pv #skbn{display:none!important}
+body.c80pv #c36sc{display:none!important}
 .c80m{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 10px;border:1.5px solid #1f4a8a;border-radius:12px;background:linear-gradient(#071a3c,#050f2a);color:#dfe9ff;font:700 13px system-ui,sans-serif}
 .c80m b{margin-right:4px;color:#bfe3ff}.c80m button{padding:5px 10px;border-radius:8px;border:1.5px solid #2b5ac9;background:#0b1a44;color:#cfe0ff;font:800 12px system-ui,sans-serif;cursor:pointer}
 .c80m button.on{background:linear-gradient(#ffd766,#f0a500);color:#1a1200;border-color:#ffc53d}.c80m small{flex-basis:100%;color:#8fa6d8;font-weight:600}`;document.head.appendChild(st);
 const M=[['fol','🚀 Theo tàu chính','Tàu phụ bay theo bảo vệ tàu chính'],['atk','⚔ Tấn công','100% tàu phụ cùng lao vào tấn công, không rút lui'],['def','🛡 Phòng thủ','Tàu phụ chạy quanh thảm bảo vệ trụ sở']];
-function box(){const m=S.c69m||'fol',d=document.createElement('div');d.className='c80m';d.innerHTML='<b>Chế độ tàu phụ:</b>'+M.map(x=>`<button data-c80="${x[0]}" class="${x[0]===m?'on':''}">${x[1]}</button>`).join('')+'<small>'+(M.find(x=>x[0]===m)||M[0])[2]+'</small>';
-  d.onclick=e=>{const b=e.target.closest('button[data-c80]');if(!b)return;S.c69m=b.dataset.c80;try{save()}catch(_){}document.querySelectorAll('.c80m').forEach(x=>x.replaceWith(box()))};return d}
+function box(){const m=S.c69m||'fol',d=document.createElement('div');d.className='c80m';const sp=S.c82spd||1;d.innerHTML='<b>Chế độ tàu phụ:</b>'+M.map(x=>`<button data-c80="${x[0]}" class="${x[0]===m?'on':''}">${x[1]}</button>`).join('')+'<b style="margin-left:10px">Tốc độ trận:</b>'+[1,2].map(v=>`<button data-c82s="${v}" class="${v===sp?'on':''}">x${v}</button>`).join('')+'<small>'+(M.find(x=>x[0]===m)||M[0])[2]+'</small>';
+  d.onclick=e=>{const v=e.target.closest('button[data-c82s]');if(v){S.c82spd=+v.dataset.c82s;try{save()}catch(_){}document.querySelectorAll('.c80m').forEach(x=>x.replaceWith(box()));return}const b=e.target.closest('button[data-c80]');if(!b)return;S.c69m=b.dataset.c80;try{save()}catch(_){}document.querySelectorAll('.c80m').forEach(x=>x.replaceWith(box()))};return d}
 function inject(){try{const fb=document.getElementById('flbody'),pre=document.getElementById('dfpre');if(fb&&pre&&pre.style.display!=='none'&&fb.childElementCount&&!fb.querySelector('.c80m'))fb.insertBefore(box(),fb.children[1]||null);
   const f=document.querySelector('#lvpane .pvfm');if(f&&f.offsetParent&&!(f.previousElementSibling&&f.previousElementSibling.classList.contains('c80m')))f.insertAdjacentElement('beforebegin',box())}catch(e){}
   try{const G=typeof DG!=='undefined'?DG:null,on=!!(G&&G.pvp&&!G.done);document.body.classList.toggle('c80pv',on);const h=document.getElementById('pvhud'),sc=document.getElementById('c36sc');if(sc){if(on&&h&&getComputedStyle(h).display!=='none'){const r=h.getBoundingClientRect();sc.style.setProperty('top',Math.round(r.bottom+6)+'px','important')}else sc.style.removeProperty('top')}}catch(e){}}
@@ -48,5 +49,11 @@ setInterval(()=>{try{const G=typeof DG!=='undefined'?DG:null,def=document.getEle
   const cur=(G.en||[]).filter(e=>e.pvEsc);G.c81L=G.c81L||[];cur.forEach(e=>{if(!G.c81L.includes(e))G.c81L.push(e)});const L=G.c81L;
   if(!L.length){EL.style.display='none';return}const k=L.length+'';if(k!==key){key=k;EL.innerHTML='<span class="t">ĐỊCH</span>'+L.map(e=>`<div class="al"><div class="av" style="background-image:url('${(e.sh&&e.sh.img)||''}')"></div><div class="hp"><i></i></div></div>`).join('')}
   EL.style.display='flex';[...EL.querySelectorAll('.al')].forEach((el,i)=>{const e=L[i];if(!e)return;const f=e.dead?0:Math.max(0,e.hp/e.max);el.classList.toggle('dead',!!e.dead||f<=0);el.querySelector('.hp i').style.width=(f*100)+'%'})}catch(e){}},200);
+})();
+/* ===== c82: tốc độ trận chọn trước · tàu phụ tự dùng kỹ năng của thuyền trưởng gắn trên chính nó ===== */
+(function(){let lastG=null;
+setInterval(()=>{try{const G=typeof DG!=='undefined'?DG:null;if(G&&G!==lastG){lastG=G;dfSpeed=S.c82spd||1;const b=document.getElementById('dfspd');if(b)b.textContent='x'+dfSpeed}if(!G)lastG=null}catch(e){}},200);
+{const _S=dfStep;dfStep=function(dt){const r=_S.apply(this,arguments);try{const G=DG;if(G&&!G.done&&window.CSK&&CSK.cast)(G.al||[]).forEach(a=>{if(a.dead||!a.c82sk||!a.c82sk.length||a.silT>0||a.stun>0)return;
+    const near=(G.en||[]).some(e=>!e.dead&&!(e.spawn>G.t)&&Math.hypot(e.x-a.x,e.y-a.y)<16);a.c82sk.forEach(k=>{k.cd-=dt;if(k.cd>0||!near)return;k.cd=k.cd0||20;a.cs=a.cs||{};try{CSK.cast(a,k,1)}catch(e){console.error(e)}})})}catch(e){}return r}}
 })();
 

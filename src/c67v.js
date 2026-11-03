@@ -69,3 +69,11 @@ if(typeof skill3d20==='function'){const o20=skill3d20;skill3d20=function(G,dt){c
 [['skill3d21',1007,1010],['skill3d22',1011,1014],['skill3d23',1015,1017]].forEach(([n,a,b])=>{try{const o=eval(n);if(typeof o!=='function')return;const inR=S=>!!(S&&S.K>=a&&S.K<=b);
   const w=function(G,dt){const E=G&&G.c40e;if(inR(E)&&!inR(G.c40)){const P=G.c40;G.c40=E;try{return o(G,dt)}finally{G.c40=P}}return o(G,dt)};
   if(n==='skill3d21')skill3d21=w;else if(n==='skill3d22')skill3d22=w;else skill3d23=w}catch(e){}});
+/* c82: vẽ kỹ năng & công trình đặc biệt của phe địch (thế giới gương) bằng chính bộ vẽ của ta */
+{const KEY=/^(csk|c\d\d\w*)$/;
+ function mg(dst,src,R,d){Object.keys(src).forEach(k=>{if(d===0&&!KEY.test(k))return;const v=src[k];if(Array.isArray(v)){if(!v.length)return;const o=dst[k];if(o!=null&&!Array.isArray(o))return;R.push([dst,k,o,Object.prototype.hasOwnProperty.call(dst,k)]);dst[k]=(o||[]).concat(v)}
+   else if(v&&typeof v==='object'&&d<3&&!(v instanceof Map)&&!(v instanceof Set)&&!v.isObject3D&&(d>0||KEY.test(k))){const ex=Object.prototype.hasOwnProperty.call(dst,k);let o=dst[k];if(o==null){o={};R.push([dst,k,undefined,ex]);dst[k]=o}else if(typeof o!=='object'||Array.isArray(o))return;mg(o,v,R,d+1)}})}
+ function wrap(n){try{const o=eval(n);if(typeof o!=='function')return;const w=function(G,dt){const L=G&&[G.c81M,G.c82W].filter(x=>x&&x.host===G);if(!L||!L.length)return o(G,dt);const R=[];try{L.forEach(W=>mg(G,W,R,0))}catch(e){}
+    try{return o(G,dt)}finally{for(let i=R.length-1;i>=0;i--){const [d,k,v,ex]=R[i];if(ex)d[k]=v;else delete d[k]}}};eval(n+'=w')}catch(e){}}
+ ['skill3d2','skill3d3','skill3d4','skill3d5','skill3d6','skill3d7','skill3d8','skill3d9','skill3d10','skill3d11','skill3d12','skill3d13','skill3d14','skill3d15','skill3d16','skill3d17','skill3d19','skill3d24'].forEach(wrap)}
+
