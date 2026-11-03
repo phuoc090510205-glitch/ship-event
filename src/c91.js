@@ -18,14 +18,35 @@ function keepAtk(G,dt){
     if(e.dead){e.c91dd=1;e.c91w=null;return}
     if(e.c91dd){e.c91dd=0;/* vừa hồi sinh: đặt lên ô trống gần phía ta nhất của thảm địch + xóa trạng thái AI cũ */
       try{if(e!==G.pvEn)espawn(G,[e])}catch(x){}
-      const a=e._ai;if(a){a.ret=0;a.st=0;a.mx=e.x;a.my=e.y;a.hc=0}e._px=e.x;e._py=e.y;e.vx=0;e.vy=0;if(e.spawn>G.t)e.spawn=G.t;e.c91w={x:e.x,y:e.y,t:0,p:.8,a:0}}
+      const a=e._ai;if(a){a.ret=0;a.st=0;a.mx=e.x;a.my=e.y;a.hc=0}e._px=e.x;e._py=e.y;e.vx=0;e.vy=0;if(e.spawn>G.t)e.spawn=G.t}
     if(e.spawn>G.t||e.stun>0)return;
     if(e.c91sp0==null||e.sp>e.c91sp0)e.c91sp0=e.sp;if(!(e.sp>.05))e.sp=e.c91sp0||2.5;
-    const W=e.c91w||(e.c91w={x:e.x,y:e.y,t:0,p:0,a:0});W.t+=dt;
-    if(W.t>=1.2){const m=Math.hypot(e.x-W.x,e.y-W.y),T=nearT(G,e);if(m<.35&&T&&T.d>rmax(e)*.9){W.p=1.4;W.a++}else if(m>=.35)W.a=0;W.x=e.x;W.y=e.y;W.t=0}
-    if(W.p>0){W.p-=dt;const T=nearT(G,e);if(!T)return;let an=Math.atan2(T.u.y-e.y,T.u.x-e.x);if(W.a>1)an+=(W.a%2?1:-1)*Math.min(1.4,.5*W.a);
-      if(T.d<=rmax(e)*.85){W.p=0;return}
-      const s=Math.max(1.5,e.sp)*dt;e.x=Math.max(.5,Math.min(G.wd.Wd-.5,e.x+Math.cos(an)*s));e.y=Math.max(.5,Math.min(G.wd.Hd-.5,e.y+Math.sin(an)*s));e.ang=an;e._px=e.x;e._py=e.y}})}
+    })}
+
+
+/* ---------- 4) AI tàu địch PvP (mới): mục tiêu gần nhất trong 40 ô (tàu hoặc công trình), tiến thẳng tới, áp sát dưới 1 ô; không né đạn, không tự thoát kẹt, không dồn hỏa lực ---------- */
+const edge=(e,t)=>{if(t.w!=null&&!t.sh){const dx=Math.max(0,Math.abs(e.x-t.x)-t.w/2),dy=Math.max(0,Math.abs(e.y-t.y)-t.h/2);return Math.hypot(dx,dy)}return Math.max(0,Math.hypot(e.x-t.x,e.y-t.y)-(t.size||2)*.3)};
+function aiInit(G,e){if(e._ai)return e._ai;const r=(G.pvo&&G.pvo.rank)||1;e._ai={hc:0};e.sp*=1+.025*r;(e.ws||[]).forEach(w=>{w.cd/=1+.03*r});return e._ai}
+function aiPick(G,e){const P=G.pl;if(P&&!P.dead&&P.cs&&P.cs.taunt>0&&edge(e,P)<=40)return P;let b=null,bd=1e9,b2=null,bd2=1e9;
+  const C=ours(G).concat((G.bl||[]).filter(o=>o.hp>0&&o.t!=='mine'));C.forEach(t=>{const d=edge(e,t);if(d<=40&&d<bd){bd=d;b=t}if(d<bd2){bd2=d;b2=t}});return b||b2}
+function aiPost(G,dt){(G.en||[]).forEach(e=>{if(!e||e.dead||!(e.pvE||e.pvEsc)||e.spawn>G.t||e._px==null)return;const a=aiInit(G,e);e.x=e._px;e.y=e._py;if(e.stun>0)return;
+    a.hc-=dt;if(e.hp<e.max*.4&&a.hc<=0&&!(e.silT>0)){a.hc=22;e.hp=Math.min(e.max,e.hp+e.max*.18);try{G.fx.push({x:e.x,y:e.y,r:e.size*1.3,t:.6,max:.6,col:'#7dffa0'})}catch(x){}}
+    const tg=aiPick(G,e);if(e.pvE)e._tg=tg;if(!tg)return;const d=edge(e,tg),dx=tg.x-e.x,dy=tg.y-e.y,l=Math.hypot(dx,dy)||1;e.ang=Math.atan2(dy,dx);
+    if(d>.6){const m=Math.min(d-.6,e.sp*(e.slowK||1)*1.08*dt);e.x+=dx/l*m;e.y+=dy/l*m}
+    (G.en||[]).forEach(o=>{if(o===e||o.dead||!o.size||o.sb)return;const q=Math.hypot(e.x-o.x,e.y-o.y),k=(e.size+o.size)*.3;if(q<k&&q>.001){const f=(k-q)*.5;e.x+=(e.x-o.x)/q*f;e.y+=(e.y-o.y)/q*f}});
+    e.x=Math.max(.5,Math.min(G.wd.Wd-.5,e.x));e.y=Math.max(.5,Math.min(G.wd.Hd-.5,e.y))})}
+(function hk(){if(!window.PVAI){setTimeout(hk,200);return}if(PVAI.c91)return;PVAI.post=aiPost;PVAI.c91=1})();
+/* ---------- 5) kỹ năng tàu địch đánh trúng công trình của ta (công trình đi vào danh sách mục tiêu của thế giới kỹ năng địch, dưới dạng vỏ bọc không bị đẩy/dịch chuyển) ---------- */
+const BPX=new Set(['x','y','tx','ty','sx','sy','vx','vy','hp','dead','max']);
+function bprox(b){if(!b.c91p)b.c91p=new Proxy(b,{get:(t,k)=>k==='size'?Math.max(t.w||1,t.h||1)*.9:k==='dead'?!(t.hp>0):k==='__b'?t:k==='team'?'p':k==='spawn'?0:k==='sb'?undefined:k==='ws'?(t.ws||[]):k==='cs'?(t.cs||(t.cs={})):t[k],set:(t,k,v)=>{if(!BPX.has(k))t[k]=v;return true}});return b.c91p}
+window.C91BP=G=>(G.bl||[]).filter(b=>b.hp>0&&b.t!=='mine'&&!b.c39tmp).map(bprox);
+{const _D=dfDmgS;dfDmgS=function(s,d,f){if(s&&s.__b){const b=s.__b,sv=DG,H=(DG&&DG.host)||DG;DG=H;try{if(H&&d>0)dfDmgB(b,d)}finally{DG=sv}return}return _D.apply(this,arguments)}}
+/* ---------- 6) xe sửa chữa + drone của công trình địch: hoạt động và hiện hình ---------- */
+function edrone(G,dt){const M=G.c81M;if(!M||!window.c15Drone)return;const L=(G.eu||[]).map((u,i)=>[u,i]).filter(([u])=>u.bd&&u.bd.t==='droneb'&&!u.dead&&u.hp>0);if(!L.length)return;
+  window.__mwRun([M],()=>{L.forEach(([u,i])=>{try{c15Drone(eprox(u,i),dt,M)}catch(e){}})})}
+{const _D=dfDraw;dfDraw=function(){const r=_D.apply(this,arguments);try{const G=DG,M=G&&G.pvp&&G.c81M;if(M&&M.bl&&M.bl.length){dq.setTransform(dfV.dpr,0,0,dfV.dpr,0,0);
+  if(window.BDR&&M.bl.some(b=>b.drs))BDR.drawTo(dq,{bl:M.bl.filter(b=>!b.dead&&b.hp>0),t:G.t},dsx,dsy,dfV.s,G.t);
+  if(window.c16Veh)M.bl.forEach(b=>{const v=b.gv;if(v&&v.m!=='idle'&&b.hp>0)window.c16Veh(dq,dsx(v.x),dsy(v.y),v.ang,dfV.s*.95,G.t,v.m==='work')})}}catch(e){}return r}}
 
 /* ---------- 2) ĐẤU ĐÔI 2 VS 2 ---------- */
 try{if(!MODES.some(m=>/2 VS 2/.test(m)))MODES.push('ĐẤU ĐÔI · 2 VS 2')}catch(e){}
@@ -117,7 +138,7 @@ if(typeof dfDmgA==='function'){const _A=dfDmgA;dfDmgA=function(a,d){const was=a&
       const e=new T.Mesh(new T.BoxGeometry(w+.1,.03,d+.1),new T.MeshBasicMaterial({color:tag==='p'?0x4fd8ff:0xff6a7a}));e.position.set((R.x0+R.x1)/2,.004,(R.y0+R.y1)/2);parent.add(e);
       const M=c&&c.id!=='cp0'?C39.mat3(c,w,d,T):null;if(!M)return;const m=new T.Mesh(new T.BoxGeometry(w,.05,d),M.m);m.position.set((R.x0+R.x1)/2,.028,(R.y0+R.y1)/2);m.receiveShadow=true;parent.add(m);if(M.k)C39.PADX.push({k:M.k,tx:M.tx})});
     G.c70=1};C39.pvpPads.c91=1})();
-{const _S=dfStep;dfStep=function(dt){const r=_S.apply(this,arguments);try{const G=DG;if(G&&G.pvp&&!G.done){keepAtk(G,dt);wStep(G,dt)}}catch(e){console.error(e)}return r}}
+{const _S=dfStep;dfStep=function(dt){const r=_S.apply(this,arguments);try{const G=DG;if(G&&G.pvp&&!G.done){keepAtk(G,dt);wStep(G,dt);edrone(G,dt)}}catch(e){console.error(e)}return r}}
 return {gen,setup2,keepAtk,cstat};
 })();
 window.C91=C91;
