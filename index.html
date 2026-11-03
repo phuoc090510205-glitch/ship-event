@@ -1819,7 +1819,7 @@ function renderSe(){
   const tg=(k,lb)=>`<div class="srow"><label>${lb}</label><span class="tg"><input type="checkbox" data-s="${k}" ${t[k]?'checked':''}><i></i></span></div>`;
   $('pp-se').innerHTML=`<div class="pfr"><h4>Lưu tiến trình</h4><div class="gpr"><img src="${PR.gp}" alt=""><p>Đăng nhập Google Play để lưu và đồng bộ tiến trình trò chơi trên nhiều thiết bị.</p>${t.gp?'<button class="gok" id="gpa">✔ Đã kết nối</button><button class="gout" id="gpb">Đăng xuất</button>':'<button class="gok" id="gpa">Đăng nhập</button>'}</div></div>
   <div class="sg"><div class="pfr"><h4>Âm thanh</h4>${sl('gun','🔊 Âm lượng súng')}${sl('music','♪ Nhạc nền')}${sl('fx','🔔 Hiệu ứng')}</div>
-  <div class="pfr"><h4>Đồ họa</h4>${sel('q','Chất lượng đồ họa',['Thấp','Trung bình','Cao'])}${sel('blur','Hiệu ứng',['Bật','Tắt'])}${sel('fps','FPS giới hạn',['30 FPS','60 FPS','90 FPS'])}${tg('shake','Rung màn hình')}${tg('light','Hiệu ứng ánh sáng')}${tg('part','Hiệu ứng hạt')}</div></div>
+  <div class="pfr"><h4>Đồ họa</h4>${sel('q','Chất lượng đồ họa',['Thấp','Trung bình','Cao'])}${sel('blur','Hiệu ứng',['Bật','Tắt'])}${sel('fps','FPS giới hạn',['30 FPS','60 FPS','90 FPS'])}${tg('shake','Chế độ rung (Level · PvP · Boss)')}${tg('light','Hiệu ứng ánh sáng')}${tg('part','Hiệu ứng hạt')}</div></div>
   <div class="pfr"><h4>Khác</h4><div class="sg"><div>${sel('lang','Ngôn ngữ',['Tiếng Việt','English'])}${tg('notif','Thông báo')}${tg('auto','Tự động dùng kỹ năng')}</div><div>${tg('pvp','Ẩn/hiện hiệu ứng PvP')}${tg('batt','Chế độ tiết kiệm pin')}<div class="srow"><label>Xóa bộ nhớ đệm</label><button class="xbtn" id="clr">Xóa</button></div><div class="srow"><button class="rbtn" id="rst">⟲ Đặt lại mặc định</button></div></div></div></div>`;
   const P=$('pp-se');
   P.querySelectorAll('input[type=range]').forEach(i=>i.oninput=()=>{S.set[i.dataset.s]=+i.value;i.nextElementSibling.textContent=i.value+'%';save()});
@@ -7419,7 +7419,7 @@ function pvGenBase(rank){
   return {ar:ar.n,hqLv,R,items:occ}
 }
 /* ---- thiết lập trận: hai trụ sở đối diện cách nhau 65 ô ---- */
-const GAP=65,STUB={id:'pvs',n:'Công trình',img:'',W:1,H:1};
+const GAP=80,STUB={id:'pvs',n:'Công trình',img:'',W:1,H:1};
 function pvMkEnemy(G,o,x,y,k,sh0){
   k=k||1;const sh=sh0||o.os,wm=dfLoadout(sh,Math.min(10,2+Math.floor(o.rank/1.5)));
   const e=dfMakeShip(sh,'e',wm,{},x,y,{size:k<1?2.1:2.5,hpMul:1,dmMul:1,dmgDiv:12,spMul:1,arm:dfArmor(sh,Math.min(60,o.rank*5)),eng:[],nuc:[],tnk:[],mrd:[],sks:[],inf:1});
@@ -7604,9 +7604,15 @@ function ecast(G,dt){if(!window.CSK||!CSK.cast)return;const W=sworld(G),ours=pla
     e.c82sk.forEach(k=>{k.cd-=dt;if(k.cd>0||!near)return;k.cd=k.cd0;const tm=e.team;window.__mwRun([W],()=>{e.team='p';e.cs=e.cs||{};try{CSK.cast(e,k,1)}finally{e.team=tm}})})})}
 /* ---- 3) kỹ năng thuyền trưởng của đối thủ (dùng chung bộ máy kỹ năng boss c54) ---- */
 function skills(G){(G.en||[]).forEach(e=>{if(!e.dead&&(e.pvE||e.pvEsc))ecap(G,e)})}
-{const _P=pvSetup;pvSetup=function(G,o){const r=_P.apply(this,arguments);try{G.c69d0={da:S.da,sao:S.sao}}catch(e){}try{carpet(G,o)}catch(e){console.error(e)}try{arm(G)}catch(e){console.error(e)}try{skills(G)}catch(e){console.error(e)}try{(G.eu||[]).forEach(u=>{if(SPEC(u)){u.c65=null;const nb=u.bd.nb;if(nb.c16||nb.c17||nb.c18||nb.c19||nb.c20||nb.c21||nb.c22)u.ws=[]}})}catch(e){}try{if(!(o&&o.human))G.eu.forEach(u=>{u.max*=1.5;u.hp=Math.min(u.max,u.hp*1.5);(u.ws||[]).forEach(w=>{w.dmg*=1.5})})}catch(e){console.error(e)}return r}}
+/* hai phe không chồng công trình: luôn giữ khoảng cách giữa hai thảm (≥1 ô) */
+function sep(G){const box=L=>{let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;L.forEach(b=>{if(!b||!b.w)return;x0=Math.min(x0,b.x-b.w/2);y0=Math.min(y0,b.y-b.h/2);x1=Math.max(x1,b.x+b.w/2);y1=Math.max(y1,b.y+b.h/2)});return x0<1e9?{x0:x0-1,y0:y0-1,x1:x1+1,y1:y1+1}:null};
+  const rp=box((G.bl||[]).filter(b=>!b.c39tmp)),re=box(G.eu||[]);if(!rp||!re)return 0;if(!(re.x0<rp.x1+1&&re.x1+1>rp.x0))return 0;const gap=rp.y0-re.y1;if(gap>=1)return 0;const d=1-gap+.01;
+  const E=(G.eu||[]).concat((G.en||[]).filter(e=>!(G.eu||[]).includes(e)));E.forEach(e=>{e.y-=d;if(e.sy!=null)e.sy-=d;if(e.ty!=null)e.ty-=d});
+  const minY=Math.min(...E.map(e=>e.y-(e.h||e.size||1)/2));if(minY<1){const k=1-minY;E.concat(G.bl||[],[G.pl],G.al||[]).forEach(e=>{if(!e)return;e.y+=k;if(e.sy!=null)e.sy+=k;if(e.ty!=null)e.ty+=k});G.wd.Hd+=k}
+  return d}
+{const _P=pvSetup;pvSetup=function(G,o){const r=_P.apply(this,arguments);try{G.c87sep=sep(G)}catch(e){console.error(e)}try{G.c69d0={da:S.da,sao:S.sao}}catch(e){}try{carpet(G,o)}catch(e){console.error(e)}try{arm(G)}catch(e){console.error(e)}try{skills(G)}catch(e){console.error(e)}try{(G.eu||[]).forEach(u=>{if(SPEC(u)){u.c65=null;const nb=u.bd.nb;if(nb.c16||nb.c17||nb.c18||nb.c19||nb.c20||nb.c21||nb.c22)u.ws=[]}})}catch(e){}try{if(!(o&&o.human))G.eu.forEach(u=>{u.max*=1.5;u.hp=Math.min(u.max,u.hp*1.5);(u.ws||[]).forEach(w=>{w.dmg*=1.5})})}catch(e){console.error(e)}return r}}
 {const _S=dfStep;dfStep=function(dt){const r=_S.apply(this,arguments);try{const G=DG;if(G&&G.pvp&&!G.done)step(G,dt)}catch(e){console.error(e)}return r}}
-window.C65={carpet,arm,skills,layout,TPL,esum,ckey,lvRank,esup,SPEC,ecap,ecast};
+window.C65={carpet,arm,skills,layout,TPL,esum,ckey,lvRank,esup,SPEC,ecap,ecast,sep};
 (function hk(){if(!window.PWR||!PWR.boost){setTimeout(hk,300);return}if(PWR.boost.c82)return;const _b=PWR.boost;PWR.boost=function(o){const r=_b.apply(this,arguments);try{const mine=Math.max(0,PWR.fleet().length-1);o.esc=Math.min(101,mine+3)}catch(e){}return r};PWR.boost.c82=1})();
 })();
 
@@ -14535,7 +14541,7 @@ function camFollow(G,dt){const P=G.pl,dead=P.dead&&!G.camF,f=G.camF?G.camF:(P.de
   if(!dead&&isFinite(P.ang))R3.yawT=Math.atan2(-Math.cos(P.ang),-Math.sin(P.ang));if(R3.yawT==null)R3.yawT=R3.yaw;R3.yaw+=angDiff(R3.yaw,R3.yawT)*Math.min(1,dt*3);
   const a=R3.yaw,D=R3.cd,fy=dead?1:HOV,cp=new T.Vector3(f.x+Math.sin(a)*D,fy+D*.62,f.y+Math.cos(a)*D),lk=new T.Vector3(f.x-Math.sin(a)*3.75,fy,f.y-Math.cos(a)*3.75);
   if(!camT||camT.g!==R3.gid){camT={g:R3.gid,p:cp.clone(),l:lk.clone()}}camT.p.lerp(cp,1-Math.exp(-dt*4.5));camT.l.lerp(lk,1-Math.exp(-dt*6));
-  cam.position.copy(camT.p);if(R3.shake>.001&&SET().shake!==false){cam.position.x+=rand(-1,1)*R3.shake;cam.position.y+=rand(-1,1)*R3.shake;R3.shake*=Math.exp(-dt*7)}cam.lookAt(camT.l);
+  cam.position.copy(camT.p);if(R3.shake>.001&&SET().shake!==false){cam.position.x+=rand(-1,1)*R3.shake;cam.position.y+=rand(-1,1)*R3.shake;R3.shake*=Math.exp(-dt*7)}else if(SET().shake===false)R3.shake=0;cam.lookAt(camT.l);
   const w=dfV.w,h=dfV.h;cam.aspect=w/h;cam.fov=w<h?74:58;cam.updateProjectionMatrix();
   fxP.position.set((dwx(0)+dwx(w))/2,FXY,(dwy(0)+dwy(h))/2);fxP.scale.set(dwx(w)-dwx(0),dwy(h)-dwy(0),1)}
 /* cần lái ảo: đặt ngón tay ở nửa trái màn hình rồi kéo (giống bản mô phỏng); chạm phần còn lại để bay tới điểm chạm */
@@ -20291,7 +20297,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL=(window.SE_CFG&&SE_CFG.fb)||'';
-  const VER='v267';
+  const VER='v268';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`
