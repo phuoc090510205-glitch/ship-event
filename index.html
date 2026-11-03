@@ -8431,7 +8431,7 @@ window.PWR=(function(){
       a.fl-=dt;if(a.fl<=0){a.dir*=-1;a.fl=1.2+Math.random()*2.2}
       let vx=0,vy=0;
       if(a.ret){const k=d>6?1:0;vx=ux*k;vy=uy*k}
-      else{const ex=d-want;const rad=Math.max(-1,Math.min(1,ex/2));vx=ux*rad+px*a.dir*.7;vy=uy*rad+py*a.dir*.7}
+      else{const ex=d-want;const rad=Math.max(.15,Math.min(1,ex/2));const lat=ex>0?.7:.45;vx=ux*rad+px*a.dir*lat;vy=uy*rad+py*a.dir*lat}
       // né đạn người chơi
       let dgx=0,dgy=0;
       G.pr.forEach(p=>{if(p.team!=='p'||p.dead)return;const rx=e.x-p.x,ry=e.y-p.y,dd2=Math.hypot(rx,ry);if(dd2>3.2||dd2<.01)return;
@@ -20297,7 +20297,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL=(window.SE_CFG&&SE_CFG.fb)||'';
-  const VER='v268';
+  const VER='v269';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`
