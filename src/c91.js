@@ -29,8 +29,9 @@ function keepAtk(G,dt){
 
 /* ---------- 2) ĐẤU ĐÔI 2 VS 2 ---------- */
 try{if(!MODES.some(m=>/2 VS 2/.test(m)))MODES.push('ĐẤU ĐÔI · 2 VS 2')}catch(e){}
+const kOK=c=>{if(!c||!(c.tier>=2))return false;const T=[window.C43TXT,window.C46TXT,window.C47TXT,window.C49TXT];const K=c.vk!=null?(T.some(t=>t&&t[c.vk])?c.vk:-1):c.tier*10+c.kind;return K>=27&&(K<=39||!!(window.C40&&C40.X&&C40.X.step[K]))};
 function gen(o){const pool=KSH.concat(typeof BSH!=='undefined'?BSH:[]),r=rankNow();
-  let cps=shuf((window.C39&&C39.CP||[]).filter(c=>c.tier>=2&&c.id!=='cp0'&&c.id!==S.carpet));const seen=new Set();cps=cps.filter(c=>{const k=c.n;if(seen.has(k))return false;seen.add(k);return true});
+  let cps=shuf((window.C39&&C39.CP||[]).filter(c=>c.tier>=2&&c.id!=='cp0'&&c.id!==S.carpet&&kOK(c)));const seen=new Set();cps=cps.filter(c=>{const k=c.n;if(seen.has(k))return false;seen.add(k);return true});
   const fa=window.__c91fa!=null?+window.__c91fa:.8+Math.random()*.5,f2=.72+Math.random()*.25,mine=(()=>{try{return Math.max(0,PWR.fleet().length-1)}catch(e){return 0}})();
   let mp=1,op=1;try{mp=PWR.total();op=PWR.opp(o)}catch(e){}
   const X={an:nm(),as:rnd(pool),fa,apw:mp*fa,ally:fa>1,ab:pvGenBase(r),acp:cps[1]&&cps[1].id,aci:(Math.random()*CAP.length)|0,
@@ -86,6 +87,28 @@ function setup2(G,o){const X=o.c91;G.c91=X;
   const L=vs.querySelector('.pvc.L');if(L&&!L.querySelector('.c91t'))L.querySelector('.lv').insertAdjacentHTML('beforebegin',`<div class="nm c91t" style="color:#9fffc8">+ Đồng đội: ${X.an} · ⚔ ${PWR.fmt(X.apw)}${X.ally?' · giữ trụ sở':''}</div>`);
   const R=vs.querySelector('#pvrc .pvc');if(R&&st==='f'&&!R.querySelector('.c91t'))R.querySelector('.lv').insertAdjacentHTML('beforebegin',`<div class="nm c91t" style="color:#ffb3b3">+ Đồng đội: ${X.n3} · ⚔ ${PWR.fmt(X.epw)}</div>`)}catch(e){}return r}}
 {const _P=pvSetup;pvSetup=function(G,o){const r=_P.apply(this,arguments);try{if(o&&o.mode===2&&o.c91)setup2(G,o)}catch(e){console.error(e)}return r}}
+/* ---------- 3) cả 4 thảm đều phát huy TOÀN BỘ sức mạnh (quân triệu hồi + mọi hiệu ứng): thêm thế giới thảm cho đồng đội và đối thủ thứ 2 ---------- */
+const DEADP={dead:true,x:-99,y:-99,hp:0,max:1,ws:[],sk:[],cs:{}};
+function wE2(G){const X=G.c91,m2=G.pvEn2;let M=G.c91M2;if(!M)M=G.c91M2={pvp:true,c72:1,c39sim:1,c91e2:1};
+  M.en=players(G);M.pl=(m2&&!m2.dead)?m2:DEADP;M.al=(G.en||[]).filter(e=>e.pvEsc&&!e.dead&&e!==m2);
+  if(!G.c91eh||G.c91eh.o!==G.eh){const o=G.eh;G.c91eh={o,p:new Proxy(o,{get:(t,k)=>k==='t'?'hq':t[k]})}}M.hq=G.c91eh.p;M.bl=(G.eu||[]).filter(u=>u.c91g==='e2');
+  M.t=G.t;M.fx=G.fx;M.bm=G.bm;M.pr=G.pr;M.rocks=G.rocks;M.dmM=1;M.wd=G.wd;M.c39reg=G.c91box.e2;M.c39c=cpById(X.ecp2);M.kills=0;return M}
+function wAl(G){const X=G.c91,am=G.c91am;let M=G.c91MA;if(!M){M=G.c91MA={pvp:true,c39sim:1,c91al:1,respawn:0,deaths:0};Object.defineProperty(M,'c14t',{get:()=>G.c14t,set:v=>{G.c14t=v},configurable:true})}
+  M.pl=(am&&!am.dead)?am:DEADP;M.al=[G.pl].concat(G.al||[]).filter(u=>u&&u!==am);M.en=G.en;M.bl=(G.bl||[]).filter(b=>b.c91g==='al');M.hq=G.hq;
+  M.t=G.t;M.fx=G.fx;M.bm=G.bm;M.pr=G.pr;M.rocks=G.rocks;M.dmM=G.dmM||1;M.wd=G.wd;M.c39reg=G.c91box.al;M.c39c=cpById(X.acp);M.kills=0;M.pb=G.pb;return M}
+function wStep(G,dt){if(!G.c91||!window.C40||!C40.step)return;
+  try{const M=wAl(G);if(!(M.c40x&&!M.c40)){C40.step(M,dt);if(M.c40){G.c40a=M.c40;if(M.c40.u.length>300)M.c40.u=M.c40.u.filter(u=>!u.gone||G.t-u.dt0<3)}}}catch(e){console.error(e)}
+  try{const M=wE2(G);if(!(M.c40x&&!M.c40)){const _D=dfDmgS;dfDmgS=function(u,d,f){if(u&&u!==G.pl&&(G.al||[]).includes(u)&&typeof dfDmgA==='function')return dfDmgA(u,d);return _D.apply(this,arguments)};
+      try{C40.step(M,dt)}finally{dfDmgS=_D}if(M.c40){G.c40e2=M.c40;M.c40.c72=1;if(M.c40.u.length>300)M.c40.u=M.c40.u.filter(u=>!u.gone||G.t-u.dt0<3)}}}catch(e){console.error(e)}
+  G.c40L=[G.c40a,G.c40e2].filter(Boolean);
+  if(!G.c91msg&&G.c40L.length){G.c91msg=1;try{toast('Cả 4 thảm đều phát huy toàn bộ sức mạnh!')}catch(e){}}}
+/* hạ gục trong vùng thảm phụ: đếm cho các thảm tính theo lượt hạ + móc hiệu ứng khi chết */
+function deathW(M,S,u,isB){if(!M||!S||!u||u.c40u)return;const ins=C40.H.inR(S.Rg,u,isB?0:2);if(S.K===28&&ins)S.cnt+=5;if(S.K===37&&ins)S.frag+=isB?80:50;if(S.K===39&&ins)S.deaths++;try{const f=C40.X.death[S.K];if(f)f(M,S,u,isB,ins)}catch(e){}}
+function onDie(u,isB){const G=DG;if(!G||!G.c91||!window.C40)return;const isO=u===G.pl||(G.al||[]).includes(u);
+  if(G.c40a)deathW(G.c91MA,G.c40a,u,isB);if(G.c40e2&&isO)deathW(G.c91M2,G.c40e2,u,false)}
+{const _D=dfDmgS;dfDmgS=function(s,d,f){const was=s&&!s.dead,r=_D.apply(this,arguments);try{if(was&&s.dead&&!s.ghost)onDie(s,!!s.sb)}catch(e){}return r}}
+if(typeof dfDmgA==='function'){const _A=dfDmgA;dfDmgA=function(a,d){const was=a&&!a.dead,r=_A.apply(this,arguments);try{if(was&&a.dead&&!a.ghost)onDie(a,false)}catch(e){}return r}}
+{const _B=dfDmgB;dfDmgB=function(b,d){const was=b&&b.hp>0,r=_B.apply(this,arguments);try{if(was&&b.hp<=0&&b.c91g==='al')onDie(b,true)}catch(e){}return r}}
 /* thảm 3D: 4 thảm riêng cho 4 người chơi */
 (function hk(){if(!window.C39||!C39.pvpPads||!C39.mat3){setTimeout(hk,300);return}if(C39.pvpPads.c91)return;const _p=C39.pvpPads;
   C39.pvpPads=function(G,parent,T){if(!G||!G.c91)return _p.apply(this,arguments);C39.PADX=[];const X=G.c91;
@@ -94,7 +117,7 @@ function setup2(G,o){const X=o.c91;G.c91=X;
       const e=new T.Mesh(new T.BoxGeometry(w+.1,.03,d+.1),new T.MeshBasicMaterial({color:tag==='p'?0x4fd8ff:0xff6a7a}));e.position.set((R.x0+R.x1)/2,.004,(R.y0+R.y1)/2);parent.add(e);
       const M=c&&c.id!=='cp0'?C39.mat3(c,w,d,T):null;if(!M)return;const m=new T.Mesh(new T.BoxGeometry(w,.05,d),M.m);m.position.set((R.x0+R.x1)/2,.028,(R.y0+R.y1)/2);m.receiveShadow=true;parent.add(m);if(M.k)C39.PADX.push({k:M.k,tx:M.tx})});
     G.c70=1};C39.pvpPads.c91=1})();
-{const _S=dfStep;dfStep=function(dt){const r=_S.apply(this,arguments);try{const G=DG;if(G&&G.pvp&&!G.done)keepAtk(G,dt)}catch(e){console.error(e)}return r}}
+{const _S=dfStep;dfStep=function(dt){const r=_S.apply(this,arguments);try{const G=DG;if(G&&G.pvp&&!G.done){keepAtk(G,dt);wStep(G,dt)}}catch(e){console.error(e)}return r}}
 return {gen,setup2,keepAtk,cstat};
 })();
 window.C91=C91;

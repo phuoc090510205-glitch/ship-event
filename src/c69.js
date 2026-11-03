@@ -1,7 +1,7 @@
 /* ===== c69: tàu phụ hộ tống — chế độ Theo tàu chính / Tấn công / Phòng thủ ===== */
 (function(){
 const MODES=[['fol','Theo tàu chính','🚀'],['atk','Tấn công','⚔'],['def','Phòng thủ','🛡']];
-const mode=()=>S.c69m||'fol';
+const isPv=()=>{const G=typeof DG!=='undefined'?DG:null;return !!(G&&G.pvp)};const mode=()=>isPv()?(S.c69pv||'atk'):(S.c69m||'fol');
 function patrol(G){const A=(G.al||[]).filter(a=>!a.dead);if(!A.length)return;let Rg=null;try{Rg=C39.region(G)}catch(e){}if(!Rg&&G.hq)Rg={x0:G.hq.x-6,y0:G.hq.y-6,x1:G.hq.x+6,y1:G.hq.y+6};if(!Rg)return;
   const o=3,x0=Rg.x0-o,y0=Rg.y0-o,W=Rg.x1-Rg.x0+2*o,H=Rg.y1-Rg.y0+2*o,P=2*(W+H);
   A.forEach((a,i)=>{let s=((G.t*2.2+i*P/A.length)%P+P)%P,x,y;if(s<W){x=x0+s;y=y0}else if((s-=W)<H){x=x0+W;y=y0+s}else if((s-=H)<W){x=x0+W-s;y=y0+H}else{s-=W;x=x0;y=y0+H-s}a.c69pt={x,y}})}
@@ -10,10 +10,10 @@ function patrol(G){const A=(G.al||[]).filter(a=>!a.dead);if(!A.length)return;let
 const bar=document.createElement('div');bar.id='c69bar';bar.style.cssText='position:fixed;left:10px;top:calc(150px + env(safe-area-inset-top,0px));z-index:8;display:none;flex-direction:column;gap:4px;font:800 11px system-ui,sans-serif';
 bar.innerHTML='<div style="color:#bfe3ff;text-shadow:0 1px 2px #000">TÀU PHỤ</div>'+MODES.map(m=>`<button data-m="${m[0]}" style="pointer-events:auto;padding:4px 8px;border-radius:8px;border:1.5px solid #2b5ac9;background:#0b1a44;color:#cfe0ff;text-align:left;cursor:pointer">${m[2]} ${m[1]}</button>`).join('');
 document.body.appendChild(bar);
-bar.onclick=e=>{const b=e.target.closest('button[data-m]');if(!b)return;S.c69m=b.dataset.m;if(typeof DG!=='undefined'&&DG)DG.c69m=S.c69m;try{save()}catch(_){}paint();
-  try{toast(S.c69m==='atk'?'Tàu phụ: 100% cùng lao vào tấn công, không rút lui cho tới khi bị hạ':S.c69m==='def'?'Tàu phụ: chạy quanh ngoài thảm bảo vệ trụ sở':'Tàu phụ: đi theo tàu chính')}catch(_){}};
+bar.onclick=e=>{const b=e.target.closest('button[data-m]');if(!b)return;if(isPv())S.c69pv=b.dataset.m;else S.c69m=b.dataset.m;const mm=mode();if(typeof DG!=='undefined'&&DG)DG.c69m=mm;try{save()}catch(_){}paint();
+  try{toast(mm==='atk'?'Tàu phụ: 100% cùng lao vào tấn công, không rút lui cho tới khi bị hạ':mm==='def'?'Tàu phụ: chạy quanh ngoài thảm bảo vệ trụ sở':'Tàu phụ: đi theo tàu chính')}catch(_){}};
 function paint(){const m=mode();bar.querySelectorAll('button').forEach(b=>{const on=b.dataset.m===m;b.style.background=on?'linear-gradient(#ffd766,#f0a500)':'#0b1a44';b.style.color=on?'#1a1200':'#cfe0ff';b.style.borderColor=on?'#ffc53d':'#2b5ac9'})}
-setInterval(()=>{const G=typeof DG!=='undefined'?DG:null,on=!!(G&&!G.done&&!G.pvp&&(G.al||[]).some(a=>!a.dead)&&document.getElementById('def')&&document.getElementById('def').style.display!=='none');const v=on?'flex':'none';if(bar.style.display!==v){bar.style.display=v;if(on)paint()}},400);
+setInterval(()=>{const G=typeof DG!=='undefined'?DG:null,on=!!(G&&!G.done&&(G.al||[]).some(a=>!a.dead&&!a.c91a)&&document.getElementById('def')&&document.getElementById('def').style.display!=='none');const v=on?'flex':'none';const tp=G&&G.pvp?'calc(200px + env(safe-area-inset-top,0px))':'calc(150px + env(safe-area-inset-top,0px))';if(bar.style.top!==tp)bar.style.top=tp;if(bar.style.display!==v){bar.style.display=v;if(on)paint()}},400);
 window.C69={mode,patrol};
 })();
 /* ===== c80: PvP — sắp lại HUD (máu trụ sở đối thủ, bảng điểm) tránh chồng lên ô tàu phụ; ẩn thông báo kỹ năng; chế độ tàu phụ chọn trước ở phần chuẩn bị hạm đội ===== */
@@ -27,10 +27,10 @@ body.c80pv #c36sc{display:none!important}
 .c80m b{margin-right:4px;color:#bfe3ff}.c80m button{padding:5px 10px;border-radius:8px;border:1.5px solid #2b5ac9;background:#0b1a44;color:#cfe0ff;font:800 12px system-ui,sans-serif;cursor:pointer}
 .c80m button.on{background:linear-gradient(#ffd766,#f0a500);color:#1a1200;border-color:#ffc53d}.c80m small{flex-basis:100%;color:#8fa6d8;font-weight:600}`;document.head.appendChild(st);
 const M=[['fol','🚀 Theo tàu chính','Tàu phụ bay theo bảo vệ tàu chính'],['atk','⚔ Tấn công','100% tàu phụ cùng lao vào tấn công, không rút lui'],['def','🛡 Phòng thủ','Tàu phụ chạy quanh thảm bảo vệ trụ sở']];
-function box(){const m=S.c69m||'fol',d=document.createElement('div');d.className='c80m';const sp=S.c82spd||1;d.innerHTML='<b>Chế độ tàu phụ:</b>'+M.map(x=>`<button data-c80="${x[0]}" class="${x[0]===m?'on':''}">${x[1]}</button>`).join('')+'<b style="margin-left:10px">Tốc độ trận:</b>'+[1,2].map(v=>`<button data-c82s="${v}" class="${v===sp?'on':''}">x${v}</button>`).join('')+'<small>'+(M.find(x=>x[0]===m)||M[0])[2]+'</small>';
-  d.onclick=e=>{const v=e.target.closest('button[data-c82s]');if(v){S.c82spd=+v.dataset.c82s;try{save()}catch(_){}document.querySelectorAll('.c80m').forEach(x=>x.replaceWith(box()));return}const b=e.target.closest('button[data-c80]');if(!b)return;S.c69m=b.dataset.c80;try{save()}catch(_){}document.querySelectorAll('.c80m').forEach(x=>x.replaceWith(box()))};return d}
-function inject(){try{const fb=document.getElementById('flbody'),pre=document.getElementById('dfpre');if(fb&&pre&&pre.style.display!=='none'&&fb.childElementCount&&!fb.querySelector('.c80m'))fb.insertBefore(box(),fb.children[1]||null);
-  const f=document.querySelector('#lvpane .pvfm');if(f&&f.offsetParent&&!(f.previousElementSibling&&f.previousElementSibling.classList.contains('c80m')))f.insertAdjacentElement('beforebegin',box())}catch(e){}
+function box(pv){const m=pv?(S.c69pv||'atk'):(S.c69m||'fol'),d=document.createElement('div');d.dataset.pv=pv?1:'';d.className='c80m';const sp=S.c82spd||1;d.innerHTML='<b>Chế độ tàu phụ:</b>'+M.map(x=>`<button data-c80="${x[0]}" class="${x[0]===m?'on':''}">${x[1]}</button>`).join('')+'<b style="margin-left:10px">Tốc độ trận:</b>'+[1,2].map(v=>`<button data-c82s="${v}" class="${v===sp?'on':''}">x${v}</button>`).join('')+'<small>'+(M.find(x=>x[0]===m)||M[0])[2]+'</small>';
+  d.onclick=e=>{const v=e.target.closest('button[data-c82s]');if(v){S.c82spd=+v.dataset.c82s;try{save()}catch(_){}document.querySelectorAll('.c80m').forEach(x=>x.replaceWith(box(!!x.dataset.pv)));return}const b=e.target.closest('button[data-c80]');if(!b)return;if(pv)S.c69pv=b.dataset.c80;else S.c69m=b.dataset.c80;try{save()}catch(_){}document.querySelectorAll('.c80m').forEach(x=>x.replaceWith(box(!!x.dataset.pv)))};return d}
+function inject(){try{const fb=document.getElementById('flbody'),pre=document.getElementById('dfpre');if(fb&&pre&&pre.style.display!=='none'&&fb.childElementCount&&!fb.querySelector('.c80m'))fb.insertBefore(box(false),fb.children[1]||null);
+  const f=document.querySelector('#lvpane .pvfm');if(f&&f.offsetParent&&!(f.previousElementSibling&&f.previousElementSibling.classList.contains('c80m')))f.insertAdjacentElement('beforebegin',box(true))}catch(e){}
   try{const G=typeof DG!=='undefined'?DG:null,on=!!(G&&G.pvp&&!G.done);document.body.classList.toggle('c80pv',on);const h=document.getElementById('pvhud'),sc=document.getElementById('c36sc');if(sc){if(on&&h&&getComputedStyle(h).display!=='none'){const r=h.getBoundingClientRect();sc.style.setProperty('top',Math.round(r.bottom+6)+'px','important')}else sc.style.removeProperty('top')}}catch(e){}}
 setInterval(inject,300);
 })();

@@ -75,10 +75,11 @@ function esum(G,dt){const F=G.c65cp;if(!F||!window.C40||!C40.step||!G.c65reg)ret
  const _S=dfDmgS;dfDmgS=function(s,d,f){const G=DG,was=s&&!s.dead,r=_S.apply(this,arguments);try{if(G&&G.c40e&&was&&s.dead&&ours(G,s))hook(s)}catch(e){}return r};
  if(typeof dfDmgA==='function'){const _A=dfDmgA;dfDmgA=function(a,d){const G=DG,was=a&&!a.dead,r=_A.apply(this,arguments);try{if(G&&G.c40e&&was&&a.dead&&ours(G,a))hook(a)}catch(e){}return r}}}
 /* phe ta bắn được quân thảm đối thủ */
-window.c72Hit=function(p){const G=DG,S=G&&G.c40e;if(!S||!S.u.length||p.team==='e'||p.dead)return false;for(const u of S.u){if(u.dead||u.noT)continue;if(Math.hypot(u.x-p.x,u.y-p.y)<=(u.hr||.6)+.15){p.dead=true;try{if(p.spl)dfBlast(p.x,p.y,p.spl,p.dmg,'p');dfDmgS(u,p.dmg||0)}catch(e){}return true}}return false};
-{const _B=bmkFor;bmkFor=function(u){const r=_B.apply(this,arguments);if(r)return r;try{const G=DG,S=G&&G.c40e;if(!S||!u||!S.u.length||!G.pvp)return null;const rg=(u.ws&&u.ws.length)?Math.max(...u.ws.map(w=>w.rng||0)):8;let b=null,bd=rg;
-  for(const o of S.u){if(o.dead||o.noT)continue;const q=Math.hypot(o.x-u.x,o.y-u.y);if(q<bd){bd=q;b=o}}if(!b)return null;for(const e of G.en){if(e.dead||e.spawn>G.t)continue;if(Math.hypot(e.x-u.x,e.y-u.y)<bd)return null}return b}catch(e){return null}}}
-{const _B=dfBlast;dfBlast=function(x,y,r,d,team){const out=_B.apply(this,arguments);try{const G=DG,S=G&&G.c40e;if(S&&team==='p')S.u.forEach(u=>{if(!u.dead&&!u.noT&&Math.hypot(u.x-x,u.y-y)<=r+(u.hr||.6))dfDmgS(u,d)})}catch(e){}return out}}
+const ES=G=>G?[G.c40e,G.c40e2].filter(S=>S&&S.u&&S.u.length):[];const EU=G=>[].concat(...ES(G).map(S=>S.u));
+window.c72Hit=function(p){const G=DG,L=EU(G);if(!L.length||p.team==='e'||p.dead)return false;for(const u of L){if(u.dead||u.noT)continue;if(Math.hypot(u.x-p.x,u.y-p.y)<=(u.hr||.6)+.15){p.dead=true;try{if(p.spl)dfBlast(p.x,p.y,p.spl,p.dmg,'p');dfDmgS(u,p.dmg||0)}catch(e){}return true}}return false};
+{const _B=bmkFor;bmkFor=function(u){const r=_B.apply(this,arguments);if(r)return r;try{const G=DG,UL=EU(G);if(!u||!UL.length||!G.pvp)return null;const rg=(u.ws&&u.ws.length)?Math.max(...u.ws.map(w=>w.rng||0)):8;let b=null,bd=rg;
+  for(const o of UL){if(o.dead||o.noT)continue;const q=Math.hypot(o.x-u.x,o.y-u.y);if(q<bd){bd=q;b=o}}if(!b)return null;for(const e of G.en){if(e.dead||e.spawn>G.t)continue;if(Math.hypot(e.x-u.x,e.y-u.y)<bd)return null}return b}catch(e){return null}}}
+{const _B=dfBlast;dfBlast=function(x,y,r,d,team){const out=_B.apply(this,arguments);try{const G=DG,UL=EU(G);if(UL.length&&team==='p')UL.forEach(u=>{if(!u.dead&&!u.noT&&Math.hypot(u.x-x,u.y-y)<=r+(u.hr||.6))dfDmgS(u,d)})}catch(e){}return out}}
 /* ---- 5) 10 mẫu xây riêng cho căn cứ đối thủ: trụ sở luôn ở hàng cuối cùng (xa phía ta nhất), công trình nằm gọn trong thảm ---- */
 const TPL=[
  {n:'Hàng ngang',f:(dx,y)=>y*100+Math.abs(dx)},

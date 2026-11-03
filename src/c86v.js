@@ -57,5 +57,5 @@ function sk25Body(G,S){const K=SK25,V=(x,z,y)=>new T.Vector3(x,y,z),Rg=S.Rg;
     else if(v.k==='lake'){tor17(v.x,.08,v.y,2+k*12,'#7ad0ff',.5*(1-k))}});
   if(S.K===2030&&S.coat&&S.t<15)S.coat.forEach(u=>{if(!u||u.dead||u.hp<=0)return;const r=Math.max(u.size||1,u.w||1,u.h||1)*.6;tor17(u.x,.4+Math.sin(G.t*3+u.x)*.1,u.y,r,'#ff8ac0',.55);dot17(u.x,1,u.y,r*2,'#ffb8d8',.15)});
   if(S.K===2026&&S.prog!=null){const r=Math.max(Rg.x1-Rg.x0,Rg.y1-Rg.y0)*.3;tor17(S.cx,.12,S.cy,r*S.prog,'#3a2414',.7)}}
-function skill3d25(G,dt){const L=[G.c40,G.c40e].filter(S=>S&&S.K>=2025&&S.K<=2034);if(!L.length){if(SK25)sk25End();return}sk25Init();const s17=SK17;SK17=SK25.H;
+function skill3d25(G,dt){const L=[G.c40,G.c40e].concat(G.c40L||[]).filter(S=>S&&S.K>=2025&&S.K<=2034);if(!L.length){if(SK25)sk25End();return}sk25Init();const s17=SK17;SK17=SK25.H;
   try{L.forEach(S=>sk25Body(G,S))}catch(e){console.error(e)}finally{SK17=s17;sk25End()}}

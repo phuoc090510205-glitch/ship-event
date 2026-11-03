@@ -60,14 +60,14 @@ function skill3d24(G,dt){if(!G||G!==DG||!(G.c19e||G.c19p||G.c20e||G.c21e||G.c22e
   catch(e){console.error(e)}finally{SK17=s17;sk24End()}}
 
 /* sức mạnh thảm của đối thủ (PvP): vẽ bằng chính bộ vẽ thảm — vẽ thảm ta trước rồi vẽ tiếp thảm địch trong cùng khung hình */
-if(typeof skill3d18==='function'&&typeof sk18Body==='function'){const o18=skill3d18;skill3d18=function(G,dt){const E=G&&G.c40e;if(!E)return o18(G,dt);const P=G.c40;
-  if(!P){G.c40=E;try{return o18(G,dt)}finally{G.c40=P}}
+if(typeof skill3d18==='function'&&typeof sk18Body==='function'){const o18=skill3d18;skill3d18=function(G,dt){const L=[G&&G.c40,G&&G.c40e].concat((G&&G.c40L)||[]).filter(Boolean);if(!G||(L.length<=1&&L[0]===G.c40))return o18(G,dt);const P=G.c40;
+  if(L.length===1){G.c40=L[0];try{return o18(G,dt)}finally{G.c40=P}}
   const B=sk18Body;sk18Body=function(G2,dt2,S2){const ps=Object.values(SK18).filter(p=>p&&typeof p.end==='function'),ends=ps.map(p=>p.end);ps.forEach(p=>p.end=()=>{});
-    try{B(G2,dt2,P)}catch(e){console.error(e)}finally{ps.forEach((p,i)=>p.end=ends[i])}B(G2,dt2,E)};
-  try{return o18(G,dt)}finally{sk18Body=B}}}
-if(typeof skill3d20==='function'){const o20=skill3d20;skill3d20=function(G,dt){const E=G&&G.c40e;if(!E)return o20(G,dt);const P=G.c40;G.c40={u:(P&&P.u?P.u:[]).concat(E.u||[])};try{return o20(G,dt)}finally{G.c40=P}}}
+    try{L.slice(0,-1).forEach(S=>{try{B(G2,dt2,S)}catch(e){console.error(e)}})}finally{ps.forEach((p,i)=>p.end=ends[i])}B(G2,dt2,L[L.length-1])};
+  G.c40=L[0];try{return o18(G,dt)}finally{sk18Body=B;G.c40=P}}}
+if(typeof skill3d20==='function'){const o20=skill3d20;skill3d20=function(G,dt){const L=[G&&G.c40e].concat((G&&G.c40L)||[]).filter(Boolean);if(!L.length)return o20(G,dt);const P=G.c40;G.c40={u:[].concat(...[P].concat(L).map(S=>S&&S.u?S.u:[]))};try{return o20(G,dt)}finally{G.c40=P}}}
 [['skill3d21',1007,1010],['skill3d22',1011,1014],['skill3d23',1015,1017]].forEach(([n,a,b])=>{try{const o=eval(n);if(typeof o!=='function')return;const inR=S=>!!(S&&S.K>=a&&S.K<=b);
-  const w=function(G,dt){const E=G&&G.c40e;if(inR(E)&&!inR(G.c40)){const P=G.c40;G.c40=E;try{return o(G,dt)}finally{G.c40=P}}return o(G,dt)};
+  const w=function(G,dt){const E=[G&&G.c40e].concat((G&&G.c40L)||[]).find(inR);if(E&&!inR(G.c40)){const P=G.c40;G.c40=E;try{return o(G,dt)}finally{G.c40=P}}return o(G,dt)};
   if(n==='skill3d21')skill3d21=w;else if(n==='skill3d22')skill3d22=w;else skill3d23=w}catch(e){}});
 /* c82: vẽ kỹ năng & công trình đặc biệt của phe địch (thế giới gương) bằng chính bộ vẽ của ta */
 {const KEY=/^(csk|c\d\d\w*)$/;
