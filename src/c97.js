@@ -36,12 +36,16 @@ const PT=make('p');window.C97PT=PT;
 const PRICE=5000;
 const own=i=>!!(S.tplP&&S.tplP[i]);
 /* ---- áp mẫu lên căn cứ của ta (màn Trụ sở): trụ sở ở phía sau (dưới), pháo ra phía trước ---- */
-function items(){const P=bPos();return bAvail().filter(b=>P[b.id]).map(b=>({id:b.id,t:b.t,w:b.w,h:b.h,hqf:b.t==='hq'}))}
-function plan(i){if(!window.C65||!C65.layout)return null;const B={items:items()};if(!B.items.some(x=>x.hqf))return null;C65.layout(B,PT[i]);return B.tpl?B:null}
+function items(){bPos();return bAvail().map(b=>({id:b.id,t:b.t,w:b.w,h:b.h,hqf:b.t==='hq'}))}/* mọi công trình đang có theo cấp trụ sở (kể cả trong Kho) */
+const PC={};
+function plan(i){const R1=bReg(),k=i+'|'+bLv('hq')+'|'+bAvail().length;if(PC[k]!==undefined)return PC[k];if(!window.C65||!C65.layout)return null;const B={items:items()};if(!B.items.some(x=>x.hqf))return PC[k]=null;C65.layout(B,PT[i]);if(!B.tpl)return PC[k]=null;
+  /* mẫu quá lớn so với bản đồ: giữ phần gần trụ sở nhất (ưu tiên theo mẫu), phần còn lại cất Kho */
+  const W=R1.x1-R1.x0,Hh=R1.y1-R1.y0,S2=Math.min(B.R,W,Hh),x0=Math.max(0,Math.min(B.R-S2,Math.round(B.R/2-S2/2)));
+  B.keep=B.items.filter(it=>it.hqf||(it.x>=x0&&it.x+it.w<=x0+S2&&it.y+it.h<=S2));B.drop=B.items.length-B.keep.length;B.cx0=x0;B.S=S2;return PC[k]=B}
 function apply(i){const B=plan(i);if(!B){toast('Không xếp được mẫu này');return false}const R1=bReg(),W=R1.x1-R1.x0,Hh=R1.y1-R1.y0;
-  if(B.R>W||B.R>Hh){toast('Căn cứ chưa đủ rộng cho mẫu này — nâng cấp trụ sở để mở rộng');return false}
-  const ox=R1.x0+Math.floor((W-B.R)/2),oy=R1.y0+Math.floor((Hh-B.R)/2),P=bPos();B.items.forEach(it=>{P[it.id]=[ox+it.x,oy+(B.R-(it.y+it.h))]});
-  try{save()}catch(e){}try{paintBase()}catch(e){}toast('Đã xếp căn cứ theo mẫu «'+PT[i].n+'»');return true}
+  const ox=R1.x0+Math.floor((W-B.S)/2),oy=R1.y0+Math.floor((Hh-B.S)/2),P=bPos(),off=bOff(),ks=new Set(B.keep.map(x=>x.id));
+  B.items.forEach(it=>{if(ks.has(it.id)){P[it.id]=[ox+it.x-B.cx0,oy+(B.S-(it.y+it.h))];delete off[it.id]}else{delete P[it.id];off[it.id]=true}});
+  try{save()}catch(e){}try{bRender()}catch(e){}toast('Đã xếp '+B.keep.length+' công trình theo mẫu «'+PT[i].n+'»'+(B.drop?' · '+B.drop+' công trình không đủ chỗ đã cất vào Kho':''));return true}
 /* ---- giao diện ---- */
 const st=document.createElement('style');st.textContent=`#c97{position:fixed;inset:0;z-index:61;display:none;flex-direction:column;background:radial-gradient(ellipse at 40% 20%,#0b2050,#040a1e 70%);color:#dfe9ff;font:600 13px system-ui,sans-serif}
 #c97 .hd{position:relative;z-index:2;display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid #1f4a8a;background:#061430e6}#c97 .hd h2{margin:0;font-size:16px;color:#fff;letter-spacing:1px}#c97 .hd small{color:#9fc4ff}
@@ -52,9 +56,9 @@ const st=document.createElement('style');st.textContent=`#c97{position:fixed;ins
 #c97 .buy{background:linear-gradient(#ffd766,#f0a500);color:#1a1200;border-color:#ffc53d}#c97 .use{background:#0c4a2a;border-color:#36d16a}`;document.head.appendChild(st);
 const ov=document.createElement('div');ov.id='c97';document.body.appendChild(ov);
 const KC={hq:'#ffd24a',t:'#ff6a6a',w:'#8a96ad',f:'#5fb0ff'};
-function draw(cv,i){const B=plan(i),q=cv.getContext('2d'),W=cv.width;q.clearRect(0,0,W,W);if(!B){q.fillStyle='#ff8a8a';q.font='bold 12px system-ui';q.fillText('—',W/2-4,W/2);return}const s=W/B.R;
-  B.items.forEach(it=>{const k=it.hqf?'hq':it.t==='wall'?'w':(typeof BT!=='undefined'&&BT[it.t])?'t':'f';q.fillStyle=KC[k];q.fillRect(it.x*s+.5,(B.R-(it.y+it.h))*s+.5,it.w*s-1,it.h*s-1)})}
-function render(){const da=Math.floor(S.da||0);ov.innerHTML=`<div class="hd"><h2>MẪU XẾP CĂN CỨ</h2><small>50 mẫu · ${PRICE.toLocaleString('vi-VN')} Đá/mẫu · bạn có ${da.toLocaleString('vi-VN')} Đá · <span style="color:#ffd24a">■</span> trụ sở <span style="color:#ff6a6a">■</span> pháo <span style="color:#8a96ad">■</span> tường <span style="color:#5fb0ff">■</span> khác</small><button class="x" data-a="x">✕ Đóng</button></div>
+function draw(cv,i){const B=plan(i),q=cv.getContext('2d'),W=cv.width;q.clearRect(0,0,W,W);if(!B){q.fillStyle='#ff8a8a';q.font='bold 12px system-ui';q.fillText('—',W/2-4,W/2);return}const s=W/B.S;
+  B.keep.forEach(it=>{const k=it.hqf?'hq':it.t==='wall'?'w':(typeof BT!=='undefined'&&BT[it.t])?'t':'f';q.fillStyle=KC[k];q.fillRect((it.x-B.cx0)*s+.5,(B.S-(it.y+it.h))*s+.5,it.w*s-1,it.h*s-1)})}
+function render(){const da=Math.floor(S.da||0);ov.innerHTML=`<div class="hd"><h2>MẪU XẾP CĂN CỨ</h2><small>50 mẫu · tự xếp toàn bộ ${(()=>{try{return bAvail().length}catch(e){return 0}})()} công trình của Trụ sở cấp ${(()=>{try{return bLv('hq')}catch(e){return 1}})()} · ${PRICE.toLocaleString('vi-VN')} Đá/mẫu · bạn có ${da.toLocaleString('vi-VN')} Đá · <span style="color:#ffd24a">■</span> trụ sở <span style="color:#ff6a6a">■</span> pháo <span style="color:#8a96ad">■</span> tường <span style="color:#5fb0ff">■</span> khác</small><button class="x" data-a="x">✕ Đóng</button></div>
   <div class="q97g">${PT.map((T,i)=>`<div class="q97c ${own(i)?'ow':''}"><canvas width="236" height="236" data-i="${i}"></canvas><b>${T.n}</b>${own(i)?`<button class="use" data-a="use" data-i="${i}">✓ Áp dụng</button>`:`<button class="buy" data-a="buy" data-i="${i}">Mua · ${PRICE.toLocaleString('vi-VN')} Đá</button>`}</div>`).join('')}</div>`;
   const cvs=[...ov.querySelectorAll('canvas')];let n=0;const nx=()=>{if(ov.style.display!=='flex'||n>=cvs.length)return;const c=cvs[n++];try{draw(c,+c.dataset.i)}catch(e){}setTimeout(nx,0)};nx()}
 ov.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,i=+b.dataset.i;if(a==='x'){ov.style.display='none';return}
