@@ -1819,7 +1819,7 @@ function renderSe(){
   const tg=(k,lb)=>`<div class="srow"><label>${lb}</label><span class="tg"><input type="checkbox" data-s="${k}" ${t[k]?'checked':''}><i></i></span></div>`;
   $('pp-se').innerHTML=`<div class="pfr"><h4>Lưu tiến trình</h4><div class="gpr"><img src="${PR.gp}" alt=""><p>Đăng nhập Google Play để lưu và đồng bộ tiến trình trò chơi trên nhiều thiết bị.</p>${t.gp?'<button class="gok" id="gpa">✔ Đã kết nối</button><button class="gout" id="gpb">Đăng xuất</button>':'<button class="gok" id="gpa">Đăng nhập</button>'}</div></div>
   <div class="sg"><div class="pfr"><h4>Âm thanh</h4>${sl('gun','🔊 Âm lượng súng')}${sl('music','♪ Nhạc nền')}${sl('fx','🔔 Hiệu ứng')}</div>
-  <div class="pfr"><h4>Đồ họa</h4>${sel('q','Chất lượng đồ họa',['Thấp','Trung bình','Cao'])}${sel('blur','Hiệu ứng',['Bật','Tắt'])}${sel('fps','FPS giới hạn',['30 FPS','60 FPS','90 FPS'])}${tg('shake','Chế độ rung (Level · PvP · Boss)')}${tg('fast','Gộp lượt vẽ mỗi khung hình (tăng tốc 3D · hình ảnh giữ nguyên)')}${tg('rng','Hiển thị đường phạm vi (nét đứt tầm quét, tầm chiêu, đường nối tàu)')}${tg('dark','Không gian chiến đấu tối (bỏ sao, hành tinh · mượt hơn)')}${tg('note','Hiển thị thông báo chiêu thức & tăng sức mạnh')}${tg('notrail','Ẩn đuôi đạn (đạn tàu · đạn công trình)')}${tg('nolv','Ẩn cấp độ công trình & trụ sở (màn xây dựng căn cứ)')}${tg('nobar','Ẩn thanh máu · giáp · năng lượng (công trình, tàu, quân triệu hồi)')}${tg('light','Hiệu ứng ánh sáng')}${tg('part','Hiệu ứng hạt')}</div></div>
+  <div class="pfr"><h4>Đồ họa</h4>${sel('q','Chất lượng đồ họa',['Thấp','Trung bình','Cao'])}${sel('blur','Hiệu ứng',['Bật','Tắt'])}${sel('fps','FPS giới hạn',['30 FPS','60 FPS','90 FPS'])}${tg('shake','Chế độ rung (Level · PvP · Boss)')}${tg('cull','Chỉ vẽ trong tầm nhìn (vật ngoài màn hình không dựng hình · giảm lag căn cứ lớn)')}${tg('fast','Gộp lượt vẽ mỗi khung hình (tăng tốc 3D · hình ảnh giữ nguyên)')}${tg('rng','Hiển thị đường phạm vi (nét đứt tầm quét, tầm chiêu, đường nối tàu)')}${tg('dark','Không gian chiến đấu tối (bỏ sao, hành tinh · mượt hơn)')}${tg('note','Hiển thị thông báo chiêu thức & tăng sức mạnh')}${tg('notrail','Ẩn đuôi đạn (đạn tàu · đạn công trình)')}${tg('nolv','Ẩn cấp độ công trình & trụ sở (màn xây dựng căn cứ)')}${tg('nobar','Ẩn thanh máu · giáp · năng lượng (công trình, tàu, quân triệu hồi)')}${tg('light','Hiệu ứng ánh sáng')}${tg('part','Hiệu ứng hạt')}</div></div>
   <div class="pfr"><h4>Khác</h4><div class="sg"><div>${sel('lang','Ngôn ngữ',['Tiếng Việt','English'])}${tg('notif','Thông báo')}${tg('auto','Tự động dùng kỹ năng')}</div><div>${tg('pvp','Ẩn/hiện hiệu ứng PvP')}${tg('batt','Chế độ tiết kiệm pin')}<div class="srow"><label>Xóa bộ nhớ đệm</label><button class="xbtn" id="clr">Xóa</button></div><div class="srow"><button class="rbtn" id="rst">⟲ Đặt lại mặc định</button></div></div></div></div>`;
   const P=$('pp-se');
   P.querySelectorAll('input[type=range]').forEach(i=>i.oninput=()=>{S.set[i.dataset.s]=+i.value;i.nextElementSibling.textContent=i.value+'%';save()});
@@ -14839,14 +14839,14 @@ const PH=new WeakMap();
 let t3=0,lastT=performance.now();
 function render(G,L){const now=performance.now(),dt=Math.min(.05,(now-lastT)/1000);lastT=now;t3+=dt;
   applyQ();const PV=R3.pv,w=PV?PV.w:(dfc.clientWidth||dfV.w),h=PV?PV.h:(dfc.clientHeight||dfV.h),pr=ren.getPixelRatio();if(cv3.width!==Math.round(w*pr)||cv3.height!==Math.round(h*pr))ren.setSize(w,h,false);
-  if(R3.gid!==G){setWorld(G);seenFx=new WeakSet();R3.yaw=0;R3.yawT=0}pools();baseZ.visible=!PV;if(shadowP)shadowP.visible=!PV;if(PV)pvCam(G,PV);else{joyStep(G);camFollow(G,dt)}gTex.needsUpdate=true;
+  if(R3.gid!==G){setWorld(G);seenFx=new WeakSet();R3.yaw=0;R3.yawT=0}pools();baseZ.visible=!PV;if(shadowP)shadowP.visible=!PV;if(PV)pvCam(G,PV);else{joyStep(G);camFollow(G,dt)}try{if(window.__cull){if(PV)__cull.on=false;else __cull.upd(cam,T)}}catch(e){}gTex.needsUpdate=true;
   {const dk=window.__dk();if(R3.c94dk!==dk){R3.c94dk=dk;sky.visible=planet.visible=atm.visible=!dk;if(R3.stars)R3.stars.visible=!dk;if(dust)dust.visible=!dk;scene.background=dk?new T.Color(0):null;if(scene.fog)scene.fog.color.setHex(dk?0:0x060a1c)}if(dk)(R3.rocks||[]).forEach(r=>{r.m.visible=false});else if(R3.c94rk)(R3.rocks||[]).forEach(r=>{r.m.visible=true});R3.c94rk=dk}
   sky.rotation.y+=dt*.004;planet.rotation.y+=dt*.01;(R3.rocks||[]).forEach(r=>{r.m.rotation.x+=r.sp.x*dt;r.m.rotation.y+=r.sp.y*dt});
   {const P=dust.geometry.attributes.position;for(let i=0;i<P.count;i+=5)P.setY(i,P.getY(i)+Math.sin(t3*.6+i)*.002);P.needsUpdate=true}
   const used=new Set();BH=[];
   L.forEach(it=>{if(!it.m)return;const o=it.o;let g=R3.inst.get(o);
     if(!g||g.userData.src!==it.src){if(g)drop(g);g=mkInst(it);R3.inst.set(o,g)}
-    used.add(o);const U=g.userData;
+    used.add(o);const U=g.userData;if(window.__cull&&__cull.on){if(!__cull.inV(o)){g.visible=false;return}const P0=G.pl,far=!!(P0&&Math.hypot(o.x-P0.x,o.y-P0.y)>42);if(U.c102f!==far){U.c102f=far;g.traverse(m=>{if(m.isMesh){if(m.c102cs==null)m.c102cs=m.castShadow;m.castShadow=far?false:m.c102cs}})}}if(!g.visible)g.visible=true;
     if(it.k==='s'){const M=U.hull.material,lf=o.lift||0;let sc=1+Math.min(1,lf)*.25;
       if(o.boss){const a=t3-U.born;if(a<1.3){const k=Math.min(1,a/1.1);sc*=.25+.75*(1+2.7*Math.pow(k-1,3)+1.7*Math.pow(k-1,2));if(!U.bfx){U.bfx=1;boom(o.x,HOV,o.y,2.6,false);rings.push({x:o.x,y:.2,z:o.y,r:o.size*3,t:0,max:1.2,c:'#ff4d5e'})}}}
       g.scale.setScalar(sc);const y=HOV+lf*1.3+Math.sin(t3*2.2+o.x)*(o.boss?.2:.09);g.position.set(o.x,y,o.y);
@@ -20445,7 +20445,7 @@ setInterval(lobbyBtn,700);lobbyBtn();
 window.__dk=function(){try{return !!(S.set&&S.set.dark)}catch(e){return false}};
 window.__inB=function(){try{const G=typeof DG!=='undefined'?DG:null;if(!G||G.done||!G.wd)return false;const c=dq&&dq.canvas;return !!(c&&c.getBoundingClientRect().width>0)}catch(e){return false}};
 window.__noNote=function(){try{return !!(S.set&&S.set.note===false)&&window.__inB()}catch(e){return false}};
-setInterval(()=>{try{document.body.classList.toggle('c101nl',!!(S.set&&S.set.nolv));if(S.set&&S.set.fast==null)S.set.fast=true;if(S.set&&S.set.rng==null)S.set.rng=true;if(S.set&&S.set.note==null)S.set.note=true;document.body.classList.toggle('c94nn',!!(S.set&&S.set.note===false))}catch(e){}},700);
+setInterval(()=>{try{document.body.classList.toggle('c101nl',!!(S.set&&S.set.nolv));if(S.set&&S.set.fast==null)S.set.fast=true;if(S.set&&S.set.cull==null)S.set.cull=true;if(S.set&&S.set.rng==null)S.set.rng=true;if(S.set&&S.set.note==null)S.set.note=true;document.body.classList.toggle('c94nn',!!(S.set&&S.set.note===false))}catch(e){}},700);
 (function(){const st=document.createElement('style');st.textContent='body.c94nn #skbn{display:none!important}body.c101nl .lvb{display:none!important}';document.head.appendChild(st)})();
 window.__nt=function(){try{return !!(S.set&&S.set.notrail)}catch(e){return false}};window.__nb=function(){try{return !!(S.set&&S.set.nobar)}catch(e){return false}};
 /* ===== c92: xóa Bản đồ dịch chuyển · LẮP RÁP MÔ-ĐUN CHO TRỤ SỞ (120 ô: 70 xanh nước biển bao quanh + 50 xanh lá ở lõi, +1 ô mỗi cấp trụ sở, người chơi tự chọn vị trí + màu) ===== */
@@ -20576,6 +20576,15 @@ window.C92={open,stats,cells,cands,base,free,credits,place:(i,j,c)=>{place(i,j,c
 })();
 
 /* ===== c95: TỐI ƯU KẾT XUẤT 3D — gộp các vật thể giống nhau thành một lượt vẽ (instancing). Hình ảnh giữ nguyên: cùng hình, màu, độ sáng, vị trí; chỉ giảm số lần GPU phải vẽ ===== */
+/* ---- chỉ vẽ trong tầm nhìn: tính vùng mặt đất camera đang nhìn thấy, vật ngoài vùng thì không dựng/không cập nhật hình (logic trận vẫn chạy đủ) ---- */
+window.__cull=(function(){const C={on:true,x0:-1e9,x1:1e9,z0:-1e9,z1:1e9,n:0};let V=null,D=null;
+  C.upd=function(cam,T){C.on=!(typeof S!=='undefined'&&S.set&&S.set.cull===false);if(!C.on)return;if(!V){V=new T.Vector3();D=new T.Vector3()}cam.updateMatrixWorld();
+    let x0=1e9,x1=-1e9,z0=1e9,z1=-1e9,ok=true;[[-1,-1],[1,-1],[1,1],[-1,1]].forEach(([u,v])=>{V.set(u,v,.5).unproject(cam);D.copy(V).sub(cam.position).normalize();let t;
+      if(D.y<-1e-3){t=-cam.position.y/D.y;t=Math.min(t,600)}else t=600;const x=cam.position.x+D.x*t,z=cam.position.z+D.z*t;x0=Math.min(x0,x,cam.position.x);x1=Math.max(x1,x,cam.position.x);z0=Math.min(z0,z,cam.position.z);z1=Math.max(z1,z,cam.position.z)});
+    const m=6;C.x0=x0-m;C.x1=x1+m;C.z0=z0-m;C.z1=z1+m};
+  C.inV=function(o,r){if(!C.on)return true;const q=(r!=null?r:Math.max(o.size||0,o.w||0,o.h||0))*.6+1;return o.x+q>=C.x0&&o.x-q<=C.x1&&o.y+q>=C.z0&&o.y-q<=C.z1};
+  C.inP=function(x,z,r){if(!C.on)return true;return x+r>=C.x0&&x-r<=C.x1&&z+r>=C.z0&&z-r<=C.z1};
+  return C})();
 window.__bat=(function(){
 let T=null,S=null,on=true;const hid=[];
 const SV=`attribute vec3 iPos;attribute vec2 iScl;attribute float iRot;attribute vec2 iCtr;attribute vec4 iCol;varying vec2 vUv;varying vec4 vCol;
@@ -20611,7 +20620,7 @@ function mBuild(g,n){if(g.me&&n<=g.cap)return;if(g.me){if(g.me.parent)g.me.paren
 function pre(scene,cam,TT){if(!on)return;T=TT;S=scene;hid.length=0;SG.forEach(g=>{g.L.length=0});MG.forEach(g=>{g.L.length=0});
   try{scene.updateMatrixWorld();
     scene.traverseVisible(o=>{if(o.userData&&o.userData.c95)return;
-      if(o.isSprite){if(window.__batNS)return;const m=o.material;if(!m||m.visible===false||!m.map||m.sizeAttenuation===false||!m.isSpriteMaterial||o.onBeforeRender!==T.Object3D.prototype.onBeforeRender)return;sGroup(m,o.renderOrder).L.push(o);return}
+      if(o.isSprite){if(window.__batNS)return;if(!o.parent.isScene||true){const e=o.matrixWorld.elements;if(!__cull.inP(e[12],e[14],Math.hypot(e[0],e[1],e[2])+1)){o.visible=false;hid.push(o);return}}const m=o.material;if(!m||m.visible===false||!m.map||m.sizeAttenuation===false||!m.isSpriteMaterial||o.onBeforeRender!==T.Object3D.prototype.onBeforeRender)return;sGroup(m,o.renderOrder).L.push(o);return}
       if(o.isMesh&&window.__batMesh!==false&&!o.isInstancedMesh&&!o.castShadow&&!o.receiveShadow){const m=o.material;if(!m||Array.isArray(m)||m.visible===false||!m.isMeshBasicMaterial||m.blending!==T.AdditiveBlending||m.depthWrite!==false||!m.transparent||m.vertexColors||o.geometry.morphAttributes&&Object.keys(o.geometry.morphAttributes).length||o.onBeforeRender!==T.Object3D.prototype.onBeforeRender)return;mGroup(o,m).L.push(o)}});
     const ce=cam.matrixWorld.elements;
     SG.forEach(g=>{const L=g.L,n=L.length;if(g.me.parent!==scene)scene.add(g.me);if(n<3){g.me.visible=false;return}g.ensure(n);
@@ -20728,14 +20737,14 @@ function box(){const d=document.createElement('div');d.className='c80m';d.id='c9
 setInterval(()=>{try{const fb=document.getElementById('flbody');if(fb&&fb.offsetParent!==null&&!document.getElementById('c99ap')){const m=fb.querySelector('.c80m');if(m)m.insertAdjacentElement('afterend',box());else fb.insertBefore(box(),fb.children[1]||null)}}catch(e){}},500);
 })();
 
-/* ===== c100: TRỤ SỞ 500 CẤP · từ cấp 100: +1 ô bản đồ mỗi phía mỗi 20 cấp · thêm số lượng công trình (pháo/tháp 10 · mìn 30 · tường +1 mỗi 2 cấp · công trình khác 5) ===== */
+/* ===== c100: TRỤ SỞ 500 CẤP · từ cấp 100: +1 ô bản đồ mỗi phía mỗi 20 cấp · thêm số lượng công trình (pháo/tháp 7 · mìn 30 · tường +1 mỗi 2 cấp · công trình khác 5) ===== */
 (function(){
 const TUR=/pháo|tháp|cối|tên lửa|bệ phóng|súng|laser|đại bác|nỏ/i;
 const base={};BLD.forEach(b=>{(base[b.t]=base[b.t]||[]).push(b)});
 Object.keys(base).forEach(t=>{const L=base[t],b0=L[0];if(t==='hq'||t==='warp'||t==='shield'||t==='hangar'||t==='cm3'||t==='refine')return;
   let hls=[];
   if(t==='wall'){for(let l=102;l<=500;l+=2)hls.push(l)}
-  else{const max=t==='mine'?30:((typeof BT!=='undefined'&&BT[t])||(b0.nb&&b0.nb.k==='tur')||TUR.test(b0.n||''))?10:5,k=max-L.length;for(let j=1;j<=k;j++)hls.push(100+Math.round(400*j/k))}
+  else{const max=t==='mine'?30:((typeof BT!=='undefined'&&BT[t])||(b0.nb&&b0.nb.k==='tur')||TUR.test(b0.n||''))?7:5,k=max-L.length;for(let j=1;j<=k;j++)hls.push(100+Math.round(400*j/k))}
   hls.forEach((hl,j)=>{const n0=String(b0.n||'').replace(/\s\d+$/,''),i=L.length+j+1;BLD.push(Object.assign({},b0,{id:t+'_x'+(j+1),n:n0+' '+i,hl,pos:null}))})});
 })();
 
@@ -20991,7 +21000,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL=(window.SE_CFG&&SE_CFG.fb)||'';
-  const VER='v287';
+  const VER='v288';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`

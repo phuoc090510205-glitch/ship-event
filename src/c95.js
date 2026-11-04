@@ -1,4 +1,13 @@
 /* ===== c95: TỐI ƯU KẾT XUẤT 3D — gộp các vật thể giống nhau thành một lượt vẽ (instancing). Hình ảnh giữ nguyên: cùng hình, màu, độ sáng, vị trí; chỉ giảm số lần GPU phải vẽ ===== */
+/* ---- chỉ vẽ trong tầm nhìn: tính vùng mặt đất camera đang nhìn thấy, vật ngoài vùng thì không dựng/không cập nhật hình (logic trận vẫn chạy đủ) ---- */
+window.__cull=(function(){const C={on:true,x0:-1e9,x1:1e9,z0:-1e9,z1:1e9,n:0};let V=null,D=null;
+  C.upd=function(cam,T){C.on=!(typeof S!=='undefined'&&S.set&&S.set.cull===false);if(!C.on)return;if(!V){V=new T.Vector3();D=new T.Vector3()}cam.updateMatrixWorld();
+    let x0=1e9,x1=-1e9,z0=1e9,z1=-1e9,ok=true;[[-1,-1],[1,-1],[1,1],[-1,1]].forEach(([u,v])=>{V.set(u,v,.5).unproject(cam);D.copy(V).sub(cam.position).normalize();let t;
+      if(D.y<-1e-3){t=-cam.position.y/D.y;t=Math.min(t,600)}else t=600;const x=cam.position.x+D.x*t,z=cam.position.z+D.z*t;x0=Math.min(x0,x,cam.position.x);x1=Math.max(x1,x,cam.position.x);z0=Math.min(z0,z,cam.position.z);z1=Math.max(z1,z,cam.position.z)});
+    const m=6;C.x0=x0-m;C.x1=x1+m;C.z0=z0-m;C.z1=z1+m};
+  C.inV=function(o,r){if(!C.on)return true;const q=(r!=null?r:Math.max(o.size||0,o.w||0,o.h||0))*.6+1;return o.x+q>=C.x0&&o.x-q<=C.x1&&o.y+q>=C.z0&&o.y-q<=C.z1};
+  C.inP=function(x,z,r){if(!C.on)return true;return x+r>=C.x0&&x-r<=C.x1&&z+r>=C.z0&&z-r<=C.z1};
+  return C})();
 window.__bat=(function(){
 let T=null,S=null,on=true;const hid=[];
 const SV=`attribute vec3 iPos;attribute vec2 iScl;attribute float iRot;attribute vec2 iCtr;attribute vec4 iCol;varying vec2 vUv;varying vec4 vCol;
@@ -34,7 +43,7 @@ function mBuild(g,n){if(g.me&&n<=g.cap)return;if(g.me){if(g.me.parent)g.me.paren
 function pre(scene,cam,TT){if(!on)return;T=TT;S=scene;hid.length=0;SG.forEach(g=>{g.L.length=0});MG.forEach(g=>{g.L.length=0});
   try{scene.updateMatrixWorld();
     scene.traverseVisible(o=>{if(o.userData&&o.userData.c95)return;
-      if(o.isSprite){if(window.__batNS)return;const m=o.material;if(!m||m.visible===false||!m.map||m.sizeAttenuation===false||!m.isSpriteMaterial||o.onBeforeRender!==T.Object3D.prototype.onBeforeRender)return;sGroup(m,o.renderOrder).L.push(o);return}
+      if(o.isSprite){if(window.__batNS)return;if(!o.parent.isScene||true){const e=o.matrixWorld.elements;if(!__cull.inP(e[12],e[14],Math.hypot(e[0],e[1],e[2])+1)){o.visible=false;hid.push(o);return}}const m=o.material;if(!m||m.visible===false||!m.map||m.sizeAttenuation===false||!m.isSpriteMaterial||o.onBeforeRender!==T.Object3D.prototype.onBeforeRender)return;sGroup(m,o.renderOrder).L.push(o);return}
       if(o.isMesh&&window.__batMesh!==false&&!o.isInstancedMesh&&!o.castShadow&&!o.receiveShadow){const m=o.material;if(!m||Array.isArray(m)||m.visible===false||!m.isMeshBasicMaterial||m.blending!==T.AdditiveBlending||m.depthWrite!==false||!m.transparent||m.vertexColors||o.geometry.morphAttributes&&Object.keys(o.geometry.morphAttributes).length||o.onBeforeRender!==T.Object3D.prototype.onBeforeRender)return;mGroup(o,m).L.push(o)}});
     const ce=cam.matrixWorld.elements;
     SG.forEach(g=>{const L=g.L,n=L.length;if(g.me.parent!==scene)scene.add(g.me);if(n<3){g.me.visible=false;return}g.ensure(n);
