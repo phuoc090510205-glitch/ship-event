@@ -146,7 +146,7 @@ function ecap(G,e){if(e.c82sk)return;if(G.pvo&&G.pvo.human&&e.pvE&&Array.isArray
     try{ent.sty=CSK.style(k,CSK.plan(k))}catch(x){}e.c82sk.push(ent)}}
 function sworld(G){let W=G.c82W;if(!W||W.host!==G){W=G.c82W={host:G,c82:1,pvp:false,c39:1,c40x:1,c20sim:1,dmM:1,kills:0,deaths:0,respawn:0,done:false,pb:{dm:1,cdm:1,rm:1}};window.__MW=(window.__MW||[]).filter(w=>w.host===G);window.__MW.push(W)}
   const M=bworld(G);W.pl=M.pl;if(!W.pl.cs)W.pl.cs={};W.al=M.al;W.en=M.en;W.bl=M.bl;W.hq=M.hq;W.t=G.t;W.fx=G.fx;W.bm=G.bm;W.wd=G.wd;W.pr=G.pr;W.rocks=G.rocks||[];W.eu=[];return W}
-function ecast(G,dt){if(!window.CSK||!CSK.cast)return;const W=sworld(G),ours=players(G).concat(window.C91BP?C91BP(G):[]);W.en=ours;
+function ecast(G,dt){if(!window.CSK||!CSK.cast)return;if(G.t<3&&window.__noIntro&&__noIntro())return;const W=sworld(G),ours=players(G).concat(window.C91BP?C91BP(G):[]);W.en=ours;
   (G.en||[]).forEach(e=>{if(e.dead||!(e.pvE||e.pvEsc))return;ecap(G,e);if(!e.c82sk.length||e.silT>0||e.stun>0||e.spawn>G.t)return;const near=ours.some(u=>Math.hypot(u.x-e.x,u.y-e.y)<16);
     e.c82sk.forEach(k=>{k.cd-=dt;if(k.cd>0||!near)return;k.cd=k.cd0;const tm=e.team;window.__mwRun([W],()=>{e.team='p';e.cs=e.cs||{};try{CSK.cast(e,k,1)}finally{e.team=tm}})})})}
 
