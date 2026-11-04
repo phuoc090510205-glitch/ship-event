@@ -28,7 +28,7 @@ function keepAtk(G,dt){
 const edge=(e,t)=>{if(t.w!=null&&!t.sh){const dx=Math.max(0,Math.abs(e.x-t.x)-t.w/2),dy=Math.max(0,Math.abs(e.y-t.y)-t.h/2);return Math.hypot(dx,dy)}return Math.max(0,Math.hypot(e.x-t.x,e.y-t.y)-(t.size||2)*.3)};
 function aiInit(G,e){if(e._ai)return e._ai;const r=(G.pvo&&G.pvo.rank)||1;e._ai={hc:0};e.sp*=1+.025*r;(e.ws||[]).forEach(w=>{w.cd/=1+.03*r});return e._ai}
 function aiPick(G,e){const P=G.pl;if(P&&!P.dead&&P.cs&&P.cs.taunt>0&&edge(e,P)<=40)return P;let b=null,bd=1e9,b2=null,bd2=1e9;
-  const C=ours(G).concat((G.bl||[]).filter(o=>o.hp>0&&o.t!=='mine'));C.forEach(t=>{const d=edge(e,t);if(d<=40&&d<bd){bd=d;b=t}if(d<bd2){bd2=d;b2=t}});return b||b2}
+  const C=ours(G).concat((G.bl||[]).filter(o=>o.hp>0&&o.t!=='mine'&&!(o.hq&&window.__hqLast&&__hqLast(G))));C.forEach(t=>{const d=edge(e,t);if(d<=40&&d<bd){bd=d;b=t}if(d<bd2){bd2=d;b2=t}});return b||b2}
 function aiPost(G,dt){(G.en||[]).forEach(e=>{if(!e||e.dead||!(e.pvE||e.pvEsc)||e.spawn>G.t||e._px==null)return;const a=aiInit(G,e);e.x=e._px;e.y=e._py;if(e.stun>0)return;
     a.hc-=dt;if(e.hp<e.max*.4&&a.hc<=0&&!(e.silT>0)){a.hc=22;e.hp=Math.min(e.max,e.hp+e.max*.18);try{G.fx.push({x:e.x,y:e.y,r:e.size*1.3,t:.6,max:.6,col:'#7dffa0'})}catch(x){}}
     const tg=aiPick(G,e);if(e.pvE)e._tg=tg;if(!tg)return;const d=edge(e,tg),dx=tg.x-e.x,dy=tg.y-e.y,l=Math.hypot(dx,dy)||1;e.ang=Math.atan2(dy,dx);
@@ -39,7 +39,7 @@ function aiPost(G,dt){(G.en||[]).forEach(e=>{if(!e||e.dead||!(e.pvE||e.pvEsc)||e
 /* ---------- 5) kỹ năng tàu địch đánh trúng công trình của ta (công trình đi vào danh sách mục tiêu của thế giới kỹ năng địch, dưới dạng vỏ bọc không bị đẩy/dịch chuyển) ---------- */
 const BPX=new Set(['x','y','tx','ty','sx','sy','vx','vy','hp','dead','max']);
 function bprox(b){if(!b.c91p)b.c91p=new Proxy(b,{get:(t,k)=>k==='size'?Math.max(t.w||1,t.h||1)*.9:k==='dead'?!(t.hp>0):k==='__b'?t:k==='team'?'p':k==='spawn'?0:k==='sb'?undefined:k==='ws'?(t.ws||[]):k==='cs'?(t.cs||(t.cs={})):t[k],set:(t,k,v)=>{if(!BPX.has(k))t[k]=v;return true}});return b.c91p}
-window.C91BP=G=>(G.bl||[]).filter(b=>b.hp>0&&b.t!=='mine'&&!b.c39tmp).map(bprox);
+window.C91BP=G=>(G.bl||[]).filter(b=>b.hp>0&&b.t!=='mine'&&!b.c39tmp&&!(b.hq&&window.__hqLast&&__hqLast(G))).map(bprox);
 {const _D=dfDmgS;dfDmgS=function(s,d,f){if(s&&s.__b){const b=s.__b,sv=DG,H=(DG&&DG.host)||DG;DG=H;try{if(H&&d>0)dfDmgB(b,d)}finally{DG=sv}return}return _D.apply(this,arguments)}}
 /* ---------- 6) xe sửa chữa + drone của công trình địch: hoạt động và hiện hình ---------- */
 function edrone(G,dt){const M=G.c81M;if(!M||!window.c15Drone)return;const L=(G.eu||[]).map((u,i)=>[u,i]).filter(([u])=>u.bd&&u.bd.t==='droneb'&&!u.dead&&u.hp>0);if(!L.length)return;
