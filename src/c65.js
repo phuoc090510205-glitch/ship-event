@@ -31,6 +31,11 @@ function atk(G,dt){if(G.t-(G.pvT0||0)<45)return;G.c69at=(G.c69at||0)+dt;if(G.c69
 function pow(G,dt){if(G.t-(G.pvT0||0)<45)return;G.c69pt=(G.c69pt||0)+dt;if(G.c69pt<6)return;G.c69pt-=6;if((G.c69k||0)>=50)return;const k=G.c69k=(G.c69k||0)+1;G.c69f=100*k;
   (G.eu||[]).forEach(u=>{if(!u.ws)return;u.ws.forEach(w=>{w.dmg=(w.dmg||0)+100/Math.max(.2,u.dm||1)})});
   fxAll(G,'#ff3a8a',1.1);try{toast('💥 Công trình hai bên +100 sát thương mỗi viên đạn (tổng +'+(100*k)+')')}catch(e){}}
+/* trụ sở hai bên mất 5% máu tối đa mỗi giây: 1 vs 1 từ phút 5 · 2 vs 2 từ phút 7 · 3 vs 3 từ phút 10 */
+function drain(G,dt){if(G.done||!G.hq||!G.eh||G.hq.c69hold||G.eh.c69hold)return;const md=(G.pvo&&G.pvo.mode)||0,T0=md===2?420:md===1?600:300;if(G.t-(G.pvT0||0)<T0)return;
+  if(!G.c97w){G.c97w=1;try{toast('⏳ Phút '+(T0/60)+': trụ sở hai bên mất 5% máu tối đa mỗi giây!')}catch(e){}}
+  const L=[G.hq,G.eh].filter(h=>h&&h.hp>0).sort((a,b)=>a.hp/a.max-b.hp/b.max);
+  for(const h of L){if(G.done)break;const d=h.max*.05*dt;if(h.hp-d>0){h.hp-=d;continue}h.shd=null;h.hp=Math.min(h.hp,h.max*.001);if(h===G.hq)dfDmgB(h,h.max*10);else dfDmgS(h,h.max*1e3)}}
 function aspd(G,dt){if(G.t-(G.pvT0||0)<60)return;G.c93at=(G.c93at||0)+dt;if(G.c93at<4)return;G.c93at-=4;if((G.c93m||0)>=50)return;const m=G.c93m=(G.c93m||0)+1,f=1+.1*m;
   (G.eu||[]).forEach(u=>{if(!u.ws)return;u.ws.forEach(w=>{if(w.c93c==null)w.c93c=w.cd||1;w.cd=w.c93c/f})});
   G.pb=G.pb||{dm:1,cdm:1,rm:1};if(G.c93cd0==null)G.c93cd0=G.pb.cdm||1;G.pb.cdm=G.c93cd0/f;
@@ -46,7 +51,7 @@ function ecarp(G,dt){const F=G.c65cp;if(!F||!window.C39)return;const c=F.c;
   tg.forEach(u=>{hitP(G,u,d);try{G.fx.push({x:u.x,y:u.y,r:2.2,t:.6,max:.6,ex:1,rot:Math.random()*6});G.bm.push({x1:G.eh?G.eh.x:u.x,y1:G.eh?G.eh.y:u.y-6,x2:u.x,y2:u.y,t:.35,col,w:5})}catch(e){}});
   (G.eu||[]).forEach(u=>{if(!u.dead&&u.hp>0&&u.hp<u.max)u.hp=Math.min(u.max,u.hp+F.V*.2/DB())});
   if(tg.length)try{toast('⚡ Sức mạnh thảm đối thủ: −'+Math.round(d)+' máu')}catch(e){}}
-function step(G,dt){try{const E=G.pvEn;if(E&&!E.dead&&(G.c88E!==E||E.c88d)){G.c88E=E;E.c88d=0;espawn(G,[E])}if(E&&E.dead)E.c88d=1}catch(e){console.error(e)}try{esup(G,dt)}catch(e){console.error(e)}try{ecast(G,dt)}catch(e){console.error(e)}try{atk(G,dt);pow(G,dt);aspd(G,dt);if(!esum(G,dt))ecarp(G,dt);else if(!G.c65cpOn){G.c65cpOn=1}}catch(e){console.error(e)}if(!G.c65on||!G.eu)return;const P=G.pl;let slowK=1;
+function step(G,dt){try{const E=G.pvEn;if(E&&!E.dead&&(G.c88E!==E||E.c88d)){G.c88E=E;E.c88d=0;espawn(G,[E])}if(E&&E.dead)E.c88d=1}catch(e){console.error(e)}try{esup(G,dt)}catch(e){console.error(e)}try{ecast(G,dt)}catch(e){console.error(e)}try{atk(G,dt);pow(G,dt);aspd(G,dt);drain(G,dt);if(!esum(G,dt))ecarp(G,dt);else if(!G.c65cpOn){G.c65cpOn=1}}catch(e){console.error(e)}if(!G.c65on||!G.eu)return;const P=G.pl;let slowK=1;
   G.eu.forEach(u=>{const c=u.c65;if(!c||u.dead||u.hp<=0)return;c.cd-=dt;const R=c.r,lk=LVK(c.l);
     if(c.k==='aura'){players(G).forEach(s=>{if(!near(u,s,R))return;
         if(c.jam)(s.ws||[]).forEach(w=>{w.t+=dt*Math.min(.6,c.jam)});
@@ -100,7 +105,7 @@ const TPL=[
 /* cấp công trình địch tăng dần theo bậc: bậc 1 ≈ cấp 1 · bậc 15 = toàn bộ cấp 100 */
 function lvRank(B,rank){const r=Math.max(1,Math.min(15,rank||1)),fl=Math.round(1+99*Math.pow((r-1)/14,1.35));
   B.items.forEach(it=>{const f=it.hqf?fl:Math.max(1,fl-((Math.random()*Math.max(1,fl*.08))|0));it.lv=Math.min(100,Math.max(it.lv||1,r>=15?100:f))});const hq=B.items.find(i=>i.hqf);if(hq)B.hqLv=hq.lv;B.lvFloor=fl;return B}
-function layout(B,ti){const items=B.items,hq=items.find(i=>i.hqf);if(!hq)return B;const rest=items.filter(i=>i!==hq),T=TPL[ti!=null?ti:(Math.random()*TPL.length)|0],gap=T.gap||0;
+function layout(B,ti){if(!TPL.c97&&window.__tplMake){TPL.c97=1;TPL.push(...window.__tplMake('e'))}const items=B.items,hq=items.find(i=>i.hqf);if(!hq)return B;const rest=items.filter(i=>i!==hq),T=(ti&&typeof ti==='object')?ti:TPL[ti!=null?ti:(Math.random()*TPL.length)|0],gap=T.gap||0;
   const kind=i=>i.t==='wall'?'w':(typeof BT!=='undefined'&&BT[i.t])?'t':'f',ord=T.ord||['t','w','f'];
   rest.sort((a,b)=>ord.indexOf(kind(a))-ord.indexOf(kind(b))||(b.w*b.h-a.w*a.h));
   const area=items.reduce((s,i)=>s+(i.w+gap)*(i.h+gap),0);let R=Math.max(hq.w+4,Math.ceil(Math.sqrt(area*1.3)));
