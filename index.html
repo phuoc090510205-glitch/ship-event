@@ -1819,7 +1819,7 @@ function renderSe(){
   const tg=(k,lb)=>`<div class="srow"><label>${lb}</label><span class="tg"><input type="checkbox" data-s="${k}" ${t[k]?'checked':''}><i></i></span></div>`;
   $('pp-se').innerHTML=`<div class="pfr"><h4>Lưu tiến trình</h4><div class="gpr"><img src="${PR.gp}" alt=""><p>Đăng nhập Google Play để lưu và đồng bộ tiến trình trò chơi trên nhiều thiết bị.</p>${t.gp?'<button class="gok" id="gpa">✔ Đã kết nối</button><button class="gout" id="gpb">Đăng xuất</button>':'<button class="gok" id="gpa">Đăng nhập</button>'}</div></div>
   <div class="sg"><div class="pfr"><h4>Âm thanh</h4>${sl('gun','🔊 Âm lượng súng')}${sl('music','♪ Nhạc nền')}${sl('fx','🔔 Hiệu ứng')}</div>
-  <div class="pfr"><h4>Đồ họa</h4>${sel('q','Chất lượng đồ họa',['Thấp','Trung bình','Cao'])}${sel('blur','Hiệu ứng',['Bật','Tắt'])}${sel('fps','FPS giới hạn',['30 FPS','60 FPS','90 FPS'])}${tg('shake','Chế độ rung (Level · PvP · Boss)')}${tg('fast','Gộp lượt vẽ mỗi khung hình (tăng tốc 3D · hình ảnh giữ nguyên)')}${tg('rng','Hiển thị đường phạm vi (nét đứt tầm quét, tầm chiêu, đường nối tàu)')}${tg('dark','Không gian chiến đấu tối (bỏ sao, hành tinh · mượt hơn)')}${tg('note','Hiển thị thông báo chiêu thức & tăng sức mạnh')}${tg('notrail','Ẩn đuôi đạn (đạn tàu · đạn công trình)')}${tg('nobar','Ẩn thanh máu · giáp · năng lượng (công trình, tàu, quân triệu hồi)')}${tg('light','Hiệu ứng ánh sáng')}${tg('part','Hiệu ứng hạt')}</div></div>
+  <div class="pfr"><h4>Đồ họa</h4>${sel('q','Chất lượng đồ họa',['Thấp','Trung bình','Cao'])}${sel('blur','Hiệu ứng',['Bật','Tắt'])}${sel('fps','FPS giới hạn',['30 FPS','60 FPS','90 FPS'])}${tg('shake','Chế độ rung (Level · PvP · Boss)')}${tg('fast','Gộp lượt vẽ mỗi khung hình (tăng tốc 3D · hình ảnh giữ nguyên)')}${tg('rng','Hiển thị đường phạm vi (nét đứt tầm quét, tầm chiêu, đường nối tàu)')}${tg('dark','Không gian chiến đấu tối (bỏ sao, hành tinh · mượt hơn)')}${tg('note','Hiển thị thông báo chiêu thức & tăng sức mạnh')}${tg('notrail','Ẩn đuôi đạn (đạn tàu · đạn công trình)')}${tg('nolv','Ẩn cấp độ công trình & trụ sở (màn xây dựng căn cứ)')}${tg('nobar','Ẩn thanh máu · giáp · năng lượng (công trình, tàu, quân triệu hồi)')}${tg('light','Hiệu ứng ánh sáng')}${tg('part','Hiệu ứng hạt')}</div></div>
   <div class="pfr"><h4>Khác</h4><div class="sg"><div>${sel('lang','Ngôn ngữ',['Tiếng Việt','English'])}${tg('notif','Thông báo')}${tg('auto','Tự động dùng kỹ năng')}</div><div>${tg('pvp','Ẩn/hiện hiệu ứng PvP')}${tg('batt','Chế độ tiết kiệm pin')}<div class="srow"><label>Xóa bộ nhớ đệm</label><button class="xbtn" id="clr">Xóa</button></div><div class="srow"><button class="rbtn" id="rst">⟲ Đặt lại mặc định</button></div></div></div></div>`;
   const P=$('pp-se');
   P.querySelectorAll('input[type=range]').forEach(i=>i.oninput=()=>{S.set[i.dataset.s]=+i.value;i.nextElementSibling.textContent=i.value+'%';save()});
@@ -20445,8 +20445,8 @@ setInterval(lobbyBtn,700);lobbyBtn();
 window.__dk=function(){try{return !!(S.set&&S.set.dark)}catch(e){return false}};
 window.__inB=function(){try{const G=typeof DG!=='undefined'?DG:null;if(!G||G.done||!G.wd)return false;const c=dq&&dq.canvas;return !!(c&&c.getBoundingClientRect().width>0)}catch(e){return false}};
 window.__noNote=function(){try{return !!(S.set&&S.set.note===false)&&window.__inB()}catch(e){return false}};
-setInterval(()=>{try{if(S.set&&S.set.fast==null)S.set.fast=true;if(S.set&&S.set.rng==null)S.set.rng=true;if(S.set&&S.set.note==null)S.set.note=true;document.body.classList.toggle('c94nn',!!(S.set&&S.set.note===false))}catch(e){}},700);
-(function(){const st=document.createElement('style');st.textContent='body.c94nn #skbn{display:none!important}';document.head.appendChild(st)})();
+setInterval(()=>{try{document.body.classList.toggle('c101nl',!!(S.set&&S.set.nolv));if(S.set&&S.set.fast==null)S.set.fast=true;if(S.set&&S.set.rng==null)S.set.rng=true;if(S.set&&S.set.note==null)S.set.note=true;document.body.classList.toggle('c94nn',!!(S.set&&S.set.note===false))}catch(e){}},700);
+(function(){const st=document.createElement('style');st.textContent='body.c94nn #skbn{display:none!important}body.c101nl .lvb{display:none!important}';document.head.appendChild(st)})();
 window.__nt=function(){try{return !!(S.set&&S.set.notrail)}catch(e){return false}};window.__nb=function(){try{return !!(S.set&&S.set.nobar)}catch(e){return false}};
 /* ===== c92: xóa Bản đồ dịch chuyển · LẮP RÁP MÔ-ĐUN CHO TRỤ SỞ (120 ô: 70 xanh nước biển bao quanh + 50 xanh lá ở lõi, +1 ô mỗi cấp trụ sở, người chơi tự chọn vị trí + màu) ===== */
 (function(){
@@ -20991,7 +20991,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL=(window.SE_CFG&&SE_CFG.fb)||'';
-  const VER='v286';
+  const VER='v287';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`
