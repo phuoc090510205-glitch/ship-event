@@ -1854,7 +1854,7 @@ addEventListener('resize',placeTsf);setInterval(placeTsf,300);
 
 /* ===== Căn cứ Trụ sở (kéo thả như Clash of Clans) ===== */
 let BN=56;const BOFF=20,BSHIFT=16;
-function bnSync(B){try{const e=Math.max(0,Math.floor((bLv('hq')-100)/20)),c=B.bnE||0;if(e!==c){const d=e-c,sh=p=>{if(Array.isArray(p)&&p.length>=2){p[0]+=d;p[1]+=d}};
+function bnSync(B){try{const e=0,c=B.bnE||0;if(e!==c){const d=e-c,sh=p=>{if(Array.isArray(p)&&p.length>=2){p[0]+=d;p[1]+=d}};
   [B.pos,B.smk].forEach(o=>{if(o)for(const k in o)sh(o[k])});if(Array.isArray(B.trp))B.trp.forEach(sh);try{if(S.pvb&&S.pvb.pos)for(const k in S.pvb.pos)sh(S.pvb.pos[k])}catch(x){}B.bnE=e;try{save()}catch(x){}}BN=56+2*e}catch(x){}}
 const BDEF=[
  {t:'hq',n:'Trụ sở chính',w:4,h:4,ch:1,c:1,hl:[1],pos:[8,8],note:'Căn cứ trung tâm dùng chung cho mọi tàu.'},
@@ -1876,7 +1876,7 @@ const BDEF=[
  {t:'warp',n:'Bản đồ dịch chuyển',w:3,h:3,ch:5,c:1,hl:[1],pos:[14,14],note:'Dịch chuyển giữa các chiến trường.'}];
 const BLD=[];BDEF.forEach(d=>{for(let i=0;i<d.c;i++)BLD.push(Object.assign({},d,{id:d.c>1?d.t+(i+1):d.t,n:d.c>1?d.n+' '+(i+1):d.n,hl:d.hl[i],pos:Array.isArray(d.pos[0])?(d.pos[i]||null):(i===0&&d.pos.length?d.pos:null)}))});
 var SPR={"wall": IMG[174], "cannon": IMG[175], "laser": IMG[176], "hq4": IMG[177]};
-function bLv(t){const B=(S.base=S.base||{});const v=(B.lv&&B.lv[t])||1;if(t==='hq'&&v>200){B.lv.hq=200;return 200}return v}
+function bLv(t){const B=(S.base=S.base||{});const v=(B.lv&&B.lv[t])||1;if(t==='hq'&&v>500){B.lv.hq=500;return 500}return v}
 var BSPR={"cannon": IMG[178], "laser": IMG[179], "wall": IMG[180], "wallv": IMG[181], "bigcannon": IMG[182], "mine": IMG[183], "crossbow": IMG[184], "crusher": IMG[185], "flame": IMG[186], "droneb": IMG[187], "pylon": IMG[188], "reactor": IMG[189], "shop": IMG[190]};
 function bInner(b){
   if(b.t==='hq')return `<img src="${HQIMG}" alt="${b.n}">`;
@@ -1899,10 +1899,10 @@ function bArt(t,w,h){
 }
 const bState={sel:null,drag:null};
 function bPos(){const B=S.base=S.base||{pos:{},z:0};B.pos=B.pos||{};bnSync(B);if(B.g===2){B.g=3;const sh=p=>{if(p&&p.length>=2){p[0]+=10;p[1]+=10}};for(const k in B.pos)sh(B.pos[k]);if(Array.isArray(B.trp))B.trp.forEach(sh);try{if(S.pvb&&S.pvb.pos)for(const k in S.pvb.pos)sh(S.pvb.pos[k])}catch(e){}}if(B.g!==3){B.g=3;for(const k in B.pos){const p=B.pos[k];if(p&&p.length>=2){p[0]+=BSHIFT;p[1]+=BSHIFT}}if(Array.isArray(B.trp))B.trp.forEach(p=>{if(p&&p.length>=2){p[0]+=BSHIFT;p[1]+=BSHIFT}})}return B.pos}
-function bReg(){bnSync(S.base=S.base||{});const k=Math.min(BOFF,Math.floor(bLv('hq')/5)),a=BOFF-k;return {x0:a,y0:a,x1:BN-a,y1:BN-a,k}}
+function bReg(){bnSync(S.base=S.base||{});const k=Math.floor(bLv('hq')/5),R=__mbReg(__mbCur());return {x0:R.x0,y0:R.y0,x1:R.x1,y1:R.y1,k}}
 function bIn(a,x,y){const R=bReg();return x>=R.x0&&y>=R.y0&&x+a.w<=R.x1&&y+a.h<=R.y1}
-function bUnl(b){return b.t!=='shield'&&b.t!=='hangar'&&b.t!=='cm3'&&chOpen(b.ch)&&bLv('hq')>=b.hl}
-function bAvail(){const k=bLv('hq')+'|'+BLD.length,n=performance.now();if(bAvail.c&&bAvail.k===k&&n-bAvail.t<250)return bAvail.c;bAvail.k=k;bAvail.t=n;return bAvail.c=BLD.filter(bUnl)}
+function bUnl(b){return b.t!=='shield'&&b.t!=='hangar'&&b.t!=='cm3'&&chOpen(b.ch)&&bLv('hq')>=b.hl&&(!window.__mbOK||__mbOK(b))}
+function bAvail(){if(window.__mbMig)__mbMig();const k=bLv('hq')+'|'+BLD.length+'|'+(window.__mbCur?__mbCur():0),n=performance.now();if(bAvail.c&&bAvail.k===k&&n-bAvail.t<250)return bAvail.c;bAvail.k=k;bAvail.t=n;return bAvail.c=BLD.filter(b=>bUnl(b)&&(!window.__mbIn||__mbIn(b)))}
 function bOverlap(a,x,y,id){if(!bIn(a,x,y))return true;const P=bPos();return bAvail().some(o=>{if(o.id===id)return false;const p=P[o.id];return p&&x<p[0]+o.w&&x+a.w>p[0]&&y<p[1]+o.h&&y+a.h>p[1]})}
 function bFree(a){const R=bReg();for(let y=R.y0;y<=R.y1-a.h;y++)for(let x=R.x0;x<=R.x1-a.w;x++)if(!bOverlap(a,x,y,a.id))return [x,y];return null}
 function bRotMap(){bPos();return S.base.rot=S.base.rot||{}}
@@ -1928,7 +1928,7 @@ function bRender(){
   const s=BLD.find(b=>b.id===bState.sel);
   const rb=$('brot');if(rb)rb.disabled=!(s&&s.t==='wall');
   $('bnote').innerHTML=s?`<b>${s.n}</b> · Cấp ${bLv(s.t)}${bHP(s.t)?' · Máu '+bHP(s.t).toLocaleString():''} · ${s.w}×${s.h} ô · ${s.note}`:'Bấm một công trình để chọn.';
-  const nx=R.k<BOFF?`Mở rộng bản đồ thêm 1 ô mỗi phía ở Trụ sở cấp ${(R.k+1)*5}. `:(bLv('hq')<200?`Mở rộng bản đồ thêm 1 ô mỗi phía ở Trụ sở cấp ${100+20*(Math.floor((bLv('hq')-100)/20)+1)}. `:'Bản đồ đã mở rộng tối đa. ');
+  const nx=(()=>{const lv=bLv('hq');if(lv>=500)return 'Đã mở đủ các căn cứ ở cấp tối đa. ';const nl=(Math.floor((lv-1)/5)+1)*5+1,a=__mbSizes(lv).length,b=__mbSizes(nl).length;return (b>a?`Trụ sở cấp ${nl}: mở thêm Căn cứ mới (${b} căn cứ). `:`Trụ sở cấp ${nl}: căn cứ mới nhất rộng thêm 1 ô. `)+`Có ${a} căn cứ. `})();
   const nl=lk.filter(b=>chOpen(b.ch)&&b.t!=='shield'&&b.t!=='hangar'&&b.t!=='cm3'),nc=lk.filter(b=>!chOpen(b.ch)&&b.t!=='shield'&&b.t!=='hangar'&&b.t!=='cm3');
   $('blk').textContent=`Căn cứ ${R.x1-R.x0}×${R.y1-R.y0}. ${nx}`+(bAvail().some(b=>!P[b.id])?`Kho: ${bAvail().filter(b=>!P[b.id]).length} công trình đang cất (hết chỗ hoặc bạn đã cất, không hoạt động) — bấm "Kho" để bày ra. `:'')+(nl.length?`Sắp mở: ${[...new Set(nl.map(b=>b.n.replace(/ \d+$/,'')))].slice(0,5).join(', ')}… (nâng Trụ sở). `:'')+(nc.length?`Mở theo chương: ${nc.map(b=>b.n).join(', ')}.`:'');
   try{window.c17BaseUI&&window.c17BaseUI(s)}catch(e){console.error(e)}
@@ -2012,7 +2012,7 @@ function bHP(t){const l=bLv(t);if(t==='hq')return hqHP();if(t==='wall')return UP
 function uMinHl(t){return Math.min(...BLD.filter(b=>b.t===t).map(b=>b.hl))}
 function uCount(t,l){return BLD.filter(b=>b.t===t&&b.hl<=l).length}
 function uUnlockText(l){
-  for(let m=l+1;m<=200;m++){
+  for(let m=l+1;m<=500;m++){
     const g={};BLD.filter(b=>b.hl===m&&b.hl>1).forEach(b=>{g[b.t]=(g[b.t]||0)+1});
     const parts=Object.keys(g).map(t=>UPD[t].n+(g[t]>1?' ×'+g[t]:uCount(t,m)>1?' (+1)':' (mới)'));
     if(m%5===0)parts.push('mở rộng bản đồ +1 ô mỗi phía');
@@ -2020,7 +2020,7 @@ function uUnlockText(l){
   }
   return '';
 }
-const UMAX=100,UMX=t=>t==='hq'?200:UMAX;
+const UMAX=100,UMX=t=>t==='hq'?500:UMAX;
 var uSel='hq';
 function hqHP(){return UPD.hq.st(bLv('hq'))[0][1]}
 function ucost(t){const l=bLv(t),u=UPD[t];const da=Math.round(1200*(1+(l-1)*.6+Math.pow(l,1.9)/12)*u.m/100)*100;if(t==='hq')return {da:da*3,sao:100+50*(l-1)};return {da,sao:u.sao?10+10*l:0}}
@@ -2528,7 +2528,8 @@ function dfMakeShip(sh,team,wm,fit,x,y,o){
   const hm=o.hpMul||1;
   return {team,sh,x,y,ang:-Math.PI/2,hp:st.hp*hm,max:st.hp*hm,sp:st.speed*(o.spMul||1),size,sc,ws,tx:x,ty:y,boss:!!o.boss,dm:o.dmMul||1,hit:0,dead:false,spawn:o.spawn||0};
 }
-function dfBuildings(){
+function dfBuildings(){const B0=S.base=S.base||{},c0=B0.cur;try{if(window.__mbHQ){B0.cur=__mbHQ();bAvail.c=null}return dfBuildings0.apply(this,arguments)}finally{B0.cur=c0;bAvail.c=null}}
+function dfBuildings0(){
   bRender();const R=bReg(),ox=R.x0-DFM,oy=R.y0-DFM,P=bPos(),L=[];
   bAvail().forEach(b=>{const p=P[b.id];if(!p)return;const lv=bLv(b.t),hp0=Math.max(2,(b.t==='mine'?100:(bHP(b.t)||800))/DFB);
     const def=BT[b.t];
@@ -20693,7 +20694,7 @@ const PK=[
 PK.forEach(([n,key,ord])=>PT.push({n:'Triển khai · '+n,pack:1,key,ord}));
 function pack(T){const R1=bReg(),W=R1.x1-R1.x0,H=R1.y1-R1.y0,its=items(),occ=new Uint8Array(W*H);
   const put=(x,y,w,h)=>{for(let j=0;j<h;j++)for(let i=0;i<w;i++)occ[(y+j)*W+x+i]=1},ok=(x,y,w,h)=>{if(x<0||y<0||x+w>W||y+h>H)return false;for(let j=0;j<h;j++)for(let i=0;i<w;i++)if(occ[(y+j)*W+x+i])return false;return true};
-  const hq=its.find(x=>x.hqf);if(!hq)return null;const hx=Math.floor(W/2-hq.w/2),hy=H-hq.h-1;put(hx,hy,hq.w,hq.h);const pos={};pos[hq.id]=[hx,hy];
+  const hq=its.find(x=>x.hqf)||{id:'__gate',w:Math.min(4,W),h:Math.min(3,H),v:1};const hx=Math.floor(W/2-hq.w/2),hy=H-hq.h-1;put(hx,hy,hq.w,hq.h);const pos={};pos[hq.id]=[hx,hy];
   const ord=[];for(let y=0;y<H;y++)for(let x=0;x<W;x++)ord.push(y*W+x);const kv=new Float64Array(W*H);ord.forEach(i=>{kv[i]=T.key(i%W,(i/W)|0,W,H)});ord.sort((a,b)=>kv[a]-kv[b]);
   const start={};let drop=0;
   T.ord.forEach(c=>{its.filter(it=>!it.hqf&&cat(it)===c).sort((a,b)=>b.w*b.h-a.w*a.h).forEach(it=>{const sk=it.w+'x'+it.h;let k=start[sk]||0;
@@ -20710,7 +20711,7 @@ function mkT(id){const r=mb(id*7919+13);r();const fs=FS[Math.floor(r()*FS.length
   return {id,n:NA[Math.floor(r()*NA.length)]+' · '+md[1]+' · '+fs[1],gen:1,p:{md:md[0],fx:co[1]*(.85+r()*.3),fn:r()*1.2,inner:(r(),true),tx:.7+r()*.9,fb:.15+r()*.7,ring:r()<.85,gap:r()<.5?1:2,fs:fs[0],msp:r()<.5?1:2,mf:2+Math.floor(r()*4),sd:Math.floor(r()*1e9)}}}
 function gen(T){const R1=bReg(),W=R1.x1-R1.x0,H=R1.y1-R1.y0,its=items(),occ=new Uint8Array(W*H),P=T.p,rnd=mb(P.sd);
   const put=(x,y,w,h)=>{for(let j=0;j<h;j++)for(let i=0;i<w;i++)occ[(y+j)*W+x+i]=1},ok=(x,y,w,h)=>{if(x<0||y<0||x+w>W||y+h>H)return false;for(let j=0;j<h;j++)for(let i=0;i<w;i++)if(occ[(y+j)*W+x+i])return false;return true};
-  const hq=its.find(x=>x.hqf);if(!hq)return null;const hx=Math.floor(W/2-hq.w/2),hy=H-hq.h-1;put(hx,hy,hq.w,hq.h);const pos={};pos[hq.id]=[hx,hy];const cx=hx+hq.w/2,cy=hy+hq.h/2;
+  const hq=its.find(x=>x.hqf)||{id:'__gate',w:Math.min(4,W),h:Math.min(3,H),v:1};const hx=Math.floor(W/2-hq.w/2),hy=H-hq.h-1;put(hx,hy,hq.w,hq.h);const pos={};pos[hq.id]=[hx,hy];const cx=hx+hq.w/2,cy=hy+hq.h/2;
   const L={f:[],t:[],w:[],m:[]};its.forEach(it=>{if(!it.hqf)L[cat(it)].push(it)});const big=(a,b)=>b.w*b.h-a.w*a.h;
   const NZ=new Float64Array(W*H);for(let i=0;i<W*H;i++)NZ[i]=rnd();
   const byKey=f=>{const o=[];for(let y=0;y<H;y++)for(let x=0;x<W;x++)o.push(y*W+x);const kv=new Float64Array(W*H);o.forEach(i=>{kv[i]=f(i%W,(i/W)|0,NZ[i])});return o.sort((a,b)=>kv[a]-kv[b])};
@@ -20745,7 +20746,7 @@ const own=k=>k[0]==='n'?!!(S.tplN&&S.tplN[k.slice(1)]):!!(S.tplP&&S.tplP[k.slice
 /* ---- áp mẫu lên căn cứ của ta (màn Trụ sở): trụ sở ở phía sau (dưới), pháo ra phía trước ---- */
 function items(){bPos();return bAvail().map(b=>({id:b.id,t:b.t,w:b.w,h:b.h,hqf:b.t==='hq'}))}/* mọi công trình đang có theo cấp trụ sở (kể cả trong Kho) */
 const PC={};
-function plan(K){if(typeof K==='number')K='o'+K;const T0=getT(K),i=+K.slice(1);const R1=bReg(),k=K+'|'+bLv('hq')+'|'+bAvail().length;if(PC[k]!==undefined)return PC[k];if(!T0)return null;if(T0.gen)return PC[k]=gen(T0);if(T0.pack)return PC[k]=pack(T0);if(!window.C65||!C65.layout)return null;const B={items:items()};if(!B.items.some(x=>x.hqf))return PC[k]=null;C65.layout(B,PT[i]);if(!B.tpl)return PC[k]=null;
+function plan(K){if(typeof K==='number')K='o'+K;const T0=getT(K),i=+K.slice(1);const R1=bReg(),k=K+'|'+bLv('hq')+'|'+bAvail().length+'|'+(S.base&&S.base.cur||0);if(PC[k]!==undefined)return PC[k];if(!T0)return null;if(T0.gen)return PC[k]=gen(T0);if(T0.pack)return PC[k]=pack(T0);if(!window.C65||!C65.layout)return null;const B={items:items()};if(!B.items.some(x=>x.hqf))return PC[k]=null;C65.layout(B,PT[i]);if(!B.tpl)return PC[k]=null;
   /* mẫu quá lớn so với bản đồ: giữ phần gần trụ sở nhất (ưu tiên theo mẫu), phần còn lại cất Kho */
   const W=R1.x1-R1.x0,Hh=R1.y1-R1.y0,S2=Math.min(B.R,W,Hh),x0=Math.max(0,Math.min(B.R-S2,Math.round(B.R/2-S2/2)));
   B.keep=B.items.filter(it=>it.hqf||(it.x>=x0&&it.x+it.w<=x0+S2&&it.y+it.h<=S2));B.drop=B.items.length-B.keep.length;B.cx0=x0;B.S=S2;return PC[k]=B}
@@ -20810,15 +20811,15 @@ function box(){const d=document.createElement('div');d.className='c80m';d.id='c9
 setInterval(()=>{try{const fb=document.getElementById('flbody');if(fb&&fb.offsetParent!==null&&!document.getElementById('c99ap')){const m=fb.querySelector('.c80m');if(m)m.insertAdjacentElement('afterend',box());else fb.insertBefore(box(),fb.children[1]||null)}}catch(e){}},500);
 })();
 
-/* ===== c100: TRỤ SỞ 200 CẤP (tối đa) · từ cấp 100: +1 ô bản đồ mỗi phía mỗi 20 cấp · thêm số lượng công trình (pháo/tháp 7 · mìn 30 · tường +1 mỗi 2 cấp · công trình khác 5) ===== */
+/* ===== c100: TRỤ SỞ 500 CẤP · thêm số lượng công trình (pháo/tháp 15 · mìn 30 · tường +1 mỗi 2 cấp · công trình khác 5) — số thực được dùng còn bị giới hạn theo diện tích các căn cứ (c107) ===== */
 (function(){
 const TUR=/pháo|tháp|cối|tên lửa|bệ phóng|súng|laser|đại bác|nỏ/i;
 const base={};BLD.forEach(b=>{(base[b.t]=base[b.t]||[]).push(b)});
 Object.keys(base).forEach(t=>{const L=base[t],b0=L[0];if(t==='hq'||t==='warp'||t==='shield'||t==='hangar'||t==='cm3'||t==='refine')return;
   let hls=[];
-  if(t==='wall'){for(let l=102;l<=200;l+=2)hls.push(l)}
-  else{const max=t==='mine'?30:((typeof BT!=='undefined'&&BT[t])||(b0.nb&&b0.nb.k==='tur')||TUR.test(b0.n||''))?7:5,k=max-L.length;for(let j=1;j<=k;j++)hls.push(100+Math.round(400*j/k))}
-  hls=hls.filter(hl=>hl<=200);hls.forEach((hl,j)=>{const n0=String(b0.n||'').replace(/\s\d+$/,''),i=L.length+j+1;BLD.push(Object.assign({},b0,{id:t+'_x'+(j+1),n:n0+' '+i,hl,pos:null}))})});
+  if(t==='wall'){for(let l=102;l<=500;l+=2)hls.push(l)}
+  else{const max=t==='mine'?30:((typeof BT!=='undefined'&&BT[t])||(b0.nb&&b0.nb.k==='tur')||TUR.test(b0.n||''))?15:5,k=max-L.length;for(let j=1;j<=k;j++)hls.push(100+Math.round(400*j/k))}
+  hls.forEach((hl,j)=>{const n0=String(b0.n||'').replace(/\s\d+$/,''),i=L.length+j+1;BLD.push(Object.assign({},b0,{id:t+'_x'+(j+1),n:n0+' '+i,hl,pos:null}))})});
 })();
 
 /* điểm mù ở màn xây căn cứ: chỉ dựng các công trình nằm trong khung đang xem (+ viền), cuộn tới đâu dựng tới đó */
@@ -20831,6 +20832,52 @@ window.__fog=(function(){let cv=null,V=null;return function(G,cam,T,PV){const sr
 window.__noIntro=function(){try{return !!(S.set&&S.set.intro===false)}catch(e){return false}};window.__S1=new Set();window.__s1=function(u){if(!u)return false;if(__S1.has(u))return true;__S1.add(u);return false};
 window.__fogOut=function(P,o){if(!window.__fogOn||o===P)return false;const N=__shdD();if(!(N<900))return false;const r=Math.max(o.size||0,o.w||0,o.h||0)/2+3.2;return Math.abs(o.x-P.x)>N+r||Math.abs(o.y-P.y)>N+r};
 window.__shdD=function(){try{const v=S.set.shdd;if(v==='Không che')return 1e9;return parseInt(v)||25}catch(e){return 25}};
+/* ===== c107: NHIỀU CĂN CỨ — căn cứ 1 rộng 11×11, cứ 5 cấp trụ sở căn cứ mới nhất rộng thêm 1 ô; đủ 23×23 thì mở căn cứ tiếp theo.
+   Mỗi công trình thuộc 1 căn cứ (S.base.bk). Căn cứ có trụ sở luôn đứng cuối hàng dọc. Màn chơi/đấu boss dùng căn cứ có trụ sở.
+   Số công trình được dùng = theo thứ tự mở khóa, tới khi lấp ~62% diện tích các căn cứ ===== */
+(function(){
+const MX=23,S0=11,ST=13,FILL=.62;
+const SB=()=>S.base=S.base||{};
+window.__mbSizes=function(lv){if(lv==null)lv=bLv('hq');const st=Math.floor((Math.max(1,lv)-1)/5),n=Math.floor(st/ST)+1,o=[];for(let j=0;j<n;j++)o.push(Math.min(MX,S0+st-j*ST));return o};
+window.__mbCells=lv=>__mbSizes(lv).reduce((a,s)=>a+s*s,0);
+let GK='',GS=null;
+window.__mbOK=function(b){const lv=bLv('hq'),k=lv+'|'+BLD.length;if(k!==GK){GK=k;GS=new Set();const bud=__mbCells(lv)*FILL;let a=0;
+  const L=BLD.map((x,i)=>[x,i]).filter(([x])=>x.t!=='shield'&&x.t!=='hangar'&&x.t!=='cm3'&&chOpen(x.ch)&&lv>=x.hl).sort((p,q)=>((p[0].t==='hq'?0:1)-(q[0].t==='hq'?0:1))||(p[0].hl-q[0].hl)||(p[1]-q[1]));
+  for(const [x] of L){const ar=x.w*x.h;if(x.t!=='hq'&&a+ar>bud)break;a+=ar;GS.add(x.id)}}return GS.has(b.id)};
+const HQ=()=>BLD.find(x=>x.t==='hq');
+window.__mbHQ=function(){const B=SB(),h=HQ();return (B.bk&&h&&B.bk[h.id]!=null)?B.bk[h.id]:0};
+window.__mbN=()=>__mbSizes().length;
+window.__mbOrd=function(){const B=SB(),n=__mbN();let o=(B.ord||[]).filter(j=>j<n);for(let j=0;j<n;j++)if(!o.includes(j))o.unshift(j);const h=__mbHQ();o=o.filter(j=>j!==h);o.push(h);B.ord=o;return o};
+window.__mbCur=function(){const B=SB(),n=__mbN();if(!(B.cur>=0&&B.cur<n))B.cur=__mbHQ();return B.cur};
+window.__mbReg=function(j){const s=__mbSizes()[j]||S0,a=Math.floor((BN-s)/2);return {x0:a,y0:a,x1:a+s,y1:a+s,s}};
+/* chuyển dữ liệu cũ (1 bản đồ lớn) sang nhiều căn cứ: tự chia công trình vào các căn cứ, còn thừa cất Kho */
+let MG=false;
+window.__mbMig=function(){const B=SB();if(B.mbv===1||MG)return;MG=true;try{const P=(B.pos=B.pos||{}),off=(B.off=B.off||{}),sz=__mbSizes(),n=sz.length;B.bk={};B.ord=null;B.cur=0;
+  const G=sz.map(s=>new Uint8Array(s*s)),R=sz.map((s,j)=>__mbReg(j));
+  const ok=(j,x,y,w,h)=>{const s=sz[j];if(x<0||y<0||x+w>s||y+h>s)return false;for(let v=0;v<h;v++)for(let u=0;u<w;u++)if(G[j][(y+v)*s+x+u])return false;return true},put=(j,x,y,w,h)=>{const s=sz[j];for(let v=0;v<h;v++)for(let u=0;u<w;u++)G[j][(y+v)*s+x+u]=1};
+  const L=BLD.filter(b=>bUnl(b)),h=L.find(b=>b.t==='hq');
+  if(h){const s=sz[0],x=Math.floor((s-h.w)/2),y=s-h.h-1;put(0,x,y,h.w,h.h);P[h.id]=[R[0].x0+x,R[0].y0+y];B.bk[h.id]=0;delete off[h.id]}
+  /* chia đều: mỗi căn cứ chỉ lấp tới ~70% trước, phần còn lại mới dồn vào chỗ trống */
+  const AR=sz.map(()=>0);if(h)AR[0]+=h.w*h.h;const tot=L.reduce((a,b)=>a+b.w*b.h,0),cap=sz.map(s=>s*s*Math.min(.92,Math.max(.5,tot/__mbCells()+.06)));
+  const tryPut=(b,lim)=>{const ord=sz.map((s,j)=>j).sort((p,q)=>AR[p]/(sz[p]*sz[p])-AR[q]/(sz[q]*sz[q]));for(const j of ord){if(lim&&AR[j]+b.w*b.h>cap[j])continue;const s=sz[j];for(let y=0;y<=s-b.h;y++)for(let x=0;x<=s-b.w;x++)if(ok(j,x,y,b.w,b.h)){put(j,x,y,b.w,b.h);AR[j]+=b.w*b.h;P[b.id]=[R[j].x0+x,R[j].y0+y];B.bk[b.id]=j;delete off[b.id];return true}}return false};
+  L.filter(b=>b!==h).sort((a,b)=>b.w*b.h-a.w*a.h).forEach(b=>{if(!tryPut(b,true)&&!tryPut(b,false)){delete P[b.id];off[b.id]=true}});
+  B.mbv=1;try{save()}catch(e){}}finally{MG=false}};
+window.__mbIn=function(b){const B=SB(),bk=(B.bk=B.bk||{}),off=B.off||{};if(off[b.id]){delete bk[b.id];return true}const c=__mbCur();if(bk[b.id]==null)bk[b.id]=b.t==='hq'?0:c;return bk[b.id]===c};
+/* thanh chọn căn cứ trong màn Trụ sở */
+const st=document.createElement('style');st.textContent=`#c107{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:4px 2px 6px;font:700 12px system-ui,sans-serif;color:#cfe0ff}
+#c107 button{cursor:pointer;border-radius:8px;border:1.5px solid #2b5ac9;background:#0b1a44;color:#dfe9ff;font:800 12px system-ui,sans-serif;padding:5px 9px}
+#c107 button.on{background:linear-gradient(#2f7bff,#1546b8);border-color:#9cc4ff;color:#fff;box-shadow:0 0 8px #3f8cff}#c107 button.hq{border-color:#ffd24a}#c107 .mv{background:#14304f;padding:5px 7px}#c107 small{color:#8fb0e8;font-weight:600}`;document.head.appendChild(st);
+function bar(){const brd=document.getElementById('bboard');if(!brd)return;const sc=brd.closest('.bscroll')||brd.parentElement;let el=document.getElementById('c107');if(!el){el=document.createElement('div');el.id='c107';sc.parentElement.insertBefore(el,sc)}
+  const o=__mbOrd(),c=__mbCur(),sz=__mbSizes(),h=__mbHQ(),pi=o.indexOf(c);
+  el.innerHTML=o.map((j,i)=>`<button data-b="${j}" class="${j===c?'on':''} ${j===h?'hq':''}">${j===h?'🏰 ':''}Căn cứ ${i+1} · ${sz[j]}×${sz[j]}</button>`).join('')+
+   (c!==h&&o.length>2?`<button class="mv" data-m="-1" ${pi<=0?'disabled':''}>◀ Lên trước</button><button class="mv" data-m="1" ${pi>=o.length-2?'disabled':''}>Lùi sau ▶</button>`:'')+
+   `<small>Căn cứ 1 ở tiền tuyến (PvP đánh vào trước) · căn cứ có trụ sở 🏰 luôn ở cuối, dùng cho màn chơi và đấu boss · chuyển công trình sang căn cứ khác: cất vào Kho rồi mở căn cứ kia và đặt ra</small>`}
+document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('#c107 button');if(!t||t.disabled)return;const B=SB();
+  if(t.dataset.b!=null){B.cur=+t.dataset.b;bAvail.c=null;bState.sel=null;try{save()}catch(x){}bRender();return}
+  if(t.dataset.m!=null){const o=__mbOrd(),i=o.indexOf(__mbCur()),k=i+(+t.dataset.m);if(k<0||k>=o.length-1)return;[o[i],o[k]]=[o[k],o[i]];B.ord=o;try{save()}catch(x){}bRender()}});
+const _R=bRender;bRender=function(){const r=_R.apply(this,arguments);try{bar()}catch(e){console.error(e)}return r};
+})();
+
 /* gộp pháo công trình hạng nặng vào pháo hạng nặng */
 WP.forEach(w=>{if(w.cat===5){w.cat=4;w.tag='PHÁO HẠNG NẶNG'}});
 /* ===== Sở hữu vật phẩm bán ở Shop khuyến mãi ===== */
@@ -21083,7 +21130,7 @@ $('ugback').addEventListener('click',()=>setTimeout(chk,0));})();
   /* Máy chủ miễn phí để người chơi thật kết bạn / gửi góp ý cho nhau: dán địa chỉ Firebase Realtime Database vào đây
      (ví dụ 'https://ten-du-an-default-rtdb.firebaseio.com'). Để trống = dùng kho dữ liệu của Artifact nếu có, nếu không thì lưu trên máy. */
   const FB_URL=(window.SE_CFG&&SE_CFG.fb)||'';
-  const VER='v295';
+  const VER='v296';
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const F=()=>{S.fb=S.fb||{};if(!S.fb.uid){S.fb.uid='P'+Math.random().toString(36).slice(2,8).toUpperCase()}S.fb.fbl=S.fb.fbl||[];return S.fb};
   const st=document.createElement('style');st.textContent=`

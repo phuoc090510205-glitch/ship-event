@@ -50,7 +50,7 @@ const PK=[
 PK.forEach(([n,key,ord])=>PT.push({n:'Triển khai · '+n,pack:1,key,ord}));
 function pack(T){const R1=bReg(),W=R1.x1-R1.x0,H=R1.y1-R1.y0,its=items(),occ=new Uint8Array(W*H);
   const put=(x,y,w,h)=>{for(let j=0;j<h;j++)for(let i=0;i<w;i++)occ[(y+j)*W+x+i]=1},ok=(x,y,w,h)=>{if(x<0||y<0||x+w>W||y+h>H)return false;for(let j=0;j<h;j++)for(let i=0;i<w;i++)if(occ[(y+j)*W+x+i])return false;return true};
-  const hq=its.find(x=>x.hqf);if(!hq)return null;const hx=Math.floor(W/2-hq.w/2),hy=H-hq.h-1;put(hx,hy,hq.w,hq.h);const pos={};pos[hq.id]=[hx,hy];
+  const hq=its.find(x=>x.hqf)||{id:'__gate',w:Math.min(4,W),h:Math.min(3,H),v:1};const hx=Math.floor(W/2-hq.w/2),hy=H-hq.h-1;put(hx,hy,hq.w,hq.h);const pos={};pos[hq.id]=[hx,hy];
   const ord=[];for(let y=0;y<H;y++)for(let x=0;x<W;x++)ord.push(y*W+x);const kv=new Float64Array(W*H);ord.forEach(i=>{kv[i]=T.key(i%W,(i/W)|0,W,H)});ord.sort((a,b)=>kv[a]-kv[b]);
   const start={};let drop=0;
   T.ord.forEach(c=>{its.filter(it=>!it.hqf&&cat(it)===c).sort((a,b)=>b.w*b.h-a.w*a.h).forEach(it=>{const sk=it.w+'x'+it.h;let k=start[sk]||0;
@@ -67,7 +67,7 @@ function mkT(id){const r=mb(id*7919+13);r();const fs=FS[Math.floor(r()*FS.length
   return {id,n:NA[Math.floor(r()*NA.length)]+' · '+md[1]+' · '+fs[1],gen:1,p:{md:md[0],fx:co[1]*(.85+r()*.3),fn:r()*1.2,inner:(r(),true),tx:.7+r()*.9,fb:.15+r()*.7,ring:r()<.85,gap:r()<.5?1:2,fs:fs[0],msp:r()<.5?1:2,mf:2+Math.floor(r()*4),sd:Math.floor(r()*1e9)}}}
 function gen(T){const R1=bReg(),W=R1.x1-R1.x0,H=R1.y1-R1.y0,its=items(),occ=new Uint8Array(W*H),P=T.p,rnd=mb(P.sd);
   const put=(x,y,w,h)=>{for(let j=0;j<h;j++)for(let i=0;i<w;i++)occ[(y+j)*W+x+i]=1},ok=(x,y,w,h)=>{if(x<0||y<0||x+w>W||y+h>H)return false;for(let j=0;j<h;j++)for(let i=0;i<w;i++)if(occ[(y+j)*W+x+i])return false;return true};
-  const hq=its.find(x=>x.hqf);if(!hq)return null;const hx=Math.floor(W/2-hq.w/2),hy=H-hq.h-1;put(hx,hy,hq.w,hq.h);const pos={};pos[hq.id]=[hx,hy];const cx=hx+hq.w/2,cy=hy+hq.h/2;
+  const hq=its.find(x=>x.hqf)||{id:'__gate',w:Math.min(4,W),h:Math.min(3,H),v:1};const hx=Math.floor(W/2-hq.w/2),hy=H-hq.h-1;put(hx,hy,hq.w,hq.h);const pos={};pos[hq.id]=[hx,hy];const cx=hx+hq.w/2,cy=hy+hq.h/2;
   const L={f:[],t:[],w:[],m:[]};its.forEach(it=>{if(!it.hqf)L[cat(it)].push(it)});const big=(a,b)=>b.w*b.h-a.w*a.h;
   const NZ=new Float64Array(W*H);for(let i=0;i<W*H;i++)NZ[i]=rnd();
   const byKey=f=>{const o=[];for(let y=0;y<H;y++)for(let x=0;x<W;x++)o.push(y*W+x);const kv=new Float64Array(W*H);o.forEach(i=>{kv[i]=f(i%W,(i/W)|0,NZ[i])});return o.sort((a,b)=>kv[a]-kv[b])};
@@ -102,7 +102,7 @@ const own=k=>k[0]==='n'?!!(S.tplN&&S.tplN[k.slice(1)]):!!(S.tplP&&S.tplP[k.slice
 /* ---- áp mẫu lên căn cứ của ta (màn Trụ sở): trụ sở ở phía sau (dưới), pháo ra phía trước ---- */
 function items(){bPos();return bAvail().map(b=>({id:b.id,t:b.t,w:b.w,h:b.h,hqf:b.t==='hq'}))}/* mọi công trình đang có theo cấp trụ sở (kể cả trong Kho) */
 const PC={};
-function plan(K){if(typeof K==='number')K='o'+K;const T0=getT(K),i=+K.slice(1);const R1=bReg(),k=K+'|'+bLv('hq')+'|'+bAvail().length;if(PC[k]!==undefined)return PC[k];if(!T0)return null;if(T0.gen)return PC[k]=gen(T0);if(T0.pack)return PC[k]=pack(T0);if(!window.C65||!C65.layout)return null;const B={items:items()};if(!B.items.some(x=>x.hqf))return PC[k]=null;C65.layout(B,PT[i]);if(!B.tpl)return PC[k]=null;
+function plan(K){if(typeof K==='number')K='o'+K;const T0=getT(K),i=+K.slice(1);const R1=bReg(),k=K+'|'+bLv('hq')+'|'+bAvail().length+'|'+(S.base&&S.base.cur||0);if(PC[k]!==undefined)return PC[k];if(!T0)return null;if(T0.gen)return PC[k]=gen(T0);if(T0.pack)return PC[k]=pack(T0);if(!window.C65||!C65.layout)return null;const B={items:items()};if(!B.items.some(x=>x.hqf))return PC[k]=null;C65.layout(B,PT[i]);if(!B.tpl)return PC[k]=null;
   /* mẫu quá lớn so với bản đồ: giữ phần gần trụ sở nhất (ưu tiên theo mẫu), phần còn lại cất Kho */
   const W=R1.x1-R1.x0,Hh=R1.y1-R1.y0,S2=Math.min(B.R,W,Hh),x0=Math.max(0,Math.min(B.R-S2,Math.round(B.R/2-S2/2)));
   B.keep=B.items.filter(it=>it.hqf||(it.x>=x0&&it.x+it.w<=x0+S2&&it.y+it.h<=S2));B.drop=B.items.length-B.keep.length;B.cx0=x0;B.S=S2;return PC[k]=B}
