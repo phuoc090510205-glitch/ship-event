@@ -32,10 +32,7 @@ function pow(G,dt){if(G.t-(G.pvT0||0)<45)return;G.c69pt=(G.c69pt||0)+dt;if(G.c69
   (G.eu||[]).forEach(u=>{if(!u.ws)return;u.ws.forEach(w=>{w.dmg=(w.dmg||0)+100/Math.max(.2,u.dm||1)})});
   fxAll(G,'#ff3a8a',1.1);try{toast('💥 Công trình hai bên +100 sát thương mỗi viên đạn (tổng +'+(100*k)+')')}catch(e){}}
 /* trụ sở hai bên mất 5% máu tối đa mỗi giây: 1 vs 1 từ phút 5 · 2 vs 2 từ phút 7 · 3 vs 3 từ phút 10 */
-function drain(G,dt){if(G.done||!G.hq||!G.eh||G.hq.c69hold||G.eh.c69hold)return;const md=(G.pvo&&G.pvo.mode)||0,T0=md===2?420:md===1?600:300;if(G.t-(G.pvT0||0)<T0)return;
-  if(!G.c97w){G.c97w=1;try{toast('⏳ Phút '+(T0/60)+': trụ sở hai bên mất 5% máu tối đa mỗi giây!')}catch(e){}}
-  const L=[G.hq,G.eh].filter(h=>h&&h.hp>0).sort((a,b)=>a.hp/a.max-b.hp/b.max);
-  for(const h of L){if(G.done)break;const d=h.max*.05*dt;if(h.hp-d>0){h.hp-=d;continue}h.shd=null;h.hp=Math.min(h.hp,h.max*.001);if(h===G.hq)dfDmgB(h,h.max*10);else dfDmgS(h,h.max*1e3)}}
+function drain(G,dt){return} /* c108: bỏ rút máu trụ sở sau 5 phút */
 function aspd(G,dt){if(G.t-(G.pvT0||0)<60)return;G.c93at=(G.c93at||0)+dt;if(G.c93at<4)return;G.c93at-=4;if((G.c93m||0)>=50)return;const m=G.c93m=(G.c93m||0)+1,f=1+.1*m;
   (G.eu||[]).forEach(u=>{if(!u.ws)return;u.ws.forEach(w=>{if(w.c93c==null)w.c93c=w.cd||1;w.cd=w.c93c/f})});
   G.pb=G.pb||{dm:1,cdm:1,rm:1};if(G.c93cd0==null)G.c93cd0=G.pb.cdm||1;G.pb.cdm=G.c93cd0/f;
